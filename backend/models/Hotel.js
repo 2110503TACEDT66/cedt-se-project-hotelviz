@@ -39,6 +39,20 @@ const HotelSchema = new mongoose.Schema(
       required: [true, "Please add an image"],
     },
     amenities: [{ type: String }],
+    roomType: [
+      {
+        key: String,
+        price: Number,
+      },
+    ],
+    minPrice: {
+      type: Number,
+      default: 0.0
+    },
+    maxPrice: {
+      type: Number,
+      default: 0.0
+    }
   },
   {
     toJSON: { virtuals: true },
