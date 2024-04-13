@@ -28,7 +28,7 @@ const HotelSchema = new mongoose.Schema(
     },
     tel: {
       type: String,
-      required: [true, "Please add a telephone number"]
+      required: [true, "Please add a telephone number"],
     },
     region: {
       type: String,
@@ -36,7 +36,21 @@ const HotelSchema = new mongoose.Schema(
     },
     image: {
       type: String,
-      required: [true, "Please add an image"]
+      required: [true, "Please add an image"],
+    },
+    roomType: [
+      {
+        key: String,
+        price: Number,
+      },
+    ],
+    minPrice: {
+      type: Number,
+      default: 0.0
+    },
+    maxPrice: {
+      type: Number,
+      default: 0.0
     }
   },
   {
