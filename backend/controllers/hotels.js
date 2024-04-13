@@ -90,6 +90,8 @@ exports.getHotel = async (req, res, next) => {
     if (!hotel) {
       return res.status(400).json({ success: false });
     }
+    console.log(hotel.minPrice);
+    console.log(hotel.maxPrice);
     res.status(200).json({ success: true, data: hotel });
   } catch (err) {
     res.status(400).json({ success: false });

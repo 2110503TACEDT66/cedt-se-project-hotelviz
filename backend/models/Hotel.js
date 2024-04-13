@@ -44,6 +44,14 @@ const HotelSchema = new mongoose.Schema(
         price: Number,
       },
     ],
+    minPrice: {
+      type: Number,
+      default: 0.0
+    },
+    maxPrice: {
+      type: Number,
+      default: 0.0
+    }
   },
   {
     toJSON: { virtuals: true },
