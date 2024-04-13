@@ -5,6 +5,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import Image from "next/image";
 import { Rating } from "@mui/material";
 
+
 interface BookingItemProps {
   bookingItem: BookingItem;
   deleteBooking: (token: string, bookingId: string) => Promise<void>;
@@ -17,7 +18,7 @@ const HistoryItemDisplay: React.FC<BookingItemProps> = ({
   session,
 }) => {
   return (
-    <div className="flex border border-disable cursor-pointer hover:translate-y-[-4px] transition-all duration-250 ease-in-out hover:shadow-md w-full h-fit rounded-xl shadow-lg bg-white overflow-hidden hover:bg-blue-50"
+    <div className="flex border border-disable cursor-pointer transition-all duration-250 ease-in-out w-full h-fit rounded-xl shadow-lg bg-white overflow-hidden "
     // onClick={() => {
     //   window.location.href = `/account/booking/?id=${bookingItem._id}`;}}
     >
@@ -36,21 +37,6 @@ const HistoryItemDisplay: React.FC<BookingItemProps> = ({
           <div className="text-md font-medium">
             Hotel: {(bookingItem.hotel as unknown as HotelItem).name}
           </div>
-          <IconButton
-            aria-label="delete"
-            size="small"
-            onClick={async (e) => {
-              if (session) {
-                e.stopPropagation();
-                if (confirm("Are you sure you want to delete this booking?")) {
-                  await deleteBooking(session.user.token, bookingItem._id);
-                } 
-                location.reload();
-              }
-            }}
-          >
-            <DeleteIcon fontSize="inherit" />
-          </IconButton>
         </div>
 
         <div className="text-md">
@@ -71,8 +57,8 @@ const HistoryItemDisplay: React.FC<BookingItemProps> = ({
         <hr/>
         {
           session?.user.role === "admin" ?
-          <div className="text-lg text-red-400">
-            Users have not rated it yet.
+          <div className="text-lg text-red-500">
+            Users have not rated a star yet.
           </div>
           :
           <div className="text-md text-gray-500">

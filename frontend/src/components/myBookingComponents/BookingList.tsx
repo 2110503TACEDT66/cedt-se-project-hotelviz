@@ -4,13 +4,15 @@ import { useSession } from "next-auth/react";
 import deleteBooking from "@/libs/deleteBooking";
 import { BookingItem } from "../../../interface";
 import BookingItemDisplay from "./BookingItemDisplay";
+import HistoryIcon from '@mui/icons-material/History';
 
 export default async function BookingList({ bookings }: { bookings: any }) {
   const { data: session } = useSession();
 
   return (
     <div className="container pt-12 px-36 ">
-      <h1
+      <table><tr>
+        <td className="pt-3.5 pr-5"><h1
         className={`font-barlow text-3xl font-bold mb-4 ${
           session?.user.role === "admin" ? "text-blue-600" : "text-gray-800"
         }`}
@@ -18,11 +20,13 @@ export default async function BookingList({ bookings }: { bookings: any }) {
         {session?.user.role === "admin"
           ? "Manage All Bookings"
           : "Manage My Bookings"}
-      </h1>
+      </h1></td>
+      <td><button onClick={(e) => window.location.href="/account/bookingHistory"} className="w-fit px-4 py-1.5 shadow-lg shadow-xl bg-orange-400 border-2 border-transparent backdrop-blur-sm hover:bg-orange-500 hover:shadow-xl duration-300 ease-in-out text-white rounded-lg font-sans font-lg font-semibold ">Booking History <HistoryIcon/></button></td>
+      </tr></table>
+      
 
-      <a href="/account/bookingHistory" className="text-blue-500 text-md underline">Click here to see booking history</a>
       {session && (
-        <h3 className="font-barlow text-lg mb-6">
+        <h3 className="font-barlow text-lg mb-6 mt-4">
           Booking Counts: {bookings.count}
         </h3>
       )}
