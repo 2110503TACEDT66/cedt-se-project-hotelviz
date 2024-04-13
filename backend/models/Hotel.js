@@ -38,13 +38,7 @@ const HotelSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please add an image"],
     },
-    amenities: {
-      accommodation: [{ type: String }],
-      services: [{ type: String }],
-      dining: [{ type: String }],
-      recreations: [{ type: String }],
-      others: [{ type: String }],
-    },
+    amenities: [{ type: String }],
   },
   {
     toJSON: { virtuals: true },
