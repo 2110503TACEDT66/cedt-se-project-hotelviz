@@ -3,9 +3,10 @@
 import { useSession } from "next-auth/react";
 import deleteBooking from "@/libs/deleteBooking";
 import { BookingItem } from "../../../interface";
-import BookingItemDisplay from "./BookingItemDisplay";
+import BookingItemDisplay from "./HistoryItemDisplay";
+import HistoryItemDisplay from "./HistoryItemDisplay";
 
-export default async function BookingList({ bookings }: { bookings: any }) {
+export default async function HistoryList({ bookings }: { bookings: any }) {
   const { data: session } = useSession();
 
   return (
@@ -16,22 +17,19 @@ export default async function BookingList({ bookings }: { bookings: any }) {
         }`}
       >
         {session?.user.role === "admin"
-          ? "Manage All Bookings"
-          : "Manage My Bookings"}
+          ? "Manage All Booking History"
+          : "My Booking History"}
       </h1>
 
-      <a href="/account/bookingHistory" className="text-blue-500 text-md underline">Click here to see booking history</a>
       {session && (
         <h3 className="font-barlow text-lg mb-6">
-          Booking Counts: {bookings.count}
+          Booking History Counts: {bookings.count}
         </h3>
       )}
 
-
-
       <div className="grid grid-cols-1 gap-6">
         {bookings.data.map((item: BookingItem) => (
-          <BookingItemDisplay
+          <HistoryItemDisplay
             key={item._id}
             bookingItem={item}
             deleteBooking={deleteBooking}
