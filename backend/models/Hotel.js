@@ -38,6 +38,7 @@ const HotelSchema = new mongoose.Schema(
       type: String,
       required: [true, "Please add an image"],
     },
+    amenities: [{ type: String }],
     roomType: [
       {
         key: String,
