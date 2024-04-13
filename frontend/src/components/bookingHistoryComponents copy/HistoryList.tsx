@@ -17,7 +17,7 @@ export default async function HistoryList({ bookings }: { bookings: any }) {
         }`}
       >
         {session?.user.role === "admin"
-          ? "Manage All Booking History"
+          ? "Booking History"
           : "My Booking History"}
       </h1>
 

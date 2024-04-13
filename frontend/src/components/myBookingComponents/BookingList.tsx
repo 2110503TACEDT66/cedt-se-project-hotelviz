@@ -21,7 +21,7 @@ export default async function BookingList({ bookings }: { bookings: any }) {
           ? "Manage All Bookings"
           : "Manage My Bookings"}
       </h1></td>
-      <td><button onClick={(e) => window.location.href="/account/bookingHistory"} className="w-fit px-4 py-1.5 shadow-lg shadow-xl bg-orange-400 border-2 border-transparent backdrop-blur-sm hover:bg-orange-500 hover:shadow-xl duration-300 ease-in-out text-white rounded-lg font-sans font-lg font-semibold ">Booking History <HistoryIcon/></button></td>
+      <td><button onClick={(e) => window.location.href="/account/bookingHistory"} className="w-fit px-4 py-2 shadow-lg shadow-xl bg-orange-400 border-2 border-transparent backdrop-blur-sm hover:bg-orange-500 hover:shadow-xl duration-300 ease-in-out text-white rounded-3xl font-sans font-lg font-medium ">Booking History <HistoryIcon/></button></td>
       </tr></table>
       
 
