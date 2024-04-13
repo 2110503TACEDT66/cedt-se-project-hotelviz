@@ -37,6 +37,10 @@ const HotelSchema = new mongoose.Schema(
     image: {
       type: String,
       required: [true, "Please add an image"]
+    },
+    rating: {
+      type: Number,
+      default: 0.0
     }
   },
   {
