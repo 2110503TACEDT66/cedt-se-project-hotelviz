@@ -28,7 +28,7 @@ const HotelSchema = new mongoose.Schema(
     },
     tel: {
       type: String,
-      required: [true, "Please add a telephone number"]
+      required: [true, "Please add a telephone number"],
     },
     region: {
       type: String,
@@ -36,8 +36,15 @@ const HotelSchema = new mongoose.Schema(
     },
     image: {
       type: String,
-      required: [true, "Please add an image"]
-    }
+      required: [true, "Please add an image"],
+    },
+    amenities: {
+      accommodation: [{ type: String }],
+      services: [{ type: String }],
+      dining: [{ type: String }],
+      recreations: [{ type: String }],
+      others: [{ type: String }],
+    },
   },
   {
     toJSON: { virtuals: true },
