@@ -52,7 +52,7 @@ export default function AllHotelCardPanel({ session }: { session: any }) {
                   hotelName={hotel.name}
                   hotelID={hotel._id}
                   imgSrc={hotel.image}
-                  address={hotel.province+' '+hotel.region}
+                  address={hotel.region+', '+hotel.province}
                 ></AllHotelCard>
               ))
             : ""}

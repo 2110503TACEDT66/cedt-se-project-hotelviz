@@ -6,9 +6,10 @@ export default async function getHotels(token: string|null,limit:number,page:num
         url += `&region[in]=${selectedRegion}`;
     }
 
-    if (selectedProvince !== "None") {
+    if (selectedProvince !== "None" && selectedProvince !== "") {
         url += `&province[in]=${selectedProvince}`;
     }
+
     
     const response = await fetch(url, {
         method: 'GET',

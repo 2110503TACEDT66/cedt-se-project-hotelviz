@@ -46,7 +46,9 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
   };
   const [page, dispatchPage] = useReducer(pageReducer, 1);
 
-  const regions = ["Bangkok", "North", "Northeast", "Central", "South"];
+  // const regions = ["Bangkok", "North", "Northeast", "Central", "South"];
+  const regions = [ "North", "Northeast", "Central", "East", "West", "South"];
+
   const provinces = [
     "Bangkok", "Pattaya", "Krabi", "Kanchanaburi", "Kalasin", "Kamphaeng Phet", "Khon Kaen", "Chanthaburi", "Chachoengsao", "Chon Buri", "Chai Nat", "Chaiyaphum", "Chumphon", 
     "Trang", "Trat", "Tak", "Nakhon Nayok", "Nakhon Pathom", "Nakhon Phanom", "Nakhon Ratchasima", "Nakhon Si Thammarat", "Nakhon Sawan", "Nonthaburi", "Narathiwat", "Nan", 
@@ -56,7 +58,15 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
     "Nong Khai", "Nong Bua Lam Phu", "Amnat Charoen", "Udon Thani", "Uttaradit", "Uthai Thani", "Ubon Ratchathani", "Ang Thong", "Chiang Rai", "Chiang Mai", 
     "Phetchaburi", "Phetchabun", "Loei", "Phrae", "Mae Hong Son"
   ];
-  
+
+  const provincesByRegion: Record<string, string[]> = {
+    North: ["Chiang Rai", "Chiang Mai", "Lampang", "Lamphun", "Phayao", "Phrae", "Nan", "Uttaradit", "Sukhothai", "Tak", "Phitsanulok", "Phetchabun", "Kamphaeng Phet", "Mae Hong Son"],
+    Northeast: ["Kalasin", "Khon Kaen", "Chaiyaphum", "Nakhon Phanom", "Nakhon Ratchasima", "Bueng Kan", "Buri Ram", "Maha Sarakham", "Mukdahan", "Yasothon", "Roi Et", "Loei", "Sakhon Nakhon", "Nong Khai", "Nong Bua Lam Phu", "Amnat Charoen", "Udon Thani", "Sakon Nakhon", "Surin", "Ubon Ratchathani"],
+    Central: ["Bangkok", "Nonthaburi", "Pathum Thani", "Samut Prakan", "Samut Sakhon", "Samut Songkhram", "Nakhon Pathom", "Phetchaburi", "Prachuap Khiri Khan", "Ratchaburi", "Sing Buri", "Saraburi", "Suphan Buri", "Ang Thong", "Lop Buri", "Chai Nat", "Phra Nakhon Si Ayutthaya"],
+    East: ["Chanthaburi", "Chon Buri", "Rayong", "Sa Kaeo", "Trat"],
+    West: ["Kanchanaburi", "Phetchaburi", "Prachuap Khiri Khan", "Ratchaburi"],
+    South: ["Krabi", "Trang", "Phangnga", "Phatthalung", "Phuket", "Yala", "Ranong", "Songkhla", "Satun", "Surat Thani", "Pattani", "Narathiwat"]
+  };  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -71,6 +81,17 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
     };
     fetchData();
   }, [page, selectedRegion, selectedProvince]);
+
+  const [filteredProvinces, setFilteredProvinces] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (selectedRegion !== "None") {
+      setFilteredProvinces(provincesByRegion[selectedRegion]);
+    } else {
+      setFilteredProvinces([]);
+    }
+  }, [selectedRegion]);
+
 
   return (
     <div className="my-0 relative bg-blue">
@@ -97,18 +118,16 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
             <select id="provincesDropdown"
             onChange={(e) => {
               if (!spinner) {
-                // e.stopPropagation();
-                // dispatchProvince({ provinceName: province });
-                // dispatchPage({ newPage: 1 });
                 const selectedProvince = e.target.value;
-                
                 dispatchProvince({ provinceName: selectedProvince });
                 dispatchPage({ newPage: 1 });
               }
             }}
             >
               <option value="">select province</option>
-              {provinces.map(province => (
+              {(selectedRegion === "None"
+              ? provinces
+              :filteredProvinces).map((province) => (
                 <option key={province} 
                 value={province}
                 selected={selectedProvince === province}
@@ -129,14 +148,14 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
                   hotelName={hotel.name}
                   hotelID={hotel._id}
                   imgSrc={hotel.image}
-                  address={hotel.region+', '+hotel.province}
+                  address={hotel.province+', '+hotel.region}
                 ></HotelCard>
               ))
             : ""}
         </div>
         <div className="py-5 justify-self-center mx-auto">
           {hotels ? (
-            (selectedRegion === "None" && selectedProvince === "None") ? (
+            (selectedRegion === "None" && !(selectedProvince !== "None" && (selectedProvince !== ""))) ? (
               <PaginationBar
                 totalPages={Math.ceil(hotels.total / 4)}
                 currentPage={page}
