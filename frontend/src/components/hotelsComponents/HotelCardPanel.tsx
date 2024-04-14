@@ -13,6 +13,14 @@ import Skeleton from "@mui/material/Skeleton";
 import { HotelItem, HotelJson } from "../../../interface";
 
 export default function HotelCardPanel({ session = null }: { session?: any }) {
+
+///mock data for RecomendPanel
+ const Recomendhotels = [{_id:"660259a44df8344ed9dfbe2d",name:"Continental Hotel",image:"https://drive.google.com/uc?id=1po69QWiOhIlYr36R0xRqCtNod2KWhNlR",province:"Krabi"}
+  ,{_id:"660259a44df8344ed9dfbe31",name:"Wan Sabai",image:"https://drive.google.com/uc?id=1yRquMBFLq_U3-vA4cfwOybp_4YVYZWcW",province:"Surat Thani"}
+  ,{_id:"660259a44df8344ed9dfbe31",name:"Wan Sabai",image:"https://drive.google.com/uc?id=1yRquMBFLq_U3-vA4cfwOybp_4YVYZWcW",province:"Surat Thani"}
+  ,{_id:"660259a44df8344ed9dfbe31",name:"Wan Sabai",image:"https://drive.google.com/uc?id=1yRquMBFLq_U3-vA4cfwOybp_4YVYZWcW",province:"Surat Thani"}
+ ]
+
   const [spinner, setSpinner] = useState(true);
   const [hotels, setHotels] = useState<HotelJson | null>(null);
   const regionReducer = (
@@ -47,6 +55,10 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
     fetchData();
   }, [page, selectedRegion]);
 
+  useEffect(()=> {
+
+  })
+
   return (
     <div className="my-0 relative bg-blue">
       <div className="relative flex flex-col px-28 py-4">
@@ -68,25 +80,51 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
             />
           ))}
         </div>
+        
+          {hotels? page==1&&hotels.count==0?
+          <div>
+            <div className="py-10 text-center">We're sorry, no hotels matched your criteria.</div>
+            <div className="font-poppins font-medium text-2xl pt-10">You Might Also Like</div>
+            <div className="grid grid-cols-4grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-items-center gap-x-4 gap-y-6 mt-8 gap-8 w-full h-auto">
+              {Recomendhotels.map((hotel) => (
+                  <HotelCard
+                    key={hotel._id}
+                    hotelName={hotel.name}
+                    hotelID={hotel._id}
+                    imgSrc={hotel.image}
+                    address={hotel.province}
+                  ></HotelCard>
+                ))}
+            </div>
+          </div>:"":""}
+          
+        
+        
         <div className="grid grid-cols-4grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-items-center gap-x-4 gap-y-6 mt-8 gap-8 w-full h-auto">
           {spinner ? <LoadingHotelCard /> : ""}
           {spinner ? <LoadingHotelCard /> : ""}
           {spinner ? <LoadingHotelCard /> : ""}
           {spinner ? <LoadingHotelCard /> : ""}
           {hotels
-            ? hotels.data.map((hotel: HotelItem) => (
-                <HotelCard
-                  key={hotel._id}
-                  hotelName={hotel.name}
-                  hotelID={hotel._id}
-                  imgSrc={hotel.image}
-                  address={hotel.province}
-                ></HotelCard>
-              ))
+            ? page==1&&hotels.count==0?""
+            
+            :(
+              hotels.data.map((hotel: HotelItem) => (
+                  <HotelCard
+                    key={hotel._id}
+                    hotelName={hotel.name}
+                    hotelID={hotel._id}
+                    imgSrc={hotel.image}
+                    address={hotel.province}
+                  ></HotelCard>
+                )))
             : ""}
+           
         </div>
         <div className="py-5 justify-self-center mx-auto">
-          {hotels ? (
+          {hotels ?
+           (
+            !(page==1&&hotels.count==0)?(
             selectedRegion === "None" ? (
               <PaginationBar
                 totalPages={Math.ceil(hotels.total / 4)}
@@ -132,7 +170,7 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
                 )}
               </div>
             )
-          ) : (
+          ):"") : (
             <div className="list-style-none flex space-x-2 rounded-lg">
               <Skeleton
                 variant="rectangular"
