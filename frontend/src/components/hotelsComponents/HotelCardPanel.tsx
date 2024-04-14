@@ -15,6 +15,8 @@ import { HotelItem, HotelJson } from "../../../interface";
 export default function HotelCardPanel({ session = null }: { session?: any }) {
   const [spinner, setSpinner] = useState(true);
   const [hotels, setHotels] = useState<HotelJson | null>(null);
+
+  
   const regionReducer = (
     selectedRegion: string,
     action: { regionName: string }
@@ -24,7 +26,20 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
     }
     return action.regionName;
   };
+
+  const provinceReducer = (
+    selectedProvince: string,
+    action: { provinceName: string }
+  ) => {
+    if (selectedProvince === action.provinceName) {
+      return "None";
+    }
+    return action.provinceName;
+  };
+
+
   const [selectedRegion, dispatchRegion] = useReducer(regionReducer, "None");
+  const [selectedProvince, dispatchProvince] = useReducer(provinceReducer, "None");
 
   const pageReducer = (page: number, action: { newPage: number }) => {
     return action.newPage;
@@ -32,6 +47,16 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
   const [page, dispatchPage] = useReducer(pageReducer, 1);
 
   const regions = ["Bangkok", "North", "Northeast", "Central", "South"];
+  const provinces = [
+    "Bangkok", "Pattaya", "Krabi", "Kanchanaburi", "Kalasin", "Kamphaeng Phet", "Khon Kaen", "Chanthaburi", "Chachoengsao", "Chon Buri", "Chai Nat", "Chaiyaphum", "Chumphon", 
+    "Trang", "Trat", "Tak", "Nakhon Nayok", "Nakhon Pathom", "Nakhon Phanom", "Nakhon Ratchasima", "Nakhon Si Thammarat", "Nakhon Sawan", "Nonthaburi", "Narathiwat", "Nan", 
+    "Bueng Kan", "Buri Ram", "Pathum Thani", "Prachuap Khiri Khan", "Prachin Buri", "Pattani", "Phra Nakhon Si Ayutthaya", "Phayao", "Phangnga", "Phatthalung", "Phichit", 
+    "Phitsanulok", "Phuket", "Maha Sarakham", "Mukdahan", "Yala", "Yasothon", "Ranong", "Rayong", "Ratchaburi", "Roi Et", "Lop Buri", "Lampang", "Lamphun", 
+    "Si Sa Ket", "Sakon Nakhon", "Songkhla", "Satun", "Samut Prakan", "Samut Songkhram", "Samut Sakhon", "Saraburi", "Sa Kaeo", "Sing Buri", "Suphan Buri", "Surat Thani", "Surin", "Sukhothai", 
+    "Nong Khai", "Nong Bua Lam Phu", "Amnat Charoen", "Udon Thani", "Uttaradit", "Uthai Thani", "Ubon Ratchathani", "Ang Thong", "Chiang Rai", "Chiang Mai", 
+    "Phetchaburi", "Phetchabun", "Loei", "Phrae", "Mae Hong Son"
+  ];
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,13 +64,13 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
       setHotels(null);
       let hotels;
       if (session)
-        hotels = await getHotels(session.user.token, 4, page, selectedRegion);
-      else hotels = await getHotels(null, 4, page, selectedRegion);
+        hotels = await getHotels(session.user.token, 4, page, selectedRegion, selectedProvince);
+      else hotels = await getHotels(null, 4, page, selectedRegion, selectedProvince);
       setHotels(hotels);
       setSpinner(false);
     };
     fetchData();
-  }, [page, selectedRegion]);
+  }, [page, selectedRegion, selectedProvince]);
 
   return (
     <div className="my-0 relative bg-blue">
@@ -68,6 +93,30 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
             />
           ))}
         </div>
+        <div className="flex flex-row gap-x-1 mt-8 justify-start ">
+            <select id="provincesDropdown"
+            onChange={(e) => {
+              if (!spinner) {
+                // e.stopPropagation();
+                // dispatchProvince({ provinceName: province });
+                // dispatchPage({ newPage: 1 });
+                const selectedProvince = e.target.value;
+                
+                dispatchProvince({ provinceName: selectedProvince });
+                dispatchPage({ newPage: 1 });
+              }
+            }}
+            >
+              <option value="">select province</option>
+              {provinces.map(province => (
+                <option key={province} 
+                value={province}
+                selected={selectedProvince === province}
+                >{province}</option>
+              ))}
+            </select>
+        </div>
+        
         <div className="grid grid-cols-4grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-items-center gap-x-4 gap-y-6 mt-8 gap-8 w-full h-auto">
           {spinner ? <LoadingHotelCard /> : ""}
           {spinner ? <LoadingHotelCard /> : ""}
@@ -80,14 +129,14 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
                   hotelName={hotel.name}
                   hotelID={hotel._id}
                   imgSrc={hotel.image}
-                  address={hotel.province}
+                  address={hotel.region+', '+hotel.province}
                 ></HotelCard>
               ))
             : ""}
         </div>
         <div className="py-5 justify-self-center mx-auto">
           {hotels ? (
-            selectedRegion === "None" ? (
+            (selectedRegion === "None" && selectedProvince === "None") ? (
               <PaginationBar
                 totalPages={Math.ceil(hotels.total / 4)}
                 currentPage={page}
