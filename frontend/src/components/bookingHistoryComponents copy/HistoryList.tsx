@@ -13,11 +13,11 @@ export default async function HistoryList({ bookings }: { bookings: any }) {
     <div className="container pt-12 px-36 ">
       <h1
         className={`font-barlow text-3xl font-bold mb-4 ${
-          session?.user.role === "admin" ? "text-blue-600" : "text-gray-800"
+          session?.user.role === "admin" ? "text-blue-600" : "text-amber-700"
         }`}
       >
         {session?.user.role === "admin"
-          ? "Booking History"
+          ? "All Booking History"
           : "My Booking History"}
       </h1>
 

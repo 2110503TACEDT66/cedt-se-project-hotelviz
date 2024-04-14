@@ -18,10 +18,7 @@ const HistoryItemDisplay: React.FC<BookingItemProps> = ({
   session,
 }) => {
   return (
-    <div className="flex border border-disable cursor-pointer transition-all duration-250 ease-in-out w-full h-fit rounded-xl shadow-lg bg-white overflow-hidden "
-    // onClick={() => {
-    //   window.location.href = `/account/booking/?id=${bookingItem._id}`;}}
-    >
+    <div className="flex border border-disable cursor-pointer transition-all duration-250 ease-in-out w-full h-fit rounded-xl shadow-lg bg-white overflow-hidden ">
       <div className="w-1/3 relative">
         <Image
           src={bookingItem.hotel?.image || "placeholder.jpg"}
@@ -65,7 +62,8 @@ const HistoryItemDisplay: React.FC<BookingItemProps> = ({
             Rate now to earn more member points.
             <table className="mt-1"><tr>
               <td><Rating size="medium" className=" pr-3 mt-1"></Rating></td>
-            <td><button onClick={(e) => {e.stopPropagation();}} className="w-fit px-4 py-1 shadow-lg shadow-xl bg-orange-400 border-2 border-transparent backdrop-blur-sm hover:bg-orange-500 hover:shadow-xl duration-300 ease-in-out text-white rounded-lg font-sans font-lg font-semibold">
+            <td><button onClick={(e) => {e.stopPropagation();}} className="w-fit px-4 py-1.5 shadow-lg shadow-xl backdrop-blur-sm hover:shadow-xl duration-300 ease-in-out text-white rounded-lg font-sans font-lg font-semibold
+            bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500">
               Rate
             </button></td>
             </tr></table>

@@ -3,6 +3,7 @@ import { BookingItem, HotelItem } from "../../../interface";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Image from "next/image";
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 interface BookingItemProps {
   bookingItem: BookingItem;
@@ -66,7 +67,18 @@ const BookingItemDisplay: React.FC<BookingItemProps> = ({
         <div className="text-md">
           Created At: {bookingItem.createdAt.toString()}
         </div>
-      </div>
+      </div>  
+        {
+          session?.user.role === "admin" ?
+          <div className="ml-auto mt-auto m-8">
+            <button onClick={(e) => {e.stopPropagation();}} className="w-fit px-4 py-3 shadow-lg shadow-xl bg-gradient-to-r from-cyan-500 to-blue-500 backdrop-blur-sm hover:from-lime-500 hover:to-emerald-500 hover:shadow-xl duration-300 ease-in-out text-white rounded-xl font-sans font-lg font-medium">
+               <CheckCircleOutlineIcon/> Approve
+            </button>
+          </div>
+          :
+          <div></div>
+        }
+      
     </div>
   );
 };
