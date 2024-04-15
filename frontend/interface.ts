@@ -10,6 +10,7 @@ export class HotelItem {
   image: string = "";
   __v: number = 0;
   id: string = "";
+  amenities: string[] = [];
 }
 
 export interface HotelJson {

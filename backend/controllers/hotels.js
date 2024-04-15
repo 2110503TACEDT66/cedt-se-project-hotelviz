@@ -173,3 +173,32 @@ exports.addRating = async (req, res, next) => {
     res.status(400).json({ success: false });
   }
 };
+
+//@desc     Get hotels by price range
+//@route    Get /api/v1/hotels/price
+//@access   Public
+exports.getHotelsByPriceRange = async (req, res, next) => {
+  const { minPrice, maxPrice } = req.query;
+
+  try {
+    if (!minPrice || !maxPrice) {
+      return res
+        .status(400)
+        .json({
+          success: false,
+          error: "Both minPrice and maxPrice must be provided",
+        });
+    }
+
+    const hotels = await Hotel.find({
+      $or: [
+        { minPrice: { $lte: maxPrice, $gte: minPrice } },
+        { maxPrice: { $lte: maxPrice, $gte: minPrice } },
+      ],
+    });
+
+    res.status(200).json({ success: true, data: hotels });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
