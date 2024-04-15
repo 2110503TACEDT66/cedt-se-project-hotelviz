@@ -172,4 +172,20 @@ exports.getHotelsByPriceRange = async (req, res, next) => {
   }
 };
 
+//@desc     Get Random Hotel
+//@route    Get /api/v1/hotels/random
+//@access   Public
+exports.getRandomHotel = async (req, res, next) => {
 
+  const count = req.query.count;
+
+  try {
+    const hotels = await Hotel.aggregate([
+      { $sample: { size: Number(count) } },
+    ]);
+
+    res.status(200).json({ success: true, data: hotels });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};

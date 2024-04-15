@@ -6,6 +6,7 @@ const {
   updateHotel,
   deleteHotel,
   getHotelsByPriceRange,
+  getRandomHotel,
 } = require("../controllers/hotels");
 
 //Include other resource routes
@@ -19,6 +20,7 @@ const { semiprotect, protect, authorize } = require("../middleware/auth");
 router.use("/:hotelId/bookings/", bookingRouter);
 
 router.route("/price").get(semiprotect, getHotelsByPriceRange);
+router.route("/random").get(getRandomHotel);
 
 
 router
