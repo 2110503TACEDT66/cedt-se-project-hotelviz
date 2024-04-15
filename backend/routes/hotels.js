@@ -5,6 +5,7 @@ const {
   createHotel,
   updateHotel,
   deleteHotel,
+  addRating
 } = require("../controllers/hotels");
 
 //Include other resource routes
@@ -26,5 +27,6 @@ router
   .get(getHotel)
   .put(protect, authorize("admin"), updateHotel)
   .delete(protect, authorize("admin"), deleteHotel);
+router.route("/rating/:id").put(protect, addRating);
 
 module.exports = router;
