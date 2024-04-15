@@ -33,6 +33,7 @@ export default function Booking({
       );
       sethotelRegion(data.data.region);
       sethotelTel(data.data.tel);
+      setamenities(data.data.amenities);
     };
 
     fetchdata();
@@ -43,6 +44,7 @@ export default function Booking({
   const [hotelAddress, sethotelAddress] = useState("");
   const [hotelRegion, sethotelRegion] = useState("");
   const [hotelTel, sethotelTel] = useState("");
+  const [amenities, setamenities] = useState([]);
 
   return (
     <main className="p-10 w-full">
@@ -68,6 +70,7 @@ export default function Booking({
             address={hotelAddress}
             region={hotelRegion}
             tel={hotelTel}
+            amenities={amenities}
           />
         </div>
       </div>
