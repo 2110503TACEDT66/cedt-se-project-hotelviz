@@ -27,6 +27,7 @@ export default function ManageHotel() {
         tel: hotel.tel,
         region: hotel.region,
         image: hotel.image,
+        amenities: hotel.amenities,
       };
       if (id) {
         await updateHotel(session.user.token, id, item);

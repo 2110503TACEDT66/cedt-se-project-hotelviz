@@ -1,6 +1,41 @@
 "use client";
-import { TextField } from "@mui/material";
+import React, { useState,useEffect } from "react";
+import { 
+  TextField,
+  OutlinedInput,
+  InputLabel,
+  MenuItem,
+  Select,
+  FormControl,
+  Stack,
+  Chip
+ } from "@mui/material";
 import { HotelItem } from "../../interface";
+import CancelIcon from "@mui/icons-material/Cancel";
+import CheckIcon from "@mui/icons-material/Check";
+
+const amenities = [
+      "Wifi(Free)",
+      "Wifi(Paid)",
+      "TV",
+      "Bathtub",
+      "Pets Allowed",
+      "Breakfast",
+      "Bar",
+      "Coffee Shop",
+      "Restaurant",
+      "Gym",
+      "Spa",
+      "Pool",
+      "Massage",
+      "Luggage Storage",
+      "Car Parking(Free of Charge)",
+      "Car Parking(With Fee)",
+      "Babysitting",
+      "Daily Housekeeping",
+      "Laundry Service",
+      "Room Service"
+];
 
 export default function HotelForm({
   hotel,
@@ -9,6 +44,12 @@ export default function HotelForm({
   hotel: HotelItem;
   onHotelChange: Function;
 }) {
+  const [selectedAmenities, setSelectedAmenities] = useState(hotel.amenities);
+
+  useEffect(() => {
+    setSelectedAmenities(hotel.amenities);
+    console.log('4')
+  }, [hotel.amenities]);
   return (
     <div className="bg-slate-100 rounded-lg space-y-5 w-full px-10 py-5 flex flex-col">
       <div>Name</div>
@@ -59,7 +100,7 @@ export default function HotelForm({
         }}
       ></TextField>
 
-<div>Postalcode</div>
+      <div>Postalcode</div>
       <TextField
         variant="outlined"
         name="postalcode"
@@ -71,7 +112,7 @@ export default function HotelForm({
         }}
       ></TextField>
 
-<div>Tel</div>
+      <div>Tel</div>
       <TextField
         variant="outlined"
         name="tel"
@@ -83,7 +124,7 @@ export default function HotelForm({
         }}
       ></TextField>
 
-<div>Region</div>
+      <div>Region</div>
       <TextField
         variant="outlined"
         name="region"
@@ -106,6 +147,62 @@ export default function HotelForm({
           onHotelChange(hotel);
         }}
       ></TextField>
+
+      <div>Amenities</div>
+      <FormControl>
+      <InputLabel>Amenities</InputLabel>
+      <Select
+        multiple
+        value={selectedAmenities}
+        onChange={(e) => {
+          const selected = e.target.value as string[];
+          setSelectedAmenities(selected);
+          hotel.amenities = selected;
+          onHotelChange(hotel);
+        }}
+        input={<OutlinedInput label="Multiple Select"/>}
+        renderValue={(selected) => (
+          <Stack gap={1} direction="row" flexWrap="wrap">
+            {selected.map((value) => (
+              <Chip
+                key={value}
+                label={value}
+                onDelete={() =>
+                  {const updatedAmenities = selectedAmenities.filter((item) => item !== value);
+                  setSelectedAmenities(updatedAmenities)
+                  hotel.amenities = updatedAmenities;
+                  onHotelChange(hotel)
+                }}
+                deleteIcon={
+                  <CancelIcon
+                    onMouseDown={(event) => event.stopPropagation()}
+                  />
+                }
+                sx={{
+                  backgroundColor:'lightgrey',
+                  color: 'black',
+                  '&:hover': {
+                    backgroundColor: '#2196f3',
+                    color: 'white'
+                  },
+                }}
+              />
+            ))}
+          </Stack>
+        )}
+      >
+        {amenities.map((name) => (
+          <MenuItem
+            key={name}
+            value={name}
+            sx={{ justifyContent: "space-between" }}
+          >
+            {name}
+            {hotel.amenities.includes(name) ? <CheckIcon color="info" /> : null}
+          </MenuItem>
+        ))}
+      </Select>
+    </FormControl>
     </div>
   );
 }
