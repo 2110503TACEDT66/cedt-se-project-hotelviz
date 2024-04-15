@@ -1,5 +1,6 @@
 import Image from "next/image";
-export default function HotelCard({hotelName,imgSrc,address,tel,region}:{hotelName:string,imgSrc:string,address:string,tel:string,region:string}){
+import Amenities from "./Amenities";
+export default function HotelCard({hotelName,imgSrc,address,tel,region,amenities}:{hotelName:string,imgSrc:string,address:string,tel:string,region:string, amenities: string[]}){
     return(
         <div className="w-full rounded-lg shadow-lg bg-white hover:bg-blue-50 flex flex-col h-[600px] ease-in-out duration-300 hover:shadow-xl hover:translate-y-[-4px]">
             
@@ -21,6 +22,8 @@ export default function HotelCard({hotelName,imgSrc,address,tel,region}:{hotelNa
                 <h1 className="pl-3 text-slate-600">{tel}</h1>
                 <p className="text-base pt-4">Region</p>
                 <h1 className="pl-3 text-slate-600">{region}</h1>
+                <Amenities amenities={amenities} />
+                
             </div>
             
         </div>
