@@ -42,6 +42,10 @@ const HotelSchema = new mongoose.Schema(
       type: Number,
       default: 0.0
     },
+    ratingCount: {
+      type: Number,
+      default: 0.0
+    },
     amenities: [{ type: String }],
     roomType: [
       {
