@@ -121,6 +121,7 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
                 if (!spinner) {
                   dispatchRegion({ regionName: regionName });
                   dispatchPage({ newPage: 1 });
+                  dispatchProvince({ provinceName: "" });
                 }
               }}
             />
