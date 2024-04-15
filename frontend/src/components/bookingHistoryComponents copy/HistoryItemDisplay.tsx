@@ -3,7 +3,8 @@ import { BookingItem, HotelItem } from "../../../interface";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Image from "next/image";
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import { Rating } from "@mui/material";
+
 
 interface BookingItemProps {
   bookingItem: BookingItem;
@@ -11,16 +12,13 @@ interface BookingItemProps {
   session?: any;
 }
 
-const BookingItemDisplay: React.FC<BookingItemProps> = ({
+const HistoryItemDisplay: React.FC<BookingItemProps> = ({
   bookingItem,
   deleteBooking,
   session,
 }) => {
   return (
-    <div className="flex border border-disable cursor-pointer hover:translate-y-[-4px] transition-all duration-250 ease-in-out hover:shadow-md w-full h-fit rounded-xl shadow-lg bg-white overflow-hidden hover:bg-blue-50"
-    onClick={() => {
-      window.location.href = `/account/booking/?id=${bookingItem._id}`;
-    }}>
+    <div className="flex border border-disable cursor-pointer transition-all duration-250 ease-in-out w-full h-fit rounded-xl shadow-lg bg-white overflow-hidden ">
       <div className="w-1/3 relative">
         <Image
           src={bookingItem.hotel?.image || "placeholder.jpg"}
@@ -36,21 +34,6 @@ const BookingItemDisplay: React.FC<BookingItemProps> = ({
           <div className="text-md font-medium">
             Hotel: {(bookingItem.hotel as unknown as HotelItem).name}
           </div>
-          <IconButton
-            aria-label="delete"
-            size="small"
-            onClick={async (e) => {
-              if (session) {
-                e.stopPropagation();
-                if (confirm("Are you sure you want to delete this booking?")) {
-                  await deleteBooking(session.user.token, bookingItem._id);
-                } 
-                location.reload();
-              }
-            }}
-          >
-            <DeleteIcon fontSize="inherit" />
-          </IconButton>
         </div>
 
         <div className="text-md">
@@ -67,20 +50,29 @@ const BookingItemDisplay: React.FC<BookingItemProps> = ({
         <div className="text-md">
           Created At: {bookingItem.createdAt.toString()}
         </div>
-      </div>  
+        
+        <hr/>
         {
           session?.user.role === "admin" ?
-          <div className="ml-auto mt-auto m-8">
-            <button onClick={(e) => {e.stopPropagation();}} className="w-fit px-4 py-3 shadow-lg shadow-xl bg-gradient-to-r from-cyan-500 to-blue-500 backdrop-blur-sm hover:from-lime-500 hover:to-emerald-500 hover:shadow-xl duration-300 ease-in-out text-white rounded-xl font-sans font-lg font-medium">
-               <CheckCircleOutlineIcon/> Approve
-            </button>
+          <div className="text-lg text-red-500">
+            Users have not rated a star yet.
           </div>
           :
-          <div></div>
+          <div className="text-md text-gray-500">
+            Rate now to earn more member points.
+            <table className="mt-1"><tr>
+              <td><Rating size="medium" className=" pr-3 mt-1"></Rating></td>
+            <td><button onClick={(e) => {e.stopPropagation();}} className="w-fit px-4 py-1.5 shadow-lg shadow-xl backdrop-blur-sm hover:shadow-xl duration-300 ease-in-out text-white rounded-lg font-sans font-lg font-semibold
+            bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500">
+              Rate
+            </button></td>
+            </tr></table>
+          </div>
         }
-      
+        
+      </div>
     </div>
   );
 };
 
-export default BookingItemDisplay;
+export default HistoryItemDisplay;
