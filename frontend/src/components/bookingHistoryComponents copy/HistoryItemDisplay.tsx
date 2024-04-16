@@ -4,6 +4,8 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Image from "next/image";
 import { Rating } from "@mui/material";
+import rateHotelStar from "@/libs/rateHotelStar";
+import { useState } from "react";
 
 
 interface BookingItemProps {
@@ -17,6 +19,8 @@ const HistoryItemDisplay: React.FC<BookingItemProps> = ({
   deleteBooking,
   session,
 }) => {
+  const [userRating,setRating] = useState<null|number>(0);
+
   return (
     <div className="flex border border-disable cursor-pointer transition-all duration-250 ease-in-out w-full h-fit rounded-xl shadow-lg bg-white overflow-hidden ">
       <div className="w-1/3 relative">
@@ -61,8 +65,19 @@ const HistoryItemDisplay: React.FC<BookingItemProps> = ({
           <div className="text-md text-gray-500">
             Rate now to earn more member points.
             <table className="mt-1"><tr>
-              <td><Rating size="medium" className=" pr-3 mt-1"></Rating></td>
-            <td><button onClick={(e) => {e.stopPropagation();}} className="w-fit px-4 py-1.5 shadow-lg shadow-xl backdrop-blur-sm hover:shadow-xl duration-300 ease-in-out text-white rounded-lg font-sans font-lg font-semibold
+              <td><Rating size="medium" className=" pr-3 mt-1" value={userRating}
+                onChange={(e, newValue) => {
+                    e.stopPropagation; 
+                    if(newValue)
+                    {
+                        setRating(newValue);
+                    }
+                    
+                }}></Rating></td>
+            <td><button onClick={(e) => {e.stopPropagation();
+            if(userRating)
+              rateHotelStar(session.user.token,bookingItem.hotel.id,userRating);
+            }} className="w-fit px-4 py-1.5 shadow-lg backdrop-blur-sm hover:shadow-xl duration-300 ease-in-out text-white rounded-lg font-sans font-lg font-semibold
             bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-500 hover:to-orange-500">
               Rate
             </button></td>
