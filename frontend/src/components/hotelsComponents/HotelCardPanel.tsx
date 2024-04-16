@@ -160,6 +160,10 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
                     hotelID={hotel._id}
                     imgSrc={hotel.image}
                     address={hotel.province}
+                    minPrice={hotel.minPrice}
+                    maxPrice={hotel.maxPrice}
+                    rating={hotel.rating}
+                    ratingCount={hotel.ratingCount}
                   ></HotelCard>
                 ))}
             </div>
@@ -183,6 +187,10 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
                   hotelID={hotel._id}
                   imgSrc={hotel.image}
                   address={hotel.province+', '+hotel.region}
+                  minPrice={hotel.minPrice}
+                  maxPrice={hotel.maxPrice}
+                  rating={hotel.rating.toPrecision(3)}
+                  ratingCount={hotel.ratingCount}
                 ></HotelCard>
               )))
             : ""}
@@ -264,51 +272,6 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
           )}
         </div>
       </div>
-
-      {/* <div className="block  w-full " >
-              <div className="flex flex-row gap-x-1 mt-16 justify-start mx-10 ">
-                  <button className="rounded-full bg-slate-100 px-5 py-2 text-sky-600 shadow-sm font-bold">North</button>
-                  <button className="rounded-full bg-slate-100 px-5 py-2 text-sky-600 shadow-sm font-bold">Northeast</button>
-                  <button className="rounded-full bg-slate-100 px-5 py-2 text-sky-600 shadow-sm font-bold">Middle</button>
-                  <button className="rounded-full bg-slate-100 px-5 py-2 text-sky-600 shadow-sm font-bold">South</button>
-              </div>
-              <div className="flex flex-row flex-wrap gap-x-10  my-10 mx-10">
-                <Link
-                  href={'/hote/hid'}
-                  key={'hid'}
-                  className="w-1/6"
-                >
-                  <HotelCard
-                    hotelName={'Pataya1'}
-                    imgSrc="/img/patta.jpg" 
-                    address="Chonburi"
-                  ></HotelCard>
-                </Link>
-                <Link
-                  href={'/hotel/hid'}
-                  key={'hid'}
-                  className="w-1/6"
-                >
-                  <HotelCard
-                    hotelName={'Pataya2'}
-                    imgSrc="/img/patta.jpg" 
-                    address="Chonburi"
-                  ></HotelCard>
-                </Link>
-                <Link
-                  href={'/hotel/hid'}
-                  key={'hid'}
-                  className="w-1/6"
-                >
-                  <HotelCard
-                    hotelName={'Pataya3'}
-                    imgSrc="/img/patta.jpg" 
-                    address="Chonburi"
-                  ></HotelCard>
-                </Link>
-
-              </div>
-            </div> */}
     </div>
   );
 }
