@@ -1,7 +1,7 @@
 "use client";
 import HotelCard from "./HotelCard";
 import Link from "next/link";
-import { useReducer, useState } from "react";
+import { use, useReducer, useState } from "react";
 import RegionButton from "./RegionButton";
 import { useEffect } from "react";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -11,15 +11,11 @@ import LoadingHotelCard from "./LoadingHotelCard";
 import PaginationBar from "../PaginationBar";
 import Skeleton from "@mui/material/Skeleton";
 import { HotelItem, HotelJson } from "../../../interface";
+import getRandomHotels from "@/libs/getRandomHotel";
 
 export default function HotelCardPanel({ session = null }: { session?: any }) {
 
-///mock data for RecomendPanel
- const Recomendhotels = [{_id:"660259a44df8344ed9dfbe2d",name:"Continental Hotel",image:"https://drive.google.com/uc?id=1po69QWiOhIlYr36R0xRqCtNod2KWhNlR",province:"Krabi"}
-  ,{_id:"660259a44df8344ed9dfbe31",name:"Wan Sabai",image:"https://drive.google.com/uc?id=1yRquMBFLq_U3-vA4cfwOybp_4YVYZWcW",province:"Surat Thani"}
-  ,{_id:"660259a44df8344ed9dfbe31",name:"Wan Sabai",image:"https://drive.google.com/uc?id=1yRquMBFLq_U3-vA4cfwOybp_4YVYZWcW",province:"Surat Thani"}
-  ,{_id:"660259a44df8344ed9dfbe31",name:"Wan Sabai",image:"https://drive.google.com/uc?id=1yRquMBFLq_U3-vA4cfwOybp_4YVYZWcW",province:"Surat Thani"}
- ]
+ const [RecomedHotel, setRecomed] = useState<HotelJson| null>(null)
 
   const [spinner, setSpinner] = useState(true);
   const [hotels, setHotels] = useState<HotelJson | null>(null);
@@ -102,8 +98,14 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
 
 
   useEffect(()=> {
-
-  })
+    const fetchData = async () => {
+      let Recomend;
+      Recomend = await getRandomHotels(session.user.token,4);
+      setRecomed(Recomend);
+    };
+    fetchData()
+  },[])
+  
 
   return (
     <div className="my-0 relative bg-blue">
@@ -121,6 +123,7 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
                 if (!spinner) {
                   dispatchRegion({ regionName: regionName });
                   dispatchPage({ newPage: 1 });
+                  dispatchProvince({ provinceName: "" });
                 }
               }}
             />
@@ -166,7 +169,8 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
             <div className="py-10 text-center">We're sorry, no hotels matched your criteria.</div>
             <div className="font-poppins font-medium text-2xl pt-10">You Might Also Like</div>
             <div className="grid grid-cols-4grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-items-center gap-x-4 gap-y-6 mt-8 gap-8 w-full h-auto">
-              {Recomendhotels.map((hotel) => (
+              {RecomedHotel?
+              RecomedHotel.data.map((hotel: HotelItem) => (
                   <HotelCard
                     key={hotel._id}
                     hotelName={hotel.name}
@@ -178,7 +182,7 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
                     rating={hotel.rating}
                     ratingCount={hotel.ratingCount}
                   ></HotelCard>
-                ))}
+                )):""}
             </div>
           </div>:"":""}
           
