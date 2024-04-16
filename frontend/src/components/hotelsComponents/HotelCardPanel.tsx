@@ -41,9 +41,32 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
     return action.provinceName;
   };
 
+  const amenitiesReducer = (
+    selectedAmenitiesList: string[],
+    action: { type: string; amenitiesName: string }
+  ) => {
+    switch (action.type) {
+      case "TOGGLE_AMENITIES":
+        const amenitiesName = action.amenitiesName;
+        const isAmenitySelected = selectedAmenitiesList.includes(amenitiesName);
+        
+        if (isAmenitySelected) {
+          return selectedAmenitiesList.filter(item => item !== amenitiesName);
+        } else {
+          return [...selectedAmenitiesList, amenitiesName];
+        }
+      default:
+        return selectedAmenitiesList;
+    }
+  };
+  
+  
+  
 
   const [selectedRegion, dispatchRegion] = useReducer(regionReducer, "None");
   const [selectedProvince, dispatchProvince] = useReducer(provinceReducer, "None");
+  const [selectedAmenitiesList, dispatchAmenities] = useReducer(amenitiesReducer,[]);
+
 
   const pageReducer = (page: number, action: { newPage: number }) => {
     return action.newPage;
@@ -72,19 +95,27 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
     South: ["Krabi", "Trang", "Phangnga", "Phatthalung", "Phuket", "Yala", "Ranong", "Songkhla", "Satun", "Surat Thani", "Pattani", "Narathiwat"]
   };  
 
+  const amenities = [
+    "Wifi", "TV", "Bathtub", "Pets Allowed", "Breakfast", "Bar", 
+    "Coffee Shop", "Restaurant", "Gym", "Spa", "Pool", "Massage",
+    "Luggage Storage", "Car Parking",
+    "Laundry Service", "Room Service"
+  ]
+
   useEffect(() => {
     const fetchData = async () => {
       setSpinner(true);
       setHotels(null);
       let hotels;
       if (session)
-        hotels = await getHotels(session.user.token, 4, page, selectedRegion, selectedProvince);
-      else hotels = await getHotels(null, 4, page, selectedRegion, selectedProvince);
+        hotels = await getHotels(session.user.token, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList);
+      else hotels = await getHotels(null, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList);
       setHotels(hotels);
       setSpinner(false);
     };
     fetchData();
-  }, [page, selectedRegion, selectedProvince]);
+  }, [page, selectedRegion, selectedProvince, selectedAmenitiesList]);
+  
 
   const [filteredProvinces, setFilteredProvinces] = useState<string[]>([]);
 
@@ -94,19 +125,14 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
     } else {
       setFilteredProvinces([]);
     }
-  }, [selectedRegion]);
-
-
-  useEffect(()=> {
     const fetchData = async () => {
       let Recomend;
       Recomend = await getRandomHotels(session.user.token,4);
       setRecomed(Recomend);
     };
-    fetchData()
-  },[])
+    fetchData();
+  }, [selectedRegion]);
   
-
   return (
     <div className="my-0 relative bg-blue">
       <div className="relative flex flex-col px-28 py-4">
@@ -163,10 +189,30 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
                 ))}
               </select>
           </div>
+
+          <div className="flex flex-wrap gap-x-1 gap-y-2 mt-8 justify-start ">
+          {amenities.map((amenitiesName) => (
+            <button 
+              key={amenitiesName}
+              name={amenitiesName}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!spinner) {
+                  dispatchAmenities({ type: "TOGGLE_AMENITIES", amenitiesName: amenitiesName });
+                  dispatchPage({ newPage: 1 });
+                }
+              }}
+              className={`hover:translate-y-[-3px] transition-all duration-250 ease-in-out hover:shadow-md rounded-full ${selectedAmenitiesList.includes(amenitiesName) ? 'bg-sky-600 text-slate-100' : 'bg-slate-100 text-sky-600'} px-5 py-2 shadow-sm font-bold`}
+            >
+              {amenitiesName}
+            </button>
+          ))}
+        </div>
         
-          {hotels? page==1&&hotels.count==0?
+          {hotels? hotels.count==0?
           <div>
-            <div className="py-10 text-center">We're sorry, no hotels matched your criteria.</div>
+            {page==1 ? <div className="py-10 text-center">We're sorry, no hotels matched your criteria.</div>:
+                       <div className="py-10 text-center">You've gone through all hotels macthing your criteria.</div>}
             <div className="font-poppins font-medium text-2xl pt-10">You Might Also Like</div>
             <div className="grid grid-cols-4grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-items-center gap-x-4 gap-y-6 mt-8 gap-8 w-full h-auto">
               {RecomedHotel?
@@ -179,7 +225,7 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
                     address={hotel.province}
                     minPrice={hotel.minPrice}
                     maxPrice={hotel.maxPrice}
-                    rating={hotel.rating}
+                    rating={hotel.rating.toPrecision(3)}
                     ratingCount={hotel.ratingCount}
                   ></HotelCard>
                 )):""}
@@ -217,7 +263,7 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
           {hotels ?
            (
             !(page==1&&hotels.count==0)?(
-              (selectedRegion === "None" && !(selectedProvince !== "None" && (selectedProvince !== ""))) ? (
+              (selectedRegion === "None" && !(selectedProvince !== "None" && (selectedProvince !== "")) && (selectedAmenitiesList===null)) ? (
               <PaginationBar
                 totalPages={Math.ceil(hotels.total / 4)}
                 currentPage={page}
@@ -245,7 +291,7 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
                 >
                   {page}
                 </span>
-                {page < hotels.total ? (
+                {(page < hotels.total && hotels.count==4) ? (
                   <button
                     className="hover:bg-slate-50 relative block rounded-xl bg-transparent font-sans font-md px-5 py-3 text-lg text-surface hover:translate-y-[-1px] hover:shadow-md transition-all duration-450 ease-in-out "
                     onClick={(e) => {
