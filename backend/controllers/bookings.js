@@ -1,4 +1,5 @@
 const Booking = require("../models/Booking");
+const bookinghistories = require("../models/Bookinghistories");
 const Hotel = require("../models/Hotel");
 
 //@desc Get all bookings
@@ -184,5 +185,44 @@ exports.deleteBooking = async (req, res, next) => {
     return res
       .status(500)
       .json({ success: false, message: "Cannot delete Booking" });
+  }
+};
+
+//@desc Get booking history
+//@route GET /api/v1/bookings/history/
+//@access Public
+exports.getBookingHistory = async (req, res, next) => {
+  let query;
+  //General users can see only their bookings!
+  if (req.user.role !== "admin") {
+    query = bookinghistories.find({ user: req.user.id }).populate({
+      path: "hotel",
+      select: "name address district province postalcode tel region image",
+    });
+  } else {
+    //If you are an admin, you can see all!
+    if (req.params.hotelId) {
+      query = bookinghistories.find({ hotel: req.params.hotelId }).populate({
+        path: "hotel",
+        select: "name address district province postalcode tel region image",
+      });
+    } else
+      query = bookinghistories.find().populate({
+        path: "hotel",
+        select: "name address district province postalcode tel region image",
+      });
+  }
+  try {
+    const bookings = await query;
+    res.status(200).json({
+      success: true,
+      count: bookings.length,
+      data: bookings,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Cannot find Booking" });
   }
 };
