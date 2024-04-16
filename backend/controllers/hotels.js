@@ -10,15 +10,16 @@ exports.getHotels = async (req, res, next) => {
 
   //Copy req.query
   const reqQuery = { ...req.query };
-
+  const toStringifyReq = {...reqQuery};
+  // console.log(req.queryPolluted.amenities);
   //Fields to exclude
-  const removeFields = ["select", "sort", "page", "limit"];
+  const removeFields = ["select", "sort", "page", "limit","amenities","minPrice","maxPrice"];
 
   //Loop over remove fields and delete them from reqQuery
-  removeFields.forEach((param) => delete reqQuery[param]);
-
+  removeFields.forEach((param) => delete toStringifyReq[param]);
+  
   //Create query string
-  let queryStr = JSON.stringify(reqQuery);
+  let queryStr = JSON.stringify(toStringifyReq);
   queryStr = queryStr.replace(
     /\b(gt|gte|lt|lte|in)\b/g,
     (match) => `$${match}`
@@ -35,11 +36,16 @@ exports.getHotels = async (req, res, next) => {
     }
     queryObj.push(price_range_filter);
   }
+  if(req.queryPolluted.amenities){
+    const amenities = req.queryPolluted.amenities;
+    amenities.forEach(amenity => {
+      queryObj.push({"amenities":amenity});
+    });
+  }
   combined_query = {
     "$and": queryObj
   }
   console.log(combined_query);
-  console.log(JSON.parse(queryStr));
 
   //finding resource
   query = Hotel.find(combined_query);
