@@ -11,11 +11,11 @@ export default async function getBookingsHistory(token: string) {
     );
 
     if (!response.ok) {
-      throw new Error("Failed to fetch bookings");
+      throw new Error("Failed to fetch bookings history");
     }
 
     return await response.json();
   } catch (error: any) {
-    throw new Error(`Failed to fetch bookings: ${error.message}`);
+    throw new Error(`Failed to fetch bookings history: ${error.message}`);
   }
 }
