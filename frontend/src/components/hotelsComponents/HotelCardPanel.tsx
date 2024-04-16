@@ -1,7 +1,7 @@
 "use client";
 import HotelCard from "./HotelCard";
 import Link from "next/link";
-import { useReducer, useState } from "react";
+import { use, useReducer, useState } from "react";
 import RegionButton from "./RegionButton";
 import { useEffect } from "react";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -11,15 +11,11 @@ import LoadingHotelCard from "./LoadingHotelCard";
 import PaginationBar from "../PaginationBar";
 import Skeleton from "@mui/material/Skeleton";
 import { HotelItem, HotelJson } from "../../../interface";
+import getRandomHotels from "@/libs/getRandomHotel";
 
 export default function HotelCardPanel({ session = null }: { session?: any }) {
 
-///mock data for RecomendPanel
- const Recomendhotels = [{_id:"660259a44df8344ed9dfbe2d",name:"Continental Hotel",image:"https://drive.google.com/uc?id=1po69QWiOhIlYr36R0xRqCtNod2KWhNlR",province:"Krabi"}
-  ,{_id:"660259a44df8344ed9dfbe31",name:"Wan Sabai",image:"https://drive.google.com/uc?id=1yRquMBFLq_U3-vA4cfwOybp_4YVYZWcW",province:"Surat Thani"}
-  ,{_id:"660259a44df8344ed9dfbe31",name:"Wan Sabai",image:"https://drive.google.com/uc?id=1yRquMBFLq_U3-vA4cfwOybp_4YVYZWcW",province:"Surat Thani"}
-  ,{_id:"660259a44df8344ed9dfbe31",name:"Wan Sabai",image:"https://drive.google.com/uc?id=1yRquMBFLq_U3-vA4cfwOybp_4YVYZWcW",province:"Surat Thani"}
- ]
+ const [RecomedHotel, setRecomed] = useState<HotelJson| null>(null)
 
   const [spinner, setSpinner] = useState(true);
   const [hotels, setHotels] = useState<HotelJson | null>(null);
@@ -45,9 +41,32 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
     return action.provinceName;
   };
 
+  const amenitiesReducer = (
+    selectedAmenitiesList: string[],
+    action: { type: string; amenitiesName: string }
+  ) => {
+    switch (action.type) {
+      case "TOGGLE_AMENITIES":
+        const amenitiesName = action.amenitiesName;
+        const isAmenitySelected = selectedAmenitiesList.includes(amenitiesName);
+        
+        if (isAmenitySelected) {
+          return selectedAmenitiesList.filter(item => item !== amenitiesName);
+        } else {
+          return [...selectedAmenitiesList, amenitiesName];
+        }
+      default:
+        return selectedAmenitiesList;
+    }
+  };
+  
+  
+  
 
   const [selectedRegion, dispatchRegion] = useReducer(regionReducer, "None");
   const [selectedProvince, dispatchProvince] = useReducer(provinceReducer, "None");
+  const [selectedAmenitiesList, dispatchAmenities] = useReducer(amenitiesReducer,[]);
+
 
   const pageReducer = (page: number, action: { newPage: number }) => {
     return action.newPage;
@@ -76,19 +95,27 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
     South: ["Krabi", "Trang", "Phangnga", "Phatthalung", "Phuket", "Yala", "Ranong", "Songkhla", "Satun", "Surat Thani", "Pattani", "Narathiwat"]
   };  
 
+  const amenities = [
+    "Wifi", "TV", "Bathtub", "Pets Allowed", "Breakfast", "Bar", 
+    "Coffee Shop", "Restaurant", "Gym", "Spa", "Pool", "Massage",
+    "Luggage Storage", "Car Parking",
+    "Laundry Service", "Room Service"
+  ]
+
   useEffect(() => {
     const fetchData = async () => {
       setSpinner(true);
       setHotels(null);
       let hotels;
       if (session)
-        hotels = await getHotels(session.user.token, 4, page, selectedRegion, selectedProvince);
-      else hotels = await getHotels(null, 4, page, selectedRegion, selectedProvince);
+        hotels = await getHotels(session.user.token, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList);
+      else hotels = await getHotels(null, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList);
       setHotels(hotels);
       setSpinner(false);
     };
     fetchData();
-  }, [page, selectedRegion, selectedProvince]);
+  }, [page, selectedRegion, selectedProvince, selectedAmenitiesList]);
+  
 
   const [filteredProvinces, setFilteredProvinces] = useState<string[]>([]);
 
@@ -98,13 +125,14 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
     } else {
       setFilteredProvinces([]);
     }
+    const fetchData = async () => {
+      let Recomend;
+      Recomend = await getRandomHotels(session.user.token,4);
+      setRecomed(Recomend);
+    };
+    fetchData();
   }, [selectedRegion]);
-
-
-  useEffect(()=> {
-
-  })
-
+  
   return (
     <div className="my-0 relative bg-blue">
       <div className="relative flex flex-col px-28 py-4">
@@ -121,6 +149,7 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
                 if (!spinner) {
                   dispatchRegion({ regionName: regionName });
                   dispatchPage({ newPage: 1 });
+                  dispatchProvince({ provinceName: "" });
                 }
               }}
             />
@@ -160,21 +189,46 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
                 ))}
               </select>
           </div>
+
+          <div className="flex flex-wrap gap-x-1 gap-y-2 mt-8 justify-start ">
+          {amenities.map((amenitiesName) => (
+            <button 
+              key={amenitiesName}
+              name={amenitiesName}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!spinner) {
+                  dispatchAmenities({ type: "TOGGLE_AMENITIES", amenitiesName: amenitiesName });
+                  dispatchPage({ newPage: 1 });
+                }
+              }}
+              className={`hover:translate-y-[-3px] transition-all duration-250 ease-in-out hover:shadow-md rounded-full ${selectedAmenitiesList.includes(amenitiesName) ? 'bg-sky-600 text-slate-100' : 'bg-slate-100 text-sky-600'} px-5 py-2 shadow-sm font-bold`}
+            >
+              {amenitiesName}
+            </button>
+          ))}
+        </div>
         
-          {hotels? page==1&&hotels.count==0?
+          {hotels? hotels.count==0?
           <div>
-            <div className="py-10 text-center">We're sorry, no hotels matched your criteria.</div>
+            {page==1 ? <div className="py-10 text-center">We're sorry, no hotels matched your criteria.</div>:
+                       <div className="py-10 text-center">You've gone through all hotels macthing your criteria.</div>}
             <div className="font-poppins font-medium text-2xl pt-10">You Might Also Like</div>
             <div className="grid grid-cols-4grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-items-center gap-x-4 gap-y-6 mt-8 gap-8 w-full h-auto">
-              {Recomendhotels.map((hotel) => (
+              {RecomedHotel?
+              RecomedHotel.data.map((hotel: HotelItem) => (
                   <HotelCard
                     key={hotel._id}
                     hotelName={hotel.name}
                     hotelID={hotel._id}
                     imgSrc={hotel.image}
                     address={hotel.province}
+                    minPrice={hotel.minPrice}
+                    maxPrice={hotel.maxPrice}
+                    rating={hotel.rating.toPrecision(3)}
+                    ratingCount={hotel.ratingCount}
                   ></HotelCard>
-                ))}
+                )):""}
             </div>
           </div>:"":""}
           
@@ -196,6 +250,10 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
                   hotelID={hotel._id}
                   imgSrc={hotel.image}
                   address={hotel.province+', '+hotel.region}
+                  minPrice={hotel.minPrice}
+                  maxPrice={hotel.maxPrice}
+                  rating={hotel.rating.toPrecision(3)}
+                  ratingCount={hotel.ratingCount}
                 ></HotelCard>
               )))
             : ""}
@@ -205,7 +263,7 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
           {hotels ?
            (
             !(page==1&&hotels.count==0)?(
-              (selectedRegion === "None" && !(selectedProvince !== "None" && (selectedProvince !== ""))) ? (
+              (selectedRegion === "None" && !(selectedProvince !== "None" && (selectedProvince !== "")) && (selectedAmenitiesList===null)) ? (
               <PaginationBar
                 totalPages={Math.ceil(hotels.total / 4)}
                 currentPage={page}
@@ -233,7 +291,7 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
                 >
                   {page}
                 </span>
-                {page < hotels.total ? (
+                {(page < hotels.total && hotels.count==4) ? (
                   <button
                     className="hover:bg-slate-50 relative block rounded-xl bg-transparent font-sans font-md px-5 py-3 text-lg text-surface hover:translate-y-[-1px] hover:shadow-md transition-all duration-450 ease-in-out "
                     onClick={(e) => {
@@ -277,51 +335,6 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
           )}
         </div>
       </div>
-
-      {/* <div className="block  w-full " >
-              <div className="flex flex-row gap-x-1 mt-16 justify-start mx-10 ">
-                  <button className="rounded-full bg-slate-100 px-5 py-2 text-sky-600 shadow-sm font-bold">North</button>
-                  <button className="rounded-full bg-slate-100 px-5 py-2 text-sky-600 shadow-sm font-bold">Northeast</button>
-                  <button className="rounded-full bg-slate-100 px-5 py-2 text-sky-600 shadow-sm font-bold">Middle</button>
-                  <button className="rounded-full bg-slate-100 px-5 py-2 text-sky-600 shadow-sm font-bold">South</button>
-              </div>
-              <div className="flex flex-row flex-wrap gap-x-10  my-10 mx-10">
-                <Link
-                  href={'/hote/hid'}
-                  key={'hid'}
-                  className="w-1/6"
-                >
-                  <HotelCard
-                    hotelName={'Pataya1'}
-                    imgSrc="/img/patta.jpg" 
-                    address="Chonburi"
-                  ></HotelCard>
-                </Link>
-                <Link
-                  href={'/hotel/hid'}
-                  key={'hid'}
-                  className="w-1/6"
-                >
-                  <HotelCard
-                    hotelName={'Pataya2'}
-                    imgSrc="/img/patta.jpg" 
-                    address="Chonburi"
-                  ></HotelCard>
-                </Link>
-                <Link
-                  href={'/hotel/hid'}
-                  key={'hid'}
-                  className="w-1/6"
-                >
-                  <HotelCard
-                    hotelName={'Pataya3'}
-                    imgSrc="/img/patta.jpg" 
-                    address="Chonburi"
-                  ></HotelCard>
-                </Link>
-
-              </div>
-            </div> */}
     </div>
   );
 }
