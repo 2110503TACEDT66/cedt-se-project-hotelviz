@@ -33,6 +33,20 @@ export interface BookingItem {
   id: string;
 }
 
+export interface HistoryItem {
+  _id: string;
+  date: Date;
+  user: string;
+  hotel: HotelItem;
+  contactEmail: string;
+  contactName: string;
+  contactTel: string;
+  createdAt: Date;
+  rating: number;
+  id: string;
+
+}
+
 export interface BookingJson {
   success: boolean;
   count: number;

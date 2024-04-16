@@ -126,19 +126,6 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
             />
           ))}
         </div>
-        <div className="mt-7">
-          <select onClick={(e) => {e.stopPropagation();}} 
-          className="hover:translate-y-[-3px] transition-all duration-250 ease-in-out hover:shadow-md rounded-full bg-slate-100 px-5 py-2 text-sky-600 shadow-sm font-bold">
-            <option>Select Rating</option>
-            <option>≥ 5</option>
-            <option>≥ 4</option>
-            <option>≥ 3</option>
-            <option>≥ 2</option>
-            <option>≥ 1</option>
-            <option>none</option>
-          </select>
-            
-        </div>
           <div className="flex flex-row gap-x-1 mt-8 justify-start ">
               <select id="provincesDropdown"
               onChange={(e) => {
@@ -161,6 +148,19 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
               </select>
           </div>
         
+          <div className="mt-7">
+          <select onClick={(e) => {e.stopPropagation();}} 
+          className="hover:translate-y-[-3px] transition-all duration-250 ease-in-out hover:shadow-md rounded-full bg-slate-100 px-5 py-2 text-sky-600 shadow-sm font-bold">
+            <option>Select Rating</option>
+            <option>≥ ★★★★★</option>
+            <option>≥ ★★★★☆</option>
+            <option>≥ ★★★☆☆</option>
+            <option>≥ ★★☆☆☆</option>
+            <option>≥ ★☆☆☆☆</option>
+            <option>≥ ☆☆☆☆☆</option>
+          </select>
+        </div>
+
           {hotels? page==1&&hotels.count==0?
           <div>
             <div className="py-10 text-center">We're sorry, no hotels matched your criteria.</div>
