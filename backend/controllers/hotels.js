@@ -23,9 +23,26 @@ exports.getHotels = async (req, res, next) => {
     /\b(gt|gte|lt|lte|in)\b/g,
     (match) => `$${match}`
   );
+  queryObj = [JSON.parse(queryStr)];
+  if(reqQuery["minPrice"]&&reqQuery["maxPrice"]){
+    const maxPrice = reqQuery["maxPrice"];
+    const minPrice = reqQuery["minPrice"];
+    price_range_filter = {
+      "$or": [
+          {"minPrice": {"$lte": maxPrice, "$gte": minPrice}},
+          {"maxPrice": {"$lte": maxPrice, "$gte": minPrice}},
+      ]
+    }
+    queryObj.push(price_range_filter);
+  }
+  combined_query = {
+    "$and": queryObj
+  }
+  console.log(combined_query);
+  console.log(JSON.parse(queryStr));
 
   //finding resource
-  query = Hotel.find(JSON.parse(queryStr));
+  query = Hotel.find(combined_query);
   if (req.user !== undefined)
     if (req.user.role === "admin") query = query.populate("bookings");
 
