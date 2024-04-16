@@ -149,7 +149,7 @@ exports.deleteHotel = async (req, res, next) => {
 };
 
 //@desc     Add Rating
-//@route    Put /api/v1/hotels/:id
+//@route    Put /api/v1/hotels/rating/:id
 //@access   Private
 exports.addRating = async (req, res, next) => {
   try {
@@ -182,12 +182,10 @@ exports.getHotelsByPriceRange = async (req, res, next) => {
 
   try {
     if (!minPrice || !maxPrice) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: "Both minPrice and maxPrice must be provided",
-        });
+      return res.status(400).json({
+        success: false,
+        error: "Both minPrice and maxPrice must be provided",
+      });
     }
 
     const hotels = await Hotel.find({
