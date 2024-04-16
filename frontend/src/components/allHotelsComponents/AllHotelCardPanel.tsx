@@ -22,7 +22,7 @@ export default function AllHotelCardPanel({ session }: { session: any }) {
   useEffect(() => {
     const fetchData = async () => {
       setSpinner(true);
-      const hotels = await getHotels(session.user.token, 4, page, "None", "None");
+      const hotels = await getHotels(session.user.token, 4, page, "None", "None", []);
       setHotels(hotels);
       setSpinner(false);
     };
