@@ -165,6 +165,32 @@ exports.deleteHotel = async (req, res, next) => {
   }
 };
 
+//@desc     Add Rating
+//@route    Put /api/v1/hotels/rating/:id
+//@access   Private
+exports.addRating = async (req, res, next) => {
+  try {
+    const hotel = await Hotel.findById(req.params.id);
+    let ratingCount = hotel.ratingCount;
+    let rating =
+      (1.0 * (hotel.rating * ratingCount + req.body.rating)) / ++ratingCount;
+    let body = {
+      rating: rating,
+      ratingCount: ratingCount,
+    };
+    hotel2 = await Hotel.findByIdAndUpdate(req.params.id, body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!hotel2) {
+      return res.status(400).json({ success: false });
+    }
+    res.status(200).json({ success: true, data: hotel });
+  } catch (err) {
+    res.status(400).json({ success: false });
+  }
+};
+
 //@desc     Get hotels by price range
 //@route    Get /api/v1/hotels/price
 //@access   Public
@@ -173,14 +199,17 @@ exports.getHotelsByPriceRange = async (req, res, next) => {
 
   try {
     if (!minPrice || !maxPrice) {
-      return res.status(400).json({ success: false, error: "Both minPrice and maxPrice must be provided" });
+      return res.status(400).json({
+        success: false,
+        error: "Both minPrice and maxPrice must be provided",
+      });
     }
 
     const hotels = await Hotel.find({
       $or: [
         { minPrice: { $lte: maxPrice, $gte: minPrice } },
-        { maxPrice: { $lte: maxPrice, $gte: minPrice } }
-      ]
+        { maxPrice: { $lte: maxPrice, $gte: minPrice } },
+      ],
     });
 
     res.status(200).json({ success: true, data: hotels });
@@ -188,5 +217,3 @@ exports.getHotelsByPriceRange = async (req, res, next) => {
     res.status(500).json({ success: false, error: err.message });
   }
 };
-
-
