@@ -196,7 +196,6 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
           ))}
         </div>
         
-<<<<<<< HEAD
           <div className="mt-7">
           <select onClick={(e) => {e.stopPropagation();}} 
           className="hover:translate-y-[-3px] transition-all duration-250 ease-in-out hover:shadow-md rounded-full bg-slate-100 px-5 py-2 text-sky-600 shadow-sm font-bold">
@@ -211,9 +210,6 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
         </div>
 
           {hotels? page==1&&hotels.count==0?
-=======
-          {hotels? hotels.count==0?
->>>>>>> 9f915892df255756947988cb24451df15d345677
           <div>
             {page==1 ? <div className="py-10 text-center">We're sorry, no hotels matched your criteria.</div>:
                        <div className="py-10 text-center">You've gone through all hotels macthing your criteria.</div>}
