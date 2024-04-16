@@ -164,9 +164,10 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
               </select>
           </div>
         
-          {hotels? page==1&&hotels.count==0?
+          {hotels? hotels.count==0?
           <div>
-            <div className="py-10 text-center">We're sorry, no hotels matched your criteria.</div>
+            {page==1 ? <div className="py-10 text-center">We're sorry, no hotels matched your criteria.</div>:
+                       <div className="py-10 text-center">You've gone through all hotels macthing your criteria.</div>}
             <div className="font-poppins font-medium text-2xl pt-10">You Might Also Like</div>
             <div className="grid grid-cols-4grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-items-center gap-x-4 gap-y-6 mt-8 gap-8 w-full h-auto">
               {RecomedHotel?
@@ -179,7 +180,7 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
                     address={hotel.province}
                     minPrice={hotel.minPrice}
                     maxPrice={hotel.maxPrice}
-                    rating={hotel.rating}
+                    rating={hotel.rating.toPrecision(3)}
                     ratingCount={hotel.ratingCount}
                   ></HotelCard>
                 )):""}
@@ -245,7 +246,7 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
                 >
                   {page}
                 </span>
-                {page < hotels.total ? (
+                {(page < hotels.total && hotels.count==4) ? (
                   <button
                     className="hover:bg-slate-50 relative block rounded-xl bg-transparent font-sans font-md px-5 py-3 text-lg text-surface hover:translate-y-[-1px] hover:shadow-md transition-all duration-450 ease-in-out "
                     onClick={(e) => {
