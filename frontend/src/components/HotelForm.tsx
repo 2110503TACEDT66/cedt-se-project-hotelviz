@@ -15,8 +15,7 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import CheckIcon from "@mui/icons-material/Check";
 
 const amenities = [
-      "Wifi(Free)",
-      "Wifi(Paid)",
+      "Wifi",
       "TV",
       "Bathtub",
       "Pets Allowed",
@@ -29,10 +28,7 @@ const amenities = [
       "Pool",
       "Massage",
       "Luggage Storage",
-      "Car Parking(Free of Charge)",
-      "Car Parking(With Fee)",
-      "Babysitting",
-      "Daily Housekeeping",
+      "Car Parking",
       "Laundry Service",
       "Room Service"
 ];
