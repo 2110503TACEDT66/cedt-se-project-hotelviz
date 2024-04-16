@@ -1,7 +1,7 @@
 "use client";
 import HotelCard from "./HotelCard";
 import Link from "next/link";
-import { useReducer, useState } from "react";
+import { use, useReducer, useState } from "react";
 import RegionButton from "./RegionButton";
 import { useEffect } from "react";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -11,15 +11,11 @@ import LoadingHotelCard from "./LoadingHotelCard";
 import PaginationBar from "../PaginationBar";
 import Skeleton from "@mui/material/Skeleton";
 import { HotelItem, HotelJson } from "../../../interface";
+import getRandomHotels from "@/libs/getRandomHotel";
 
 export default function HotelCardPanel({ session = null }: { session?: any }) {
 
-///mock data for RecomendPanel
- const Recomendhotels = [{_id:"660259a44df8344ed9dfbe2d",name:"Continental Hotel",image:"https://drive.google.com/uc?id=1po69QWiOhIlYr36R0xRqCtNod2KWhNlR",province:"Krabi"}
-  ,{_id:"660259a44df8344ed9dfbe31",name:"Wan Sabai",image:"https://drive.google.com/uc?id=1yRquMBFLq_U3-vA4cfwOybp_4YVYZWcW",province:"Surat Thani"}
-  ,{_id:"660259a44df8344ed9dfbe31",name:"Wan Sabai",image:"https://drive.google.com/uc?id=1yRquMBFLq_U3-vA4cfwOybp_4YVYZWcW",province:"Surat Thani"}
-  ,{_id:"660259a44df8344ed9dfbe31",name:"Wan Sabai",image:"https://drive.google.com/uc?id=1yRquMBFLq_U3-vA4cfwOybp_4YVYZWcW",province:"Surat Thani"}
- ]
+ const [RecomedHotel, setRecomed] = useState<HotelJson| null>(null)
 
   const [spinner, setSpinner] = useState(true);
   const [hotels, setHotels] = useState<HotelJson | null>(null);
@@ -129,11 +125,14 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
     } else {
       setFilteredProvinces([]);
     }
+    const fetchData = async () => {
+      let Recomend;
+      Recomend = await getRandomHotels(session.user.token,4);
+      setRecomed(Recomend);
+    };
+    fetchData();
   }, [selectedRegion]);
-
-
   
-
   return (
     <div className="my-0 relative bg-blue">
       <div className="relative flex flex-col px-28 py-4">
@@ -150,10 +149,24 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
                 if (!spinner) {
                   dispatchRegion({ regionName: regionName });
                   dispatchPage({ newPage: 1 });
+                  dispatchProvince({ provinceName: "" });
                 }
               }}
             />
           ))}
+        </div>
+        <div className="mt-7">
+          <select onClick={(e) => {e.stopPropagation();}} 
+          className="hover:translate-y-[-3px] transition-all duration-250 ease-in-out hover:shadow-md rounded-full bg-slate-100 px-5 py-2 text-sky-600 shadow-sm font-bold">
+            <option>Select Rating</option>
+            <option>≥ 5</option>
+            <option>≥ 4</option>
+            <option>≥ 3</option>
+            <option>≥ 2</option>
+            <option>≥ 1</option>
+            <option>none</option>
+          </select>
+            
         </div>
           <div className="flex flex-row gap-x-1 mt-8 justify-start ">
               <select id="provincesDropdown"
@@ -196,12 +209,14 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
           ))}
         </div>
         
-          {hotels? page==1&&hotels.count==0?
+          {hotels? hotels.count==0?
           <div>
-            <div className="py-10 text-center">We're sorry, no hotels matched your criteria.</div>
+            {page==1 ? <div className="py-10 text-center">We're sorry, no hotels matched your criteria.</div>:
+                       <div className="py-10 text-center">You've gone through all hotels macthing your criteria.</div>}
             <div className="font-poppins font-medium text-2xl pt-10">You Might Also Like</div>
             <div className="grid grid-cols-4grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-items-center gap-x-4 gap-y-6 mt-8 gap-8 w-full h-auto">
-              {Recomendhotels.map((hotel) => (
+              {RecomedHotel?
+              RecomedHotel.data.map((hotel: HotelItem) => (
                   <HotelCard
                     key={hotel._id}
                     hotelName={hotel.name}
@@ -210,10 +225,10 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
                     address={hotel.province}
                     minPrice={hotel.minPrice}
                     maxPrice={hotel.maxPrice}
-                    rating={hotel.rating}
+                    rating={hotel.rating.toPrecision(3)}
                     ratingCount={hotel.ratingCount}
                   ></HotelCard>
-                ))}
+                )):""}
             </div>
           </div>:"":""}
           
@@ -276,7 +291,7 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
                 >
                   {page}
                 </span>
-                {page < hotels.total ? (
+                {(page < hotels.total && hotels.count==4) ? (
                   <button
                     className="hover:bg-slate-50 relative block rounded-xl bg-transparent font-sans font-md px-5 py-3 text-lg text-surface hover:translate-y-[-1px] hover:shadow-md transition-all duration-450 ease-in-out "
                     onClick={(e) => {
