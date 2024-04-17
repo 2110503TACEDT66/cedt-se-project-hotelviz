@@ -1,6 +1,11 @@
 "use client";
-import { TextField } from "@mui/material";
-import { HotelItem } from "../../interface";
+import React, { useState , useEffect } from "react";
+import {
+  FormControl,
+  TextField,
+} from "@mui/material";
+import { HotelItem, RoomType } from "../../interface";
+
 
 export default function HotelForm({
   hotel,
@@ -8,10 +13,41 @@ export default function HotelForm({
 }: {
   hotel: HotelItem;
   onHotelChange: Function;
-}) {
+}) 
+  {
+
+  const [numFields, setNumFields] = useState(hotel.roomType.length);
+  const [formData, setFormData] = useState(Array(numFields).fill(""));
+
+  useEffect(() => {
+    setNumFields(hotel.roomType.length);
+  },[hotel.roomType])
+
+  const handleNumFieldChange = (e : React.ChangeEvent<{ value: unknown }>) => {
+    const num = parseInt(e.target.value as string);
+    if (!isNaN(num)) {
+      setNumFields(num);
+      setFormData(Array(num).fill(""));
+    }
+  };
+
+  const handleFieldChange = (index: number, field: keyof RoomType, value: any) => {
+    const updatedHotel = { ...hotel };
+    if (!updatedHotel.roomType) {
+      updatedHotel.roomType = [];
+    }
+    if (!updatedHotel.roomType[index]) {
+      (updatedHotel.roomType[index]) = new RoomType();
+    }
+    (updatedHotel.roomType[index]?  hotel.roomType[index] : 1 as any)[field] = value;
+    onHotelChange(updatedHotel);
+  };
+
+  
+
   return (
     <div className="bg-slate-100 rounded-lg space-y-5 w-full px-10 py-5 flex flex-col">
-      <div>Name</div>
+  <div>Name</div>
       <TextField
         variant="outlined"
         name="name"
@@ -23,7 +59,7 @@ export default function HotelForm({
         }}
       ></TextField>
 
-      <div>Address</div>
+  <div>Address</div>
       <TextField
        variant="outlined"
         name="address"
@@ -35,7 +71,7 @@ export default function HotelForm({
         }}
       ></TextField>
 
-      <div>District</div>
+  <div>District</div>
       <TextField
         variant="outlined"
         name="district"
@@ -47,7 +83,7 @@ export default function HotelForm({
         }}
       ></TextField>
 
-      <div>Province</div>
+  <div>Province</div>
       <TextField
         variant="outlined"
         name="province"
@@ -59,7 +95,7 @@ export default function HotelForm({
         }}
       ></TextField>
 
-<div>Postalcode</div>
+  <div>Postalcode</div>
       <TextField
         variant="outlined"
         name="postalcode"
@@ -71,7 +107,7 @@ export default function HotelForm({
         }}
       ></TextField>
 
-<div>Tel</div>
+  <div>Tel</div>
       <TextField
         variant="outlined"
         name="tel"
@@ -83,7 +119,7 @@ export default function HotelForm({
         }}
       ></TextField>
 
-<div>Region</div>
+  <div>Region</div>
       <TextField
         variant="outlined"
         name="region"
@@ -95,7 +131,7 @@ export default function HotelForm({
         }}
       ></TextField>
 
-      <div>Image Link</div>
+  <div>Image Link</div>
       <TextField
         variant="outlined"
         name="image"
@@ -106,6 +142,44 @@ export default function HotelForm({
           onHotelChange(hotel);
         }}
       ></TextField>
-    </div>
+
+  <div>Number of roomtype</div>
+  <TextField
+          label="Number of Fields"
+          type="number"
+          value={numFields}
+          onChange={handleNumFieldChange}
+  />
+
+  <div>Types of Room</div>
+  {Array.from({ length: numFields }, (_, index) => (
+        <div key={index}>
+          <FormControl sx={{ m: 1, width: 500 ,'& > :not(style) + :not(style)' : {mt:2 } }}>
+          <TextField 
+            label={`Price of Room Type ${index + 1}`}
+            name="roomtype"
+            value={hotel.roomType?.[index]?.key || ''}
+            onChange={(e) => 
+              {handleFieldChange(index,"key", e.target.value)
+            }
+            }
+          />
+
+          <TextField 
+            label={`Price of Room Type ${index + 1}`}
+            value={(hotel.roomType && hotel.roomType[index]) ? hotel.roomType[index].price : 0}
+            name="price"
+            onChange={(e) => {
+              const newPrice = parseFloat(e.target.value);
+              hotel.price = isNaN(newPrice) ? 0 : newPrice;
+              {handleFieldChange(index,"price", e.target.value)
+            }
+            } }
+          />
+          </FormControl>
+        </div>
+      ))}
+      </div>
+    
   );
 }

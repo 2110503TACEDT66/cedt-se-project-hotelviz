@@ -7,7 +7,7 @@ import HotelForm from "@/components/HotelForm";
 import createHotel from "@/libs/createHotel";
 import updateHotel from "@/libs/updateHotel";
 import deleteHotel from "@/libs/deleteHotel";
-import { HotelItem } from "../../../../interface";
+import { HotelItem, RoomType } from "../../../../interface";
 import Link from "next/link";
 
 export default function ManageHotel() {
@@ -27,6 +27,7 @@ export default function ManageHotel() {
         tel: hotel.tel,
         region: hotel.region,
         image: hotel.image,
+        roomType: hotel.roomType, 
       };
       if (id) {
         await updateHotel(session.user.token, id, item);
