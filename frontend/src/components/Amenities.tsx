@@ -18,6 +18,4 @@ interface AmenitiesProps {
       </div>
     );
   };
-  
-  export default Amenities;
-  
+export default Amenities; 

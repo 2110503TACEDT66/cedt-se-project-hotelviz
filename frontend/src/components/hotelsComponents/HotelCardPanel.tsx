@@ -1,7 +1,7 @@
 "use client";
 import HotelCard from "./HotelCard";
 import Link from "next/link";
-import { use, useReducer, useState } from "react";
+import {useReducer, useState } from "react";
 import RegionButton from "./RegionButton";
 import { useEffect } from "react";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
@@ -12,6 +12,10 @@ import PaginationBar from "../PaginationBar";
 import Skeleton from "@mui/material/Skeleton";
 import { HotelItem, HotelJson } from "../../../interface";
 import getRandomHotels from "@/libs/getRandomHotel";
+import Slider from '@mui/material/Slider';
+
+
+const minDistance = 100;
 
 export default function HotelCardPanel({ session = null }: { session?: any }) {
 
@@ -60,9 +64,6 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
     }
   };
   
-  
-  
-
   const [selectedRegion, dispatchRegion] = useReducer(regionReducer, "None");
   const [selectedProvince, dispatchProvince] = useReducer(provinceReducer, "None");
   const [selectedAmenitiesList, dispatchAmenities] = useReducer(amenitiesReducer,[]);
@@ -102,19 +103,29 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
     "Laundry Service", "Room Service"
   ]
 
+  const [price, setPrice] = useState<number[]>([0, 7000]);
+  const [minPrice, setMinPrice] = useState<number>(0);
+  const [maxPrice, setMaxPrice] = useState<number>(7000);
+  const [initialPrice, setInitialPrice] = useState<number[]>([0, 7000]);
+
   useEffect(() => {
     const fetchData = async () => {
       setSpinner(true);
       setHotels(null);
       let hotels;
       if (session)
-        hotels = await getHotels(session.user.token, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList);
-      else hotels = await getHotels(null, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList);
+        hotels = await getHotels(session.user.token, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList, minPrice, maxPrice);
+      else hotels = await getHotels(null, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList, minPrice, maxPrice);
       setHotels(hotels);
       setSpinner(false);
     };
-    fetchData();
-  }, [page, selectedRegion, selectedProvince, selectedAmenitiesList]);
+  
+    const timeoutId = setTimeout(() => {
+      fetchData();
+    }, 500);
+  
+    return () => clearTimeout(timeoutId);
+  }, [page, selectedRegion, selectedProvince, selectedAmenitiesList, minPrice, maxPrice]);
   
 
   const [filteredProvinces, setFilteredProvinces] = useState<string[]>([]);
@@ -132,7 +143,49 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
     };
     fetchData();
   }, [selectedRegion]);
+
+
+  const handleChange = (
+    event: Event,
+    newValue: number | number[],
+    activeThumb: number,
+  ) => {
+    if (!Array.isArray(newValue)) {
+      return;
+    }
   
+    if (activeThumb === 0) {
+      setPrice([Math.min(newValue[0], price[1] - minDistance), price[1]]);
+    } else {
+      setPrice([price[0], Math.max(newValue[1], price[0] + minDistance)]);
+    }
+  
+    setMinPrice(newValue[0]);
+    setMaxPrice(newValue[1]);
+  };
+  
+  const handleMouseUp = () => {
+    setInitialPrice(price);
+    setMinPrice(price[0]);
+    setMaxPrice(price[1]);
+  };
+
+  const handleSliderChangeCommitted = () => {
+    if (initialPrice !== price) {
+      const fetchData = async () => {
+        setSpinner(true);
+        setHotels(null);
+        let hotels;
+        if (session)
+          hotels = await getHotels(session.user.token, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList, price[0], price[1]);
+        else hotels = await getHotels(null, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList, price[0], price[1]);
+        setHotels(hotels);
+        setSpinner(false);
+      };
+      fetchData();
+    }
+  };
+
   return (
     <div className="my-0 relative bg-blue">
       <div className="relative flex flex-col px-28 py-4">
@@ -154,19 +207,6 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
               }}
             />
           ))}
-        </div>
-        <div className="mt-7">
-          <select onClick={(e) => {e.stopPropagation();}} 
-          className="hover:translate-y-[-3px] transition-all duration-250 ease-in-out hover:shadow-md rounded-full bg-slate-100 px-5 py-2 text-sky-600 shadow-sm font-bold">
-            <option>Select Rating</option>
-            <option>≥ 5</option>
-            <option>≥ 4</option>
-            <option>≥ 3</option>
-            <option>≥ 2</option>
-            <option>≥ 1</option>
-            <option>none</option>
-          </select>
-            
         </div>
           <div className="flex flex-row gap-x-1 mt-8 justify-start ">
               <select id="provincesDropdown"
@@ -208,8 +248,41 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
             </button>
           ))}
         </div>
+
         
-          {hotels? hotels.count==0?
+        <div className="flex flex-wrap gap-x-1 gap-y-2 mt-8 justify-start ">
+          <Slider
+            // getAriaLabel={() => 'Price range slider'}
+            value={price}
+            onChange={handleChange}
+            valueLabelDisplay="auto"
+            // getAriaValueText={() => 'Price range'}
+            onMouseUp={handleMouseUp}
+            onChangeCommitted={handleSliderChangeCommitted}
+            min={0}
+            max={7000}
+            disableSwap
+          />
+          
+          your price range : ฿{price.join(' - ฿')}
+
+        </div>
+
+        
+          <div className="mt-7">
+          <select onClick={(e) => {e.stopPropagation();}} 
+          className="hover:translate-y-[-3px] transition-all duration-250 ease-in-out hover:shadow-md rounded-full bg-slate-100 px-5 py-2 text-sky-600 shadow-sm font-bold">
+            <option>Select Rating</option>
+            <option>≥ ★★★★★</option>
+            <option>≥ ★★★★☆</option>
+            <option>≥ ★★★☆☆</option>
+            <option>≥ ★★☆☆☆</option>
+            <option>≥ ★☆☆☆☆</option>
+            <option>≥ ☆☆☆☆☆</option>
+          </select>
+        </div>
+
+          {hotels? page==1&&hotels.count==0?
           <div>
             {page==1 ? <div className="py-10 text-center">We're sorry, no hotels matched your criteria.</div>:
                        <div className="py-10 text-center">You've gone through all hotels macthing your criteria.</div>}
