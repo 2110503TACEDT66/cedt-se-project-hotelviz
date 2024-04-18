@@ -6,13 +6,14 @@ import RegionButton from "./RegionButton";
 import { useEffect } from "react";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import getHotels from "@/libs/getHotel";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Rating } from "@mui/material";
 import LoadingHotelCard from "./LoadingHotelCard";
 import PaginationBar from "../PaginationBar";
 import Skeleton from "@mui/material/Skeleton";
 import { HotelItem, HotelJson } from "../../../interface";
 import getRandomHotels from "@/libs/getRandomHotel";
 import Slider from '@mui/material/Slider';
+import { Star } from "@mui/icons-material";
 
 
 const minDistance = 100;
@@ -186,6 +187,8 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
     }
   };
 
+  const [userRating,setRating] = useState<null|number>(0);
+
   return (
     <div className="my-0 relative bg-blue">
       <div className="relative flex flex-col px-28 py-4">
@@ -270,16 +273,19 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
 
         
           <div className="mt-7">
-          <select onClick={(e) => {e.stopPropagation();}} 
-          className="hover:translate-y-[-3px] transition-all duration-250 ease-in-out hover:shadow-md rounded-full bg-slate-100 px-5 py-2 text-sky-600 shadow-sm font-bold">
-            <option>Select Rating</option>
-            <option>≥ ★★★★★</option>
-            <option>≥ ★★★★☆</option>
-            <option>≥ ★★★☆☆</option>
-            <option>≥ ★★☆☆☆</option>
-            <option>≥ ★☆☆☆☆</option>
-            <option>≥ ☆☆☆☆☆</option>
-          </select>
+
+          <table>
+            <tr>
+              <td>select rating : </td>
+              <td className="text-neutral-400 text-lg pr-1 pl-2">≥</td>
+              <td><Rating size='large' onChange={(e,newValue) => {
+                e.stopPropagation; 
+                setRating(newValue);
+                }}>
+              </Rating></td>
+            </tr>
+          </table>
+          
         </div>
 
           {hotels? page==1&&hotels.count==0?
