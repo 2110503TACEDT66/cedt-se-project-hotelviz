@@ -142,7 +142,8 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
     }
     const fetchData = async () => {
       let Recomend;
-      Recomend = await getRandomHotels(session.user.token,4);
+      if(session) Recomend = await getRandomHotels(session.user.token,4);
+      else Recomend = await getRandomHotels(null,4);
       setRecomed(Recomend);
     };
     fetchData();
@@ -319,8 +320,8 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
 
           {hotels? hotels.count==0?
           <div>
-            {page==1 ? <div className="py-10 text-center">We're sorry, no hotels matched your criteria.</div>:
-                       <div className="py-10 text-center">You've gone through all hotels macthing your criteria.</div>}
+            {page==1 ? <div className="py-10 text-center">We're sorry, No hotels match your filtering criteria.</div>:
+                       <div className="py-10 text-center">You've gone through all hotels macthing your filtering criteria.</div>}
             <div className="font-poppins font-medium text-2xl pt-10">You Might Also Like</div>
             <div className="grid grid-cols-4grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-items-center gap-x-4 gap-y-6 mt-8 gap-8 w-full h-auto">
               {RecomedHotel?
