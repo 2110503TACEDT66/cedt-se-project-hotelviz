@@ -121,12 +121,13 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
       else hotels = await getHotels(null, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList, minPrice, maxPrice, userRating);
       setHotels(hotels);
       setSpinner(false);
+      console.log(`count ${hotels.count}`);
     };
   
     const timeoutId = setTimeout(() => {
       fetchData();
     }, 500);
-  
+    
     return () => clearTimeout(timeoutId);
   }, [page, selectedRegion, selectedProvince, selectedAmenitiesList, minPrice, maxPrice, userRating]);
   
@@ -316,7 +317,7 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
         </div>
       </div>
 
-          {hotels? page==1&&hotels.count==0?
+          {hotels? hotels.count==0?
           <div>
             {page==1 ? <div className="py-10 text-center">We're sorry, no hotels matched your criteria.</div>:
                        <div className="py-10 text-center">You've gone through all hotels macthing your criteria.</div>}
