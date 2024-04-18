@@ -10,11 +10,17 @@ export class HotelItem {
   image: string = "";
   __v: number = 0;
   id: string = "";
+  roomType: RoomType[]=[];
   amenities: string[] = [];
   rating: number = 0;
   ratingCount: number = 0;
   minPrice: number = 0;
   maxPrice: number = 0;
+}
+
+export class RoomType{
+  key : string = "";
+  price : number = 0;
 }
 
 export interface HotelJson {
