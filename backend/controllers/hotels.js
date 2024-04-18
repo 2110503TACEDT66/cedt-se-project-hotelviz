@@ -10,22 +10,45 @@ exports.getHotels = async (req, res, next) => {
 
   //Copy req.query
   const reqQuery = { ...req.query };
-
+  const toStringifyReq = {...reqQuery};
+  // console.log(req.queryPolluted.amenities);
   //Fields to exclude
-  const removeFields = ["select", "sort", "page", "limit"];
+  const removeFields = ["select", "sort", "page", "limit","amenities","minPrice","maxPrice"];
 
   //Loop over remove fields and delete them from reqQuery
-  removeFields.forEach((param) => delete reqQuery[param]);
-
+  removeFields.forEach((param) => delete toStringifyReq[param]);
+  
   //Create query string
-  let queryStr = JSON.stringify(reqQuery);
+  let queryStr = JSON.stringify(toStringifyReq);
   queryStr = queryStr.replace(
     /\b(gt|gte|lt|lte|in)\b/g,
     (match) => `$${match}`
   );
+  queryObj = [JSON.parse(queryStr)];
+  if(reqQuery["minPrice"]&&reqQuery["maxPrice"]){
+    const maxPrice = reqQuery["maxPrice"];
+    const minPrice = reqQuery["minPrice"];
+    price_range_filter = {
+      "$or": [
+          {"minPrice": {"$lte": maxPrice, "$gte": minPrice}},
+          {"maxPrice": {"$lte": maxPrice, "$gte": minPrice}},
+      ]
+    }
+    queryObj.push(price_range_filter);
+  }
+  if(req.queryPolluted.amenities){
+    const amenities = req.queryPolluted.amenities;
+    amenities.forEach(amenity => {
+      queryObj.push({"amenities":amenity});
+    });
+  }
+  combined_query = {
+    "$and": queryObj
+  }
+  console.log(combined_query);
 
   //finding resource
-  query = Hotel.find(JSON.parse(queryStr));
+  query = Hotel.find(combined_query);
   if (req.user !== undefined)
     if (req.user.role === "admin") query = query.populate("bookings");
 
@@ -148,6 +171,32 @@ exports.deleteHotel = async (req, res, next) => {
   }
 };
 
+//@desc     Add Rating
+//@route    Put /api/v1/hotels/rating/:id
+//@access   Private
+exports.addRating = async (req, res, next) => {
+  try {
+    const hotel = await Hotel.findById(req.params.id);
+    let ratingCount = hotel.ratingCount;
+    let rating =
+      (1.0 * (hotel.rating * ratingCount + req.body.rating)) / ++ratingCount;
+    let body = {
+      rating: rating,
+      ratingCount: ratingCount,
+    };
+    hotel2 = await Hotel.findByIdAndUpdate(req.params.id, body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!hotel2) {
+      return res.status(400).json({ success: false });
+    }
+    res.status(200).json({ success: true, data: hotel });
+  } catch (err) {
+    res.status(400).json({ success: false });
+  }
+};
+
 //@desc     Get hotels by price range
 //@route    Get /api/v1/hotels/price
 //@access   Public
@@ -156,14 +205,17 @@ exports.getHotelsByPriceRange = async (req, res, next) => {
 
   try {
     if (!minPrice || !maxPrice) {
-      return res.status(400).json({ success: false, error: "Both minPrice and maxPrice must be provided" });
+      return res.status(400).json({
+        success: false,
+        error: "Both minPrice and maxPrice must be provided",
+      });
     }
 
     const hotels = await Hotel.find({
       $or: [
         { minPrice: { $lte: maxPrice, $gte: minPrice } },
-        { maxPrice: { $lte: maxPrice, $gte: minPrice } }
-      ]
+        { maxPrice: { $lte: maxPrice, $gte: minPrice } },
+      ],
     });
 
     res.status(200).json({ success: true, data: hotels });
@@ -172,4 +224,21 @@ exports.getHotelsByPriceRange = async (req, res, next) => {
   }
 };
 
+//@desc     Get Random Hotel
+//@route    Get /api/v1/hotels/random
+//@access   Public
+exports.getRandomHotel = async (req, res, next) => {
+
+  const count = req.query.count;
+
+  try {
+    const hotels = await Hotel.aggregate([
+      { $sample: { size: Number(count) } },
+    ]);
+
+    res.status(200).json({ success: true, data: hotels });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+};
 

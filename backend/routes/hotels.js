@@ -5,7 +5,9 @@ const {
   createHotel,
   updateHotel,
   deleteHotel,
+  addRating,
   getHotelsByPriceRange,
+  getRandomHotel,
 } = require("../controllers/hotels");
 
 //Include other resource routes
@@ -19,7 +21,7 @@ const { semiprotect, protect, authorize } = require("../middleware/auth");
 router.use("/:hotelId/bookings/", bookingRouter);
 
 router.route("/price").get(semiprotect, getHotelsByPriceRange);
-
+router.route("/random").get(getRandomHotel);
 
 router
   .route("/")
@@ -27,10 +29,11 @@ router
   .post(protect, authorize("admin"), createHotel);
 router
   .route("/:id")
-  .get(getHotel)
+  .get(semiprotect, getHotel)
   .put(protect, authorize("admin"), updateHotel)
   .delete(protect, authorize("admin"), deleteHotel);
+router.route("/rating/:id").put(protect, addRating);
 
-  // Route for getting hotels by price range
+// Route for getting hotels by price range
 
 module.exports = router;

@@ -1,16 +1,22 @@
-export default async function getHotels(token: string|null,limit:number,page:number,selectedRegion:string,selectedProvince:string){
+export default async function getHotels(token: string|null,limit:number,page:number,selectedRegion:string,selectedProvince:string,selectedAmenitiesList:string[],minPrice:number,maxPrice:number){
     
-    let url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/hotels?limit=${limit}&page=${page}&sort=_id`;
+    let url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/hotels?limit=${limit}&page=${page}&sort=_id&minPrice=${minPrice}&maxPrice=${maxPrice}`;
 
     if (selectedRegion !== "None") {
-        url += `&region[in]=${selectedRegion}`;
+        url += `&region=${selectedRegion}`;
     }
 
     if (selectedProvince !== "None" && selectedProvince !== "") {
-        url += `&province[in]=${selectedProvince}`;
+        url += `&province=${selectedProvince}`;
     }
 
-    
+    if (selectedAmenitiesList.length > 0) {
+        for (const amenity of selectedAmenitiesList) {
+          url += `&amenities=${amenity}`;
+        }
+      }      
+
+    console.log(url)
     const response = await fetch(url, {
         method: 'GET',
         headers: {
