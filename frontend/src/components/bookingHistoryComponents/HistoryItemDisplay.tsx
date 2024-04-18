@@ -16,7 +16,6 @@ const HistoryItemDisplay: React.FC<HistoryItemProps> = ({
   historyItem,
   session,
 }) => {
-  const [userRating,setRating] = useState<null|number>(0);
 
   return (
     <div className="flex border border-disable cursor-pointer transition-all duration-250 ease-in-out w-full h-fit rounded-xl shadow-lg bg-white overflow-hidden ">

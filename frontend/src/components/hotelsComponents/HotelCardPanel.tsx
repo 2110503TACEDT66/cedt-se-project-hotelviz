@@ -6,13 +6,14 @@ import RegionButton from "./RegionButton";
 import { useEffect } from "react";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import getHotels from "@/libs/getHotel";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Rating } from "@mui/material";
 import LoadingHotelCard from "./LoadingHotelCard";
 import PaginationBar from "../PaginationBar";
 import Skeleton from "@mui/material/Skeleton";
 import { HotelItem, HotelJson } from "../../../interface";
 import getRandomHotels from "@/libs/getRandomHotel";
 import Slider from '@mui/material/Slider';
+import { Star } from "@mui/icons-material";
 
 
 const minDistance = 100;
@@ -107,6 +108,8 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
   const [minPrice, setMinPrice] = useState<number>(0);
   const [maxPrice, setMaxPrice] = useState<number>(7000);
   const [initialPrice, setInitialPrice] = useState<number[]>([0, 7000]);
+  const [userRating,setRating] = useState<number>(0);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -114,8 +117,8 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
       setHotels(null);
       let hotels;
       if (session)
-        hotels = await getHotels(session.user.token, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList, minPrice, maxPrice);
-      else hotels = await getHotels(null, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList, minPrice, maxPrice);
+        hotels = await getHotels(session.user.token, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList, minPrice, maxPrice, userRating);
+      else hotels = await getHotels(null, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList, minPrice, maxPrice, userRating);
       setHotels(hotels);
       setSpinner(false);
     };
@@ -125,7 +128,7 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
     }, 500);
   
     return () => clearTimeout(timeoutId);
-  }, [page, selectedRegion, selectedProvince, selectedAmenitiesList, minPrice, maxPrice]);
+  }, [page, selectedRegion, selectedProvince, selectedAmenitiesList, minPrice, maxPrice, userRating]);
   
 
   const [filteredProvinces, setFilteredProvinces] = useState<string[]>([]);
@@ -177,8 +180,8 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
         setHotels(null);
         let hotels;
         if (session)
-          hotels = await getHotels(session.user.token, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList, price[0], price[1]);
-        else hotels = await getHotels(null, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList, price[0], price[1]);
+          hotels = await getHotels(session.user.token, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList, price[0], price[1], userRating);
+        else hotels = await getHotels(null, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList, price[0], price[1], userRating);
         setHotels(hotels);
         setSpinner(false);
       };
@@ -186,30 +189,42 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
     }
   };
 
+
   return (
     <div className="my-0 relative bg-blue">
-      <div className="relative flex flex-col px-28 py-4">
-        <div className="font-poppins font-medium text-2xl">
-          Find hotel for your next trip 🗺️
+      <div className="relative flex flex-col px-28 py-4">  
+      <div className="font-poppins font-medium text-2xl pb-9">
+        Find hotel for your next trip 🗺️
+      </div>
+        <div className="border border-gray-300 rounded-2xl py-6 px-9">
+        
+        <div className="flex text-neutral-600">
+        
+        <div className="w-[50%]">
+          <div className=" mb-2">Region :</div>
+          <div className="flex flex-wrap gap-x-1.5 gap-y-2.5 justify-start ">
+            {regions.map((regionName) => (
+              <RegionButton
+                key={regionName}
+                name={regionName}
+                selected={selectedRegion === regionName}
+                onRegion={() => {
+                  if (!spinner) {
+                    dispatchRegion({ regionName: regionName });
+                    dispatchPage({ newPage: 1 });
+                    dispatchProvince({ provinceName: "" });
+                  }
+                }}
+              />
+            ))}
+          </div>
         </div>
-        <div className="flex flex-row gap-x-1 mt-8 justify-start ">
-          {regions.map((regionName) => (
-            <RegionButton
-              key={regionName}
-              name={regionName}
-              selected={selectedRegion === regionName}
-              onRegion={() => {
-                if (!spinner) {
-                  dispatchRegion({ regionName: regionName });
-                  dispatchPage({ newPage: 1 });
-                  dispatchProvince({ provinceName: "" });
-                }
-              }}
-            />
-          ))}
-        </div>
-          <div className="flex flex-row gap-x-1 mt-8 justify-start ">
-              <select id="provincesDropdown"
+        <div className="h-auto w-0.5 rounded-full bg-gray-200"></div>
+
+          <div className="flex-row gap-x-1 justify-start px-7">
+              <div className=" mb-2">Province :</div>
+              <div>
+              <select id="provincesDropdown" className="hover:translate-y-[-3px] transition-all duration-250 ease-in-out hover:shadow-md rounded-full bg-slate-100 px-5 py-2 text-sky-600 shadow-sm font-bold"
               onChange={(e) => {
                 if (!spinner) {
                   const selectedProvince = e.target.value;
@@ -228,9 +243,50 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
                   >{province}</option>
                 ))}
               </select>
+              </div>
           </div>
+        </div>
+          
 
-          <div className="flex flex-wrap gap-x-1 gap-y-2 mt-8 justify-start ">
+        <div className="flex mt-12">
+        <div className="flex flex-wrap gap-x-1 gap-y-2 justify-start w-[50%] text-neutral-600">
+          Price Range : ฿{price.join(' - ฿')}
+          <Slider
+            // getAriaLabel={() => 'Price range slider'}
+            className="ml-5 mr-14"
+            value={price}
+            onChange={handleChange}
+            valueLabelDisplay="auto"
+            // getAriaValueText={() => 'Price range'}
+            onMouseUp={handleMouseUp}
+            onChangeCommitted={handleSliderChangeCommitted}
+            min={0}
+            max={7000}
+            disableSwap
+          />  
+        </div>
+        <div className="h-auto w-0.5 rounded-full bg-gray-200"/>
+              <div className="mx-7 text-neutral-600">
+              Rating : ≥ {userRating} 
+              <div className="flex ml-1 mt-1">
+              {/* <div className="mt-1 mr-1 text-lg text-neutral-400">≥</div> */}
+              <Rating size='large' precision={0.5} 
+                  onChange={(e,newValue) => {
+                  e.stopPropagation; 
+                  if(newValue){setRating(newValue);}
+                  else{setRating(0);}
+                  dispatchPage({ newPage: 1 });
+                  // if (!spinner) {
+                  //   dispatchRegion({ regionName: newValue });
+                  // }
+                }}>
+              </Rating>
+              </div>
+        </div>
+        </div>
+        <div className="mt-10 text-neutral-600">Amenities :</div>
+          <div className="flex flex-wrap gap-x-1.5 gap-y-2.5 mt-2 justify-start mb-5">
+            
           {amenities.map((amenitiesName) => (
             <button 
               key={amenitiesName}
@@ -244,43 +300,14 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
               }}
               className={`hover:translate-y-[-3px] transition-all duration-250 ease-in-out hover:shadow-md rounded-full ${selectedAmenitiesList.includes(amenitiesName) ? 'bg-sky-600 text-slate-100' : 'bg-slate-100 text-sky-600'} px-5 py-2 shadow-sm font-bold`}
             >
+              <div className="flex align-center">
+              <img src={`/amenities/${amenitiesName}.png`} className="w-4 h-4 mr-2 my-auto" />
               {amenitiesName}
+              </div>
             </button>
           ))}
         </div>
-
-        
-        <div className="flex flex-wrap gap-x-1 gap-y-2 mt-8 justify-start ">
-          <Slider
-            // getAriaLabel={() => 'Price range slider'}
-            value={price}
-            onChange={handleChange}
-            valueLabelDisplay="auto"
-            // getAriaValueText={() => 'Price range'}
-            onMouseUp={handleMouseUp}
-            onChangeCommitted={handleSliderChangeCommitted}
-            min={0}
-            max={7000}
-            disableSwap
-          />
-          
-          your price range : ฿{price.join(' - ฿')}
-
-        </div>
-
-        
-          <div className="mt-7">
-          <select onClick={(e) => {e.stopPropagation();}} 
-          className="hover:translate-y-[-3px] transition-all duration-250 ease-in-out hover:shadow-md rounded-full bg-slate-100 px-5 py-2 text-sky-600 shadow-sm font-bold">
-            <option>Select Rating</option>
-            <option>≥ ★★★★★</option>
-            <option>≥ ★★★★☆</option>
-            <option>≥ ★★★☆☆</option>
-            <option>≥ ★★☆☆☆</option>
-            <option>≥ ★☆☆☆☆</option>
-            <option>≥ ☆☆☆☆☆</option>
-          </select>
-        </div>
+      </div>
 
           {hotels? page==1&&hotels.count==0?
           <div>
