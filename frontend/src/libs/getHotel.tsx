@@ -16,7 +16,7 @@ export default async function getHotels(token: string|null,limit:number,page:num
         }
       }      
 
-    console.log(url)
+    // console.log(url)
     const response = await fetch(url, {
         method: 'GET',
         headers: {

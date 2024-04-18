@@ -165,15 +165,22 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
   
     setMinPrice(newValue[0]);
     setMaxPrice(newValue[1]);
+    // dispatchPage({ newPage: 1 });
+    // console.log("wow");
   };
   
   const handleMouseUp = () => {
     setInitialPrice(price);
     setMinPrice(price[0]);
     setMaxPrice(price[1]);
+    // console.log("wooo");
+
   };
 
   const handleSliderChangeCommitted = () => {
+    // console.log("weeee");
+    dispatchPage({ newPage: 1 });
+    console.log(page)
     if (initialPrice !== price) {
       const fetchData = async () => {
         setSpinner(true);
