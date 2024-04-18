@@ -1,4 +1,4 @@
-export default async function getHotels(token: string|null,limit:number,page:number,selectedRegion:string,selectedProvince:string,selectedAmenitiesList:string[],minPrice:number,maxPrice:number){
+export default async function getHotels(token: string|null,limit:number,page:number,selectedRegion:string,selectedProvince:string,selectedAmenitiesList:string[],minPrice:number,maxPrice:number,rating:number){
     
     let url = `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/hotels?limit=${limit}&page=${page}&sort=_id&minPrice=${minPrice}&maxPrice=${maxPrice}`;
 
