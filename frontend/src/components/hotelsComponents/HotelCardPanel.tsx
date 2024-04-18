@@ -191,28 +191,39 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
 
   return (
     <div className="my-0 relative bg-blue">
-      <div className="relative flex flex-col px-28 py-4">
-        <div className="font-poppins font-medium text-2xl">
-          Find hotel for your next trip 🗺️
+      <div className="relative flex flex-col px-28 py-4">  
+      <div className="font-poppins font-medium text-2xl pb-9">
+        Find hotel for your next trip 🗺️
+      </div>
+        <div className="border border-gray-300 rounded-2xl py-6 px-9">
+        
+        <div className="flex">
+        
+        <div className="w-[50%]">
+          <div className=" mb-2">Region :</div>
+          <div className="flex flex-wrap gap-x-1.5 gap-y-2.5 justify-start ">
+            {regions.map((regionName) => (
+              <RegionButton
+                key={regionName}
+                name={regionName}
+                selected={selectedRegion === regionName}
+                onRegion={() => {
+                  if (!spinner) {
+                    dispatchRegion({ regionName: regionName });
+                    dispatchPage({ newPage: 1 });
+                    dispatchProvince({ provinceName: "" });
+                  }
+                }}
+              />
+            ))}
+          </div>
         </div>
-        <div className="flex flex-row gap-x-1 mt-8 justify-start ">
-          {regions.map((regionName) => (
-            <RegionButton
-              key={regionName}
-              name={regionName}
-              selected={selectedRegion === regionName}
-              onRegion={() => {
-                if (!spinner) {
-                  dispatchRegion({ regionName: regionName });
-                  dispatchPage({ newPage: 1 });
-                  dispatchProvince({ provinceName: "" });
-                }
-              }}
-            />
-          ))}
-        </div>
-          <div className="flex flex-row gap-x-1 mt-8 justify-start ">
-              <select id="provincesDropdown"
+        <div className="h-15 w-0.5 rounded-full bg-gray-200"></div>
+
+          <div className="flex-row gap-x-1 justify-start px-7">
+              <div className=" mb-2">Province :</div>
+              <div>
+              <select id="provincesDropdown" className="hover:translate-y-[-3px] transition-all duration-250 ease-in-out hover:shadow-md rounded-full bg-slate-100 px-5 py-2 text-sky-600 shadow-sm font-bold"
               onChange={(e) => {
                 if (!spinner) {
                   const selectedProvince = e.target.value;
@@ -231,9 +242,44 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
                   >{province}</option>
                 ))}
               </select>
+              </div>
           </div>
+        </div>
+          
 
-          <div className="flex flex-wrap gap-x-1 gap-y-2 mt-8 justify-start ">
+        <div className="flex mt-12">
+        <div className="flex flex-wrap gap-x-1 gap-y-2 justify-start w-[50%]">
+          Price Range : ฿{price.join(' - ฿')}
+          <Slider
+            // getAriaLabel={() => 'Price range slider'}
+            className="ml-5 mr-14"
+            value={price}
+            onChange={handleChange}
+            valueLabelDisplay="auto"
+            // getAriaValueText={() => 'Price range'}
+            onMouseUp={handleMouseUp}
+            onChangeCommitted={handleSliderChangeCommitted}
+            min={0}
+            max={7000}
+            disableSwap
+          />  
+        </div>
+        <div className="h-25 w-0.5 rounded-full bg-gray-200"/>
+              <div className="mx-7">
+              Rating :
+              <div className="flex ml-2 mt-1">
+              <div className="mt-1 mr-1 text-lg text-neutral-400">≥</div>
+              <Rating size='large' onChange={(e,newValue) => {
+                e.stopPropagation; 
+                setRating(newValue);
+                }}>
+              </Rating>
+              </div>
+        </div>
+        </div>
+        <div className="mt-10">Amenities :</div>
+          <div className="flex flex-wrap gap-x-1.5 gap-y-2.5 mt-2 justify-start mb-5">
+            
           {amenities.map((amenitiesName) => (
             <button 
               key={amenitiesName}
@@ -247,46 +293,14 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
               }}
               className={`hover:translate-y-[-3px] transition-all duration-250 ease-in-out hover:shadow-md rounded-full ${selectedAmenitiesList.includes(amenitiesName) ? 'bg-sky-600 text-slate-100' : 'bg-slate-100 text-sky-600'} px-5 py-2 shadow-sm font-bold`}
             >
+              <div className="flex align-center">
+              <img src={`/amenities/${amenitiesName}.png`} className="w-4 h-4 mr-2 my-auto" />
               {amenitiesName}
+              </div>
             </button>
           ))}
         </div>
-
-        
-        <div className="flex flex-wrap gap-x-1 gap-y-2 mt-8 justify-start ">
-          <Slider
-            // getAriaLabel={() => 'Price range slider'}
-            value={price}
-            onChange={handleChange}
-            valueLabelDisplay="auto"
-            // getAriaValueText={() => 'Price range'}
-            onMouseUp={handleMouseUp}
-            onChangeCommitted={handleSliderChangeCommitted}
-            min={0}
-            max={7000}
-            disableSwap
-          />
-          
-          your price range : ฿{price.join(' - ฿')}
-
-        </div>
-
-        
-          <div className="mt-7">
-
-          <table>
-            <tr>
-              <td>select rating : </td>
-              <td className="text-neutral-400 text-lg pr-1 pl-2">≥</td>
-              <td><Rating size='large' onChange={(e,newValue) => {
-                e.stopPropagation; 
-                setRating(newValue);
-                }}>
-              </Rating></td>
-            </tr>
-          </table>
-          
-        </div>
+      </div>
 
           {hotels? page==1&&hotels.count==0?
           <div>
