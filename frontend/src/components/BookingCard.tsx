@@ -1,8 +1,9 @@
 import Image from "next/image";
 import Amenities from "./Amenities";
-export default function HotelCard({hotelName,imgSrc,address,tel,region,amenities}:{hotelName:string,imgSrc:string,address:string,tel:string,region:string, amenities: string[]}){
+import RoomType from "./RoomType";
+export default function HotelCard({hotelName,imgSrc,address,tel,region,amenities,roomType}:{hotelName:string,imgSrc:string,address:string,tel:string,region:string, amenities: string[],roomType:Array<{ _id: number, price: string, key:string }>}){
     return(
-        <div className="w-full rounded-lg shadow-lg bg-white hover:bg-blue-50 flex flex-col h-[600px] ease-in-out duration-300 hover:shadow-xl hover:translate-y-[-4px]">
+        <div className=" w-full rounded-lg shadow-lg bg-white hover:bg-blue-50 flex flex-col h-[800px] ease-in-out duration-300 hover:shadow-xl hover:translate-y-[-4px]">
             
             <div className="relative h-1/2">
                 
@@ -23,7 +24,7 @@ export default function HotelCard({hotelName,imgSrc,address,tel,region,amenities
                 <p className="text-base pt-4">Region</p>
                 <h1 className="pl-3 text-slate-600">{region}</h1>
                 <Amenities amenities={amenities} />
-                
+                <RoomType roomType={roomType}></RoomType>
             </div>
             
         </div>
