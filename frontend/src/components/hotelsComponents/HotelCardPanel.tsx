@@ -270,7 +270,7 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
               Rating :
               <div className="flex ml-2 mt-1">
               <div className="mt-1 mr-1 text-lg text-neutral-400">≥</div>
-              <Rating size='large' onChange={(e,newValue) => {
+              <Rating size='large' precision={0.5} onChange={(e,newValue) => {
                   e.stopPropagation; 
                   if(newValue){setRating(newValue);}
                   else{setRating(0);}
