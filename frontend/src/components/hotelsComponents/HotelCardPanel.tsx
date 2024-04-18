@@ -108,6 +108,8 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
   const [minPrice, setMinPrice] = useState<number>(0);
   const [maxPrice, setMaxPrice] = useState<number>(7000);
   const [initialPrice, setInitialPrice] = useState<number[]>([0, 7000]);
+  const [userRating,setRating] = useState<number>(0);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -115,8 +117,8 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
       setHotels(null);
       let hotels;
       if (session)
-        hotels = await getHotels(session.user.token, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList, minPrice, maxPrice);
-      else hotels = await getHotels(null, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList, minPrice, maxPrice);
+        hotels = await getHotels(session.user.token, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList, minPrice, maxPrice, userRating);
+      else hotels = await getHotels(null, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList, minPrice, maxPrice, userRating);
       setHotels(hotels);
       setSpinner(false);
     };
@@ -126,7 +128,7 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
     }, 500);
   
     return () => clearTimeout(timeoutId);
-  }, [page, selectedRegion, selectedProvince, selectedAmenitiesList, minPrice, maxPrice]);
+  }, [page, selectedRegion, selectedProvince, selectedAmenitiesList, minPrice, maxPrice, userRating]);
   
 
   const [filteredProvinces, setFilteredProvinces] = useState<string[]>([]);
@@ -178,8 +180,8 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
         setHotels(null);
         let hotels;
         if (session)
-          hotels = await getHotels(session.user.token, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList, price[0], price[1]);
-        else hotels = await getHotels(null, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList, price[0], price[1]);
+          hotels = await getHotels(session.user.token, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList, price[0], price[1], userRating);
+        else hotels = await getHotels(null, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList, price[0], price[1], userRating);
         setHotels(hotels);
         setSpinner(false);
       };
@@ -187,7 +189,6 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
     }
   };
 
-  const [userRating,setRating] = useState<null|number>(0);
 
   return (
     <div className="my-0 relative bg-blue">
@@ -270,8 +271,13 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
               <div className="flex ml-2 mt-1">
               <div className="mt-1 mr-1 text-lg text-neutral-400">≥</div>
               <Rating size='large' onChange={(e,newValue) => {
-                e.stopPropagation; 
-                setRating(newValue);
+                  e.stopPropagation; 
+                  if(newValue){setRating(newValue);}
+                  else{setRating(0);}
+                  dispatchPage({ newPage: 1 });
+                  // if (!spinner) {
+                  //   dispatchRegion({ regionName: newValue });
+                  // }
                 }}>
               </Rating>
               </div>
