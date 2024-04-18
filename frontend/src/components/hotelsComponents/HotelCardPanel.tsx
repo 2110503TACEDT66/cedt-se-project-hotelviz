@@ -198,7 +198,7 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
       </div>
         <div className="border border-gray-300 rounded-2xl py-6 px-9">
         
-        <div className="flex">
+        <div className="flex text-neutral-600">
         
         <div className="w-[50%]">
           <div className=" mb-2">Region :</div>
@@ -249,7 +249,7 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
           
 
         <div className="flex mt-12">
-        <div className="flex flex-wrap gap-x-1 gap-y-2 justify-start w-[50%]">
+        <div className="flex flex-wrap gap-x-1 gap-y-2 justify-start w-[50%] text-neutral-600">
           Price Range : ฿{price.join(' - ฿')}
           <Slider
             // getAriaLabel={() => 'Price range slider'}
@@ -266,7 +266,7 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
           />  
         </div>
         <div className="h-auto w-0.5 rounded-full bg-gray-200"/>
-              <div className="mx-7">
+              <div className="mx-7 text-neutral-600">
               Rating : ≥ {userRating} 
               <div className="flex ml-1 mt-1">
               {/* <div className="mt-1 mr-1 text-lg text-neutral-400">≥</div> */}
@@ -284,7 +284,7 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
               </div>
         </div>
         </div>
-        <div className="mt-10">Amenities :</div>
+        <div className="mt-10 text-neutral-600">Amenities :</div>
           <div className="flex flex-wrap gap-x-1.5 gap-y-2.5 mt-2 justify-start mb-5">
             
           {amenities.map((amenitiesName) => (
