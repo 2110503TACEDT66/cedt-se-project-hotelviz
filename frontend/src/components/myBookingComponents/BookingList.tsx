@@ -5,9 +5,27 @@ import deleteBooking from "@/libs/deleteBooking";
 import { BookingItem } from "../../../interface";
 import BookingItemDisplay from "./BookingItemDisplay";
 import HistoryIcon from '@mui/icons-material/History';
+import createHistory from "@/libs/createHistory";
 
 export default async function BookingList({ bookings }: { bookings: any }) {
   const { data: session } = useSession();
+
+  const transferToHistory = async (bookingItem: BookingItem) => {
+    if(session) {
+      const item = {
+        date: bookingItem.date,
+        user: bookingItem.user,
+        contactEmail: bookingItem.contactEmail,
+        contactName: bookingItem.contactName,
+        contactTel: bookingItem.contactTel,
+        createdAt: bookingItem.createdAt,
+        rating: -1,
+      }
+      await createHistory(session.user.token, bookingItem.hotel._id, item);
+      await deleteBooking(session.user.token, bookingItem._id);
+      location.reload();
+    }
+  }
 
   return (
     <div className="container pt-12 px-36 ">
@@ -43,6 +61,7 @@ export default async function BookingList({ bookings }: { bookings: any }) {
             key={item._id}
             bookingItem={item}
             deleteBooking={deleteBooking}
+            transferToHistory={transferToHistory}
             session={session}
           />
         ))}
