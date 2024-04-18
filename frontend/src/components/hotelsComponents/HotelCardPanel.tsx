@@ -219,7 +219,7 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
             ))}
           </div>
         </div>
-        <div className="h-15 w-0.5 rounded-full bg-gray-200"></div>
+        <div className="h-auto w-0.5 rounded-full bg-gray-200"></div>
 
           <div className="flex-row gap-x-1 justify-start px-7">
               <div className=" mb-2">Province :</div>
@@ -265,7 +265,7 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
             disableSwap
           />  
         </div>
-        <div className="h-25 w-0.5 rounded-full bg-gray-200"/>
+        <div className="h-auto w-0.5 rounded-full bg-gray-200"/>
               <div className="mx-7">
               Rating : ≥ {userRating} 
               <div className="flex ml-1 mt-1">
