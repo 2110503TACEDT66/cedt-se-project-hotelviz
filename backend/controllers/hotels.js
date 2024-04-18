@@ -13,8 +13,8 @@ exports.getHotels = async (req, res, next) => {
   const toStringifyReq = {...reqQuery};
   // console.log(req.queryPolluted.amenities);
   //Fields to exclude
-  const removeFields = ["select", "sort", "page", "limit","amenities","minPrice","maxPrice"];
-
+  const removeFields = ["select", "sort", "page", "limit","minPrice","maxPrice"];
+  if(req.queryPolluted.amenities) removeFields.push("amenities");
   //Loop over remove fields and delete them from reqQuery
   removeFields.forEach((param) => delete toStringifyReq[param]);
   
