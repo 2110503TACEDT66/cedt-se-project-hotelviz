@@ -243,20 +243,6 @@ exports.addBookingHistory = async (req, res, next) => {
         message: `No hotel with the id of ${req.params.hotelId}`,
       });
     }
-
-    //add user Id to req.body
-    req.body.user = req.user.id;
-
-    //Check for existed booking
-    const existedBookings = await Bookinghistories.find({ user: req.user.id });
-
-    //If the user is not an admin, they can only create 3 booking.
-    if (existedBookings.length >= 3 && req.user.role !== "admin") {
-      return res.status(400).json({
-        success: false,
-        message: `The user with ID ${req.user.id} has already made 3 bookings`,
-      });
-    }
   } catch (error) {
     console.log(error);
     return res

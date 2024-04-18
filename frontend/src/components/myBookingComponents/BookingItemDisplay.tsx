@@ -4,16 +4,20 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Image from "next/image";
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import session from "redux-persist/lib/storage/session";
+import createHistory from "@/libs/createHistory";
 
 interface BookingItemProps {
   bookingItem: BookingItem;
   deleteBooking: (token: string, bookingId: string) => Promise<void>;
+  transferToHistory: (bookingItem: BookingItem) => Promise<void>;
   session?: any;
 }
 
 const BookingItemDisplay: React.FC<BookingItemProps> = ({
   bookingItem,
   deleteBooking,
+  transferToHistory,
   session,
 }) => {
   return (
@@ -71,7 +75,11 @@ const BookingItemDisplay: React.FC<BookingItemProps> = ({
         {
           session?.user.role === "admin" ?
           <div className="ml-auto mt-auto m-8">
-            <button onClick={(e) => {e.stopPropagation();}} className="w-fit px-4 py-3 shadow-lg shadow-xl bg-gradient-to-r from-cyan-500 to-blue-500 backdrop-blur-sm hover:from-lime-500 hover:to-emerald-500 hover:shadow-xl duration-300 ease-in-out text-white rounded-xl font-sans font-lg font-medium">
+            <button onClick={async (e) => {
+              e.stopPropagation();
+              await transferToHistory(bookingItem);
+              }} 
+              className="w-fit px-4 py-3 shadow-lg shadow-xl bg-gradient-to-r from-cyan-500 to-blue-500 backdrop-blur-sm hover:from-lime-500 hover:to-emerald-500 hover:shadow-xl duration-300 ease-in-out text-white rounded-xl font-sans font-lg font-medium">
                <CheckCircleOutlineIcon/> Approve
             </button>
           </div>
