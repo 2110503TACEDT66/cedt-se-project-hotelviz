@@ -34,6 +34,7 @@ export default function Booking({
       sethotelRegion(data.data.region);
       sethotelTel(data.data.tel);
       setamenities(data.data.amenities);
+      setRoomtype(data.data.roomType);
     };
 
     fetchdata();
@@ -45,6 +46,7 @@ export default function Booking({
   const [hotelRegion, sethotelRegion] = useState("");
   const [hotelTel, sethotelTel] = useState("");
   const [amenities, setamenities] = useState([]);
+  const [roomType,setRoomtype] = useState([])
 
   return (
     <main className="p-10 w-full">
@@ -71,6 +73,7 @@ export default function Booking({
             region={hotelRegion}
             tel={hotelTel}
             amenities={amenities}
+            roomType={roomType}
           />
         </div>
       </div>
