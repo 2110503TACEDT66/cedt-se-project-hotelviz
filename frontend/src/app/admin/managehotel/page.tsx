@@ -15,7 +15,6 @@ export default function ManageHotel() {
 
   const urlParams = useSearchParams();
   const id = urlParams.get("id");
-
   const makeBooking = async () => {
     if (session) {
       const item = {
@@ -29,6 +28,8 @@ export default function ManageHotel() {
         image: hotel.image,
         roomType: hotel.roomType, 
         amenities: hotel.amenities,
+        maxPrice:Math.max(...hotel.roomType.map(room => room.price)),
+        minPrice:Math.min(...hotel.roomType.map(room => room.price))
       };
       if (id) {
         await updateHotel(session.user.token, id, item);
