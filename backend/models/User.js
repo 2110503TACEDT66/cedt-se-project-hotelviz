@@ -31,6 +31,11 @@ const UserSchema = new mongoose.Schema({
     minlength: 6,
     select: false,
   },
+  tier: {
+    type: String,
+    enum: ["none", "platinum", "gold"], //ฝากใส่เพิ่ม
+    default: "none"
+  },
   favorite: [
     {
       type: mongoose.Schema.ObjectId,
