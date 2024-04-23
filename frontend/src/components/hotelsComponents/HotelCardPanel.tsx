@@ -121,12 +121,13 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
       else hotels = await getHotels(null, 4, page, selectedRegion, selectedProvince, selectedAmenitiesList, minPrice, maxPrice, userRating);
       setHotels(hotels);
       setSpinner(false);
+      console.log(`count ${hotels.count}`);
     };
   
     const timeoutId = setTimeout(() => {
       fetchData();
     }, 500);
-  
+    
     return () => clearTimeout(timeoutId);
   }, [page, selectedRegion, selectedProvince, selectedAmenitiesList, minPrice, maxPrice, userRating]);
   
@@ -141,7 +142,8 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
     }
     const fetchData = async () => {
       let Recomend;
-      Recomend = await getRandomHotels(session.user.token,4);
+      if(session) Recomend = await getRandomHotels(session.user.token,4);
+      else Recomend = await getRandomHotels(null,4);
       setRecomed(Recomend);
     };
     fetchData();
@@ -165,15 +167,22 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
   
     setMinPrice(newValue[0]);
     setMaxPrice(newValue[1]);
+    // dispatchPage({ newPage: 1 });
+    // console.log("wow");
   };
   
   const handleMouseUp = () => {
     setInitialPrice(price);
     setMinPrice(price[0]);
     setMaxPrice(price[1]);
+    // console.log("wooo");
+
   };
 
   const handleSliderChangeCommitted = () => {
+    // console.log("weeee");
+    dispatchPage({ newPage: 1 });
+    console.log(page)
     if (initialPrice !== price) {
       const fetchData = async () => {
         setSpinner(true);
@@ -309,10 +318,10 @@ export default function HotelCardPanel({ session = null }: { session?: any }) {
         </div>
       </div>
 
-          {hotels? page==1&&hotels.count==0?
+          {hotels? hotels.count==0?
           <div>
-            {page==1 ? <div className="py-10 text-center">We're sorry, no hotels matched your criteria.</div>:
-                       <div className="py-10 text-center">You've gone through all hotels macthing your criteria.</div>}
+            {page==1 ? <div className="py-10 text-center">We're sorry, No hotels match your filtering criteria.</div>:
+                       <div className="py-10 text-center">You've gone through all hotels macthing your filtering criteria.</div>}
             <div className="font-poppins font-medium text-2xl pt-10">You Might Also Like</div>
             <div className="grid grid-cols-4grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 justify-items-center gap-x-4 gap-y-6 mt-8 gap-8 w-full h-auto">
               {RecomedHotel?
