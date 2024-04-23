@@ -31,6 +31,10 @@ const UserSchema = new mongoose.Schema({
     minlength: 6,
     select: false,
   },
+  point: {
+    type: Number,
+    default: 0
+  },
   favorite: [
     {
       type: mongoose.Schema.ObjectId,
