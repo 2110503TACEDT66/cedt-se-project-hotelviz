@@ -1,19 +1,24 @@
 const express = require("express");
 const {
-  getCoupons
+  getCoupons,
+  getCoupon,
+  addCoupon,
+  updateCoupon,
+  deleteCoupon,
 } = require("../controllers/coupons");
 
 const router = express.Router({ mergeParams: true });
 
-const { protect, authorize } = require("../middleware/auth");
+const { semiprotect, protect, authorize } = require("../middleware/auth");
 
 router
   .route("/")
   .get(protect, getCoupons)
-// router
-//   .route("/:id")
-//   .get(protect, getBooking)
-//   .put(protect, authorize("admin", "user"), updateBooking)
-//   .delete(protect, authorize("admin", "user"), deleteBooking);
+  .post(protect, authorize("admin"), addCoupon);
+router
+  .route("/:id")
+  .get(semiprotect, getCoupon)
+  .put(protect, authorize("admin"), updateCoupon)
+  .delete(protect, authorize("admin"), deleteCoupon);
 
 module.exports = router;

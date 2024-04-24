@@ -18,6 +18,10 @@ const CouponSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "User",
     },
+    used: {
+      type: Boolean,
+      default: false,
+    },
     expiredDate: {
       type: Date,
       required: [true, "Please add expired date"],
