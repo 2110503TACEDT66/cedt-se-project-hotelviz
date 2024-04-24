@@ -34,11 +34,11 @@ const UserSchema = new mongoose.Schema({
   tier: {
     type: String,
     enum: ["none", "platinum", "gold"], //ฝากใส่เพิ่ม
-    default: "none"
+    default: "none",
   },
   experience: {
     type: Number,
-    default: 0
+    default: 0,
   },
   point: {
     type: Number,
