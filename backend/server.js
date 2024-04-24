@@ -19,6 +19,7 @@ connectDB();
 const hotels = require("./routes/hotels");
 const bookings = require("./routes/bookings");
 const auth = require("./routes/auth");
+const coupons = require("./routes/coupons");
 const favorites = require("./routes/favorites");
 
 const app = express();
@@ -54,6 +55,7 @@ app.use(cors());
 app.use("/api/v1/hotels", hotels);
 app.use("/api/v1/bookings", bookings);
 app.use("/api/v1/auth", auth);
+app.use("/api/v1/coupons", coupons);
 app.use("/api/v1/favorites", favorites);
 
 const PORT = process.env.PORT || 5000;

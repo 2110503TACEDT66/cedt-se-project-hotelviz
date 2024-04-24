@@ -40,9 +40,19 @@ const UserSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  point: {
+    type: Number,
+    default: 0,
+  },
   favorite: [
     {
       type: mongoose.Schema.ObjectId,
+    },
+  ],
+  coupons: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: "Coupon",
     },
   ],
   resetPasswordToken: String,
