@@ -36,6 +36,10 @@ const UserSchema = new mongoose.Schema({
     enum: ["none", "platinum", "gold"], //ฝากใส่เพิ่ม
     default: "none"
   },
+  experience: {
+    type: Number,
+    default: 0
+  },
   favorite: [
     {
       type: mongoose.Schema.ObjectId,
