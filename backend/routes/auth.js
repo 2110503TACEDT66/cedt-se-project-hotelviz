@@ -231,6 +231,55 @@ const { protect } = require("../middleware/auth");
 *       500:
 *         description: Server error
 */
+/**
+* @swagger
+* /auth/logout:
+*   get:
+*     summary: Logout user
+*     tags: [Users]
+*     responses:
+*       200:
+*         description: User logged out successfully
+*       500:
+*         description: Server error
+*/
+/**
+* @swagger
+* /auth/deleteUser:
+*   delete:
+*     summary: Delete user
+*     tags: [Users]
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             type: object
+*             properties:
+*               password:
+*                 type: string
+*                 description: User's password
+*                 example: password123
+*     responses:
+*       200:
+*         description: User deleted successfully
+*       401:
+*         description: Unauthorized, user not logged in
+*       500:
+*         description: Server error
+*/
+/**
+* @swagger
+* /auth/me:
+*   get:
+*     summary: About me
+*     tags: [Users]
+*     responses:
+*       200:
+*         description: User logged out successfully
+*       500:
+*         description: Server error
+*/
 
 
 router.post("/register", register);
