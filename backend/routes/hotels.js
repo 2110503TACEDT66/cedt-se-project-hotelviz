@@ -238,8 +238,30 @@ const {
 *       404:
 *         description: The hotel was not found
 */
-
-
+/**
+* @swagger
+* /hotels/random:
+*   get:
+*     summary: Returns the list of random hotels
+*     tags: [Hotels]
+*     parameters:
+*       - in: query
+*         name: count
+*         schema:
+*           type: string
+*         required: true
+*         description: The amount of random hotels
+*         example: 2
+*     responses:
+*       200:
+*         description: The list of random hotels
+*         content:
+*           application/json:
+*             schema:
+*               type: array
+*               items:
+*                 $ref: '#/components/schemas/Hotel'
+*/
 
 //Include other resource routes
 const bookingRouter = require("./bookings");
