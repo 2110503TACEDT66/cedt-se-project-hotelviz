@@ -10,6 +10,13 @@ const {
   getRandomHotel,
 } = require("../controllers/hotels");
 
+//Include other resource routes
+const bookingRouter = require("./bookings");
+
+const router = express.Router();
+
+const { semiprotect, protect, authorize } = require("../middleware/auth");
+
 /**
 * @swagger  
 * components:
@@ -262,13 +269,6 @@ const {
 *               items:
 *                 $ref: '#/components/schemas/Hotel'
 */
-
-//Include other resource routes
-const bookingRouter = require("./bookings");
-
-const router = express.Router();
-
-const { semiprotect, protect, authorize } = require("../middleware/auth");
 
 //Re-route into other resource routers
 router.use("/:hotelId/bookings/", bookingRouter);
