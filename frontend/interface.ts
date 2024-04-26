@@ -43,6 +43,18 @@ export interface BookingItem {
   id: string;
 }
 
+export class CouponItem {
+  _id: string="";
+  expiredDate: Date= new Date(0);
+  owner: string="";
+  type: string="";
+  tiers: string[]=[];
+  discount: Number=0;
+  createdAt: Date= new Date(0);
+  point: Number=0;
+  used : boolean=false;
+}
+
 export interface HistoryItem {
   _id: string;
   date: Date;
@@ -61,4 +73,12 @@ export interface BookingJson {
   success: boolean;
   count: number;
   data: BookingItem[];
+}
+
+export interface CouponJson {
+  success: boolean;
+  count: number;
+  data: CouponItem[];
+  pagination: Object;
+  total: number;
 }
