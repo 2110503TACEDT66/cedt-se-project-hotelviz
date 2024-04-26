@@ -4,7 +4,7 @@ import Coupon from "@/components/memberComponents/Coupon";
 
 export default async function Mybookings() {
     return(
-        <main>
+        <main className="relative flex flex-col px-28 py-4">
           <div className="flex">
             <MemberExp/>
             <MemberInfo/>
