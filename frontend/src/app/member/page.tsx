@@ -1,5 +1,6 @@
 import MemberExp from "@/components/memberComponents/MemberExp";
 import MemberInfo from "@/components/memberComponents/MemberInfo";
+import Coupon from "@/components/memberComponents/Coupon";
 
 export default async function Mybookings() {
     return(
@@ -8,7 +9,9 @@ export default async function Mybookings() {
             <MemberExp/>
             <MemberInfo/>
           </div>
-          
+          <div>
+              <Coupon/>      
+          </div>
         </main>
     )
 }
