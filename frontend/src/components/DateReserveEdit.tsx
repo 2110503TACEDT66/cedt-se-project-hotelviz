@@ -74,16 +74,7 @@ export default function DateReserve({
         ></DatePicker>
       </LocalizationProvider>
 
-      <div>Contact Name</div>
-      <TextField
-        fullWidth
       
-        variant="outlined"
-        name="RoomType"
-
-        defaultValue={contactName}
-        
-      ></TextField>
 
       <div>Contact Name</div>
       <TextField
