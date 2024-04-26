@@ -46,7 +46,7 @@ export default function MemberExp() {
 
 
     return (
-        <div className="flex m-2 pl-3 border border-gray-300 w-full h-[200px] rounded-xl bg-white">
+        <div className="flex m-4 pl-3 border border-gray-300 w-full h-[200px] rounded-xl bg-white">
         <div className='relative ml-1' >
             <Gauge value={Math.min(Exp,FullExp)} valueMax={FullExp} 
             startAngle={-120} endAngle={120} width={180}

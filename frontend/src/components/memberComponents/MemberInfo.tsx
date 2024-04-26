@@ -57,20 +57,17 @@ export default function MemberInfo() {
     })
 
     return(
-        <div className="flex m-2 text-base border border-gray-300 w-full h-[200px] rounded-xl bg-white p-3">
+        <div className="flex m-4 text-base border border-gray-300 w-full h-[200px] rounded-xl bg-white ">
             {/* <div className='h-full'></div> */}
             <div className='content-center p-10'>
             <Stack direction="row" spacing={2}>
                 <Avatar {...stringAvatar(`${session?.user.name}`)}/>
             </Stack>
             </div>
-
-            <div className='content-center font-bold '>
-            <table className='border-separate border-spacing-3'>
-                <tr>
-                    <td className="w-[65px]">Name</td>
-                    <td>{session?.user.name}</td>
-                </tr>
+            <div className='content-center font-bold w-full mr-8'>
+                <div className={`px-2   text-4xl text-zinc-800`}>{session?.user.name}</div>
+                <hr className='mt-3 mb-1'/>
+            <table className='border-separate border-spacing-2 text-zinc-600'>
                 <tr>
                     <td>Email</td>
                     <td>{session?.user.email}</td>
