@@ -6,7 +6,7 @@ import BedtimeIcon from '@mui/icons-material/Bedtime';
 export default function MemberExp() {
 
     return (
-        <div className="flex m-2 pl-3  border border-gray-300 w-[800px] h-[200px] rounded-xl bg-white ">
+        <div className="flex m-2 pl-3 border border-gray-300 w-full h-[200px] rounded-xl bg-white ">
         <div className='relative ml-1' >
             <Gauge value={75} valueMax={200} 
             startAngle={-120} endAngle={120} width={180}
@@ -15,9 +15,7 @@ export default function MemberExp() {
                   fill: '#FFD700',
                 },
               })}
-            text={
-                ''
-            }
+            text={''}
             />
         </div>   
         <div className='absolute mt-16 ml-16 w-[60px]'>
