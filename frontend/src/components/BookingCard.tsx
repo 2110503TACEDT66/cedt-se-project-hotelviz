@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Amenities from "./Amenities";
-import RoomType from "./RoomType";
-export default function HotelCard({hotelName,imgSrc,address,tel,region,amenities,roomType}:{hotelName:string,imgSrc:string,address:string,tel:string,region:string, amenities: string[],roomType:Array<{ _id: number, price: string, key:string }>}){
+import RoomTypeInfo from "./RoomTypeInfo";
+import { RoomType } from "../../interface";
+export default function HotelCard({hotelName,imgSrc,address,tel,region,amenities,roomType}:{hotelName:string,imgSrc:string,address:string,tel:string,region:string, amenities: string[],roomType:RoomType[]}){
     return(
         <div className=" w-full rounded-lg shadow-lg bg-white hover:bg-blue-50 flex flex-col h-[800px] ease-in-out duration-300 hover:shadow-xl hover:translate-y-[-4px]">
             
@@ -24,7 +25,7 @@ export default function HotelCard({hotelName,imgSrc,address,tel,region,amenities
                 <p className="text-base pt-4">Region</p>
                 <h1 className="pl-3 text-slate-600">{region}</h1>
                 <Amenities amenities={amenities} />
-                <RoomType roomType={roomType}></RoomType>
+                <RoomTypeInfo roomType={roomType}></RoomTypeInfo>
             </div>
             
         </div>
