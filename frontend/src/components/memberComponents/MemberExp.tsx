@@ -26,7 +26,7 @@ export default function MemberExp() {
             <div className='border border-stone-800'></div>
             <div className='font-bold text-md text-center'>200</div>
         </div>
-        <div className='m-8'>
+        <div className='m-8 w-full'>
         
         <div className=' w-auto text-4xl font-bold text-yellow-500'>
             Platinum
@@ -35,8 +35,8 @@ export default function MemberExp() {
         <div className='w-auto text-lg font-bold text-black-400'>
             Point balance : {"321"}
         </div>
-        <div className='mt-2 w-auto  text-sm font-bold text-neutral-400 font-sans'>
-            Earn more {"125"} <BedtimeIcon/> to get ...
+        <div className='mt-2 w-auto text-sm font-bold text-neutral-400 font-sans'>
+            Earn more {"125"} <BedtimeIcon fontSize={"inherit"}/> to get ...
         </div>
         </div>
         </div>

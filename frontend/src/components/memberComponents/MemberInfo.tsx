@@ -2,10 +2,24 @@
 import { useState, useEffect } from 'react';
 import { useSession } from "next-auth/react";
 // import getUserProfile from '@/libs/getUserProfile';
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
+import getUserProfile from '@/libs/getUserProfile';
+import { UserInformation } from '../../../interface';
 
 export default function MemberInfo() {
     const { data: session, status } = useSession();
-    // const [userTel, setUserTel] = useState<string>("");
+    const [contactTel, setTel] = useState<string>("-");
+
+
+    useEffect(() => {
+        const getUserInfo = async () => {
+            if(session){
+                const userInfo:UserInformation = (await getUserProfile(session?.user.token)).data;
+                setTel(userInfo.tel);
+            }
+        };
+        getUserInfo();
+    })
 
     // useEffect(() => {
     //     const fetchUserProfile = async () => {
@@ -30,22 +44,26 @@ export default function MemberInfo() {
     // }, [session, status]); 
 
     return(
-        <a className="m-2 text-base border border-gray-300 w-full h-[200px] rounded-xl bg-white p-3">
-            
+        <a className="flex m-2 text-base border border-gray-300 w-full h-[200px] rounded-xl bg-white p-3">
+            <div className='h-full'>
+
+            </div>
+            <div>
             <table>
                 <tr>
                     <td className="w-[65px]">Name</td>
                     <td>{session?.user.name}</td>
                 </tr>
-                {/* <tr>
+                <tr>
                     <td>Tel</td>
-                    <td>{userTel}</td>
-                </tr> */}
+                    <td>{contactTel}</td>
+                </tr>
                 <tr>
                     <td>Email</td>
                     <td>{session?.user.email}</td>
                 </tr>
             </table>
+            </div>
         </a>
     )
 }

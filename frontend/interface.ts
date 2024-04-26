@@ -62,3 +62,12 @@ export interface BookingJson {
   count: number;
   data: BookingItem[];
 }
+
+export interface UserInformation {
+  _id: string;
+  name: string;
+  tel: string;
+  email: string;
+  role: string;
+  createdAt: string;
+}
