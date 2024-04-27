@@ -250,3 +250,46 @@ exports.deleteCouponsByType = async (req, res, next) => {
       .json({ success: false, message: "Cannot delete coupons" });
   }
 };
+
+//@desc Update coupons by type
+//@route PUT /api/v1/coupons/type/:couponType
+//@access Private
+exports.updateCouponsByType = async (req, res, next) => {
+  try {
+    const { couponType } = req.params;
+    const updateData = req.body;
+
+    // Check if the user is an admin
+    if (req.user.role !== "admin") {
+      return res.status(401).json({
+        success: false,
+        message: `User ${req.user.id} is not authorized to update coupons`,
+      });
+    }
+
+    // Find and update coupons with the provided couponType
+    const updatedCoupons = await Coupon.updateMany(
+      { type: couponType },
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    if (updatedCoupons.modifiedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: `No coupons found with type ${couponType}`,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: updatedCoupons,
+      message: `${updatedCoupons.modifiedCount} coupons with type ${couponType} updated successfully`,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Cannot update coupons" });
+  }
+};
