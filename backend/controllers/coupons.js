@@ -54,22 +54,31 @@ exports.getCoupon = async (req, res, next) => {
 //@access Private
 exports.addCoupon = async (req, res, next) => {
   try {
-    const { numberOfCoupons, ...couponData } = req.body;
-      const coupons = [];
+    const { numberOfCoupons, type, ...couponData } = req.body;
+    const coupons = [];
 
-      for (let i = 0; i < numberOfCoupons; i++) {
-        const coupon = await Coupon.create({ ...couponData});
-        coupons.push(coupon);
-      }
-
-      res.status(201).json({ success: true, data: coupons });
-    } catch (error) {
-      console.log(error.stack);
+    // Check if the coupon type already exists
+    const existingCoupon = await Coupon.findOne({ type });
+    if (existingCoupon) {
       return res.status(400).json({
         success: false,
-        message: "The requested body not match the Coupon model",
+        message: `Coupon type '${type}' already exists`,
       });
     }
+
+    for (let i = 0; i < numberOfCoupons; i++) {
+      const coupon = await Coupon.create({ ...couponData, type });
+      coupons.push(coupon);
+    }
+
+    res.status(201).json({ success: true, data: coupons });
+  } catch (error) {
+    console.log(error.stack);
+    return res.status(400).json({
+      success: false,
+      message: "The requested body not match the Coupon model",
+    });
+  }
 };
 
 //@desc Update coupon
