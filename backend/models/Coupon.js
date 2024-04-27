@@ -1,10 +1,6 @@
 const mongoose = require("mongoose");
 const CouponSchema = new mongoose.Schema(
   {
-    couponId:{
-      type: String,
-      required: [true, "Please add coupon type"]
-    },
     type: {
       type: String,
       required: [true, "Please add coupon type"],

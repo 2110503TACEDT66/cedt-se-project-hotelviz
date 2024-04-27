@@ -54,15 +54,22 @@ exports.getCoupon = async (req, res, next) => {
 //@access Private
 exports.addCoupon = async (req, res, next) => {
   try {
-    const coupon = await Coupon.create(req.body);
-    res.status(201).json({ success: true, data: coupon });
-  } catch (error) {
-    console.log(error.stack);
-    return res.status(400).json({
-      success: false,
-      message: "The requested body not match the Coupon model",
-    });
-  }
+    const { numberOfCoupons, ...couponData } = req.body;
+      const coupons = [];
+
+      for (let i = 0; i < numberOfCoupons; i++) {
+        const coupon = await Coupon.create({ ...couponData});
+        coupons.push(coupon);
+      }
+
+      res.status(201).json({ success: true, data: coupons });
+    } catch (error) {
+      console.log(error.stack);
+      return res.status(400).json({
+        success: false,
+        message: "The requested body not match the Coupon model",
+      });
+    }
 };
 
 //@desc Update coupon
@@ -79,20 +86,31 @@ exports.updateCoupon = async (req, res, next) => {
     }
 
     if (req.user.role !== "admin") {
-      return res.status(401).json({
-        success: false,
-        message: `User ${req.user.id} is not authorized to update this coupon`,
+      // Check if the user owns the coupon and the coupon is not already used
+      if (req.user.id.toString() !== coupon.owner.toString() || coupon.used) {
+        return res.status(401).json({
+          success: false,
+          message: `User ${req.user.id} is not authorized to update this coupon`,
+        });
+      }
+
+      // Allow users to update only the 'used' field to true
+      req.body = { used: true };
+      coupon = await Coupon.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+        runValidators: true,
+      });
+    } 
+    else{
+      coupon = await Coupon.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+        runValidators: true,
+      });
+      res.status(200).json({
+        success: true,
+        data: coupon,
       });
     }
-
-    coupon = await Coupon.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-    res.status(200).json({
-      success: true,
-      data: coupon,
-    });
   } catch (error) {
     console.log(error);
     return res
@@ -135,7 +153,7 @@ exports.deleteCoupon = async (req, res, next) => {
 };
 
 //@desc Redeem one coupon
-//@route POST /api/v1/coupons/reddem/: couponID
+//@route POST /api/v1/coupons/redeem/: couponID
 //@access Private
 exports.redeemCoupon = async (req, res, next) => {
   try {
@@ -145,7 +163,7 @@ exports.redeemCoupon = async (req, res, next) => {
         success: false,
         message: `No coupon with the id of ${req.params.couponId}`,
       });
-    } else if (coupon.owner != undefined) {
+    } else if (coupon.owner != null) {
       return res.status(404).json({
         success: false,
         message: `Coupon with the id of ${req.params.couponId} is already owned`,
@@ -154,7 +172,7 @@ exports.redeemCoupon = async (req, res, next) => {
 
     let user;
 
-    if (req.user.role === "admin" && req.body.user != undefined)
+    if (req.user.role === "admin" && req.body.user != null)
       user = await User.findById(req.body.user);
     else user = await User.findById(req.user.id);
 
@@ -192,5 +210,43 @@ exports.redeemCoupon = async (req, res, next) => {
     return res
       .status(500)
       .json({ success: false, message: "Cannot redeem coupon" });
+  }
+};
+
+//@desc Delete coupons by type
+//@route DELETE /api/v1/coupons/type/:couponType
+//@access Private
+exports.deleteCouponsByType = async (req, res, next) => {
+  try {
+    const { couponType } = req.params;
+
+    // Check if the user is an admin
+    if (req.user.role !== "admin") {
+      return res.status(401).json({
+        success: false,
+        message: `User ${req.user.id} is not authorized to delete coupons`,
+      });
+    }
+
+    // Find and delete coupons with the provided couponType
+    const deletedCoupons = await Coupon.deleteMany({ type: couponType });
+
+    if (deletedCoupons.deletedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: `No coupons found with type ${couponType}`,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {},
+      message: `${deletedCoupons.deletedCount} coupons with type ${couponType} deleted successfully`,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Cannot delete coupons" });
   }
 };
