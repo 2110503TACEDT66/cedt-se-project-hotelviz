@@ -63,7 +63,7 @@ export default function Booking({
             comfirmation email
           </div>
 
-          <BookingForm hotelID={params.hid}></BookingForm>
+          <BookingForm hotelID={params.hid} roomType={roomType}></BookingForm>
         </div>
         <div className="basis-2/5">
           <BookingCard
