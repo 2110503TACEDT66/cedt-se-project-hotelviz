@@ -85,7 +85,7 @@ export default async function TopMenu() {
               href="/member">
               <PersonIcon />
               <div className="underline text-lg font-sans font-semibold whitespace-nowrap">
-                Profile
+                {session.user.name}
               </div>
             </Link>
           <Link
