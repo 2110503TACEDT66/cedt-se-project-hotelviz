@@ -64,3 +64,11 @@ export interface BookingJson {
   count: number;
   data: BookingItem[];
 }
+
+export interface BookingDetail {
+  date: Date;
+  roomType: RoomType;
+  contactEmail: string;
+  contactName: string;
+  contactTel: string;
+}
