@@ -17,8 +17,8 @@ const BookingSchema = new mongoose.Schema(
       required: [true, "Please add a hotel"],
     },
     roomType: {
-      key: String,
-      price: Number,
+      type: String,
+      required: [true, "Please add a roomtype"],
     },
     contactEmail: {
       type: String,
@@ -36,6 +36,14 @@ const BookingSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    price: {
+      type: Number,
+      required: [true, "Please add pricePaid"],
+    },
+    discount: {
+      type: Number,
+      required: [true, "Please add discount"],
+    }
   },
   {
     toJSON: { virtuals: true },

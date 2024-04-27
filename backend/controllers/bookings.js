@@ -108,14 +108,9 @@ exports.addBooking = async (req, res, next) => {
   
     // Add points to the user after successful booking creation if role is "user"
     if (req.user.role === 'user') {
-      const bookedRoom = await Room.findById(booking.room);
-
-      // Find the room type of the booked room
-      const roomType = await RoomType.findById(bookedRoom.roomType);
-
       // Add the price of the room type to the user's points
-      const pointsToAdd = parseInt(roomType.price/10);
-      const exptoAdd = parseInt(roomType.price/100)
+      const pointsToAdd = parseInt(booking.price/10);
+      const exptoAdd = parseInt(booking.price/100)
 
       // Find the user and update their points
       const user = await User.findById(req.user.id);
