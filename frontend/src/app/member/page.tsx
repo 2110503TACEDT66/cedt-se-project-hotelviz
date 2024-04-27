@@ -26,7 +26,7 @@ export default function Member() {
   },[userInfo])
 
     return(
-        <main className=" flex flex-col px-28 py-4">
+        <main className=" flex flex-col px-28 py-8">
           {
             (userInfo._id == "")? 
             <div className="flex flex-wrap">
@@ -47,8 +47,17 @@ export default function Member() {
             </div>
           </div>
           }
-          
-          <div>
+
+          <h1 className="text-2xl font-bold mx-4 mt-8">Your Coupon</h1>
+          <div className="flex overflow-x-auto mx-4 ">
+              <Coupon/>      
+              <Coupon/>      
+          </div>
+          <h1 className="text-2xl font-bold mx-4 mt-8">Collect coupons here !</h1>
+          <div className="flex overflow-x-auto mx-4 ">
+              <Coupon/>      
+              <Coupon/>      
+              <Coupon/>                 
               <Coupon/>      
           </div>
         </main>
