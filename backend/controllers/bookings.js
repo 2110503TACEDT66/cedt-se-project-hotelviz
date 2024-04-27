@@ -1,6 +1,7 @@
 const Booking = require("../models/Booking");
 const Bookinghistories = require("../models/Bookinghistories");
 const Hotel = require("../models/Hotel");
+const User = require('../models/User');
 
 //@desc Get all bookings
 //@route GET /api/v1/bookings
@@ -104,6 +105,20 @@ exports.addBooking = async (req, res, next) => {
 
   try {
     const booking = await Booking.create(req.body);
+  
+    // Add points to the user after successful booking creation if role is "user"
+    if (req.user.role === 'user') {
+      // Add the price of the room type to the user's points
+      const pointsToAdd = parseInt(booking.price/10);
+      const exptoAdd = parseInt(booking.price/100)
+
+      // Find the user and update their points
+      const user = await User.findById(req.user.id);
+      user.point += pointsToAdd;
+      user.experience += exptoAdd;
+      await user.save();
+    }
+  
     res.status(201).json({
       success: true,
       data: booking,
@@ -112,10 +127,12 @@ exports.addBooking = async (req, res, next) => {
     console.log(error.stack);
     return res.status(400).json({
       success: false,
-      message: "The requested body not match the Booking model",
+      message: "The requested body does not match the Booking model",
     });
   }
-};
+  
+}
+
 
 //@desc Update booking
 //@route PUT/api/v1/bookings/:id

@@ -36,12 +36,14 @@ export interface BookingItem {
   date: Date;
   user: string;
   hotel: HotelItem;
-  roomType: RoomType;
+  roomType: string;
   contactEmail: string;
   contactName: string;
   contactTel: string;
   createdAt: Date;
   id: string;
+  price: number;
+  discount: number;
 }
 
 export class CouponItem {

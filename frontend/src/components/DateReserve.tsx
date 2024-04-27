@@ -81,13 +81,16 @@ export default function DateReserve({
         value={roomType}
         label=""
         onChange={(e) => {
-          setRoomType(e.target.value)
+          setRoomType(e.target.value as RoomType)
           onRoomTypeChange(e.target.value);
         }}
       >
         
         {roomtype.map((room) => (
-          <MenuItem key={room.key} value={room}>
+          <MenuItem 
+          key={room.key} 
+          value={room}
+          >
             {room.key}
           </MenuItem>
         ))}
