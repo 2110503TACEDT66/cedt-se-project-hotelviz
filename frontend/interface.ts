@@ -87,12 +87,27 @@ export interface CouponJson {
   total: number;
 }
 
-export interface UserInformation {
-  _id: string;
-  name: string;
-  tel: string;
-  email: string;
-  role: string;
-  createdAt: string;
+export class UserInformation {
+  _id: string = "";
+  name: string = "";
+  tel: string = "";
+  email: string = "";
+  role: string = "";
+  createdAt: string = "";
+  tier: string = "";
+  experience: number = 0;
+  point: number = 0;
+  coupons: Coupons[] = [];
 }
 
+export interface Coupons {
+  _id: string;
+  type: string;
+  discount: number;
+  tiers: string[];
+  point: number;
+  owner: string;
+  used: boolean;
+  createAt: string;
+  expiredDate: string;
+}

@@ -41,40 +41,40 @@ function stringToColor(string: string) {
   
   
 
-export default function MemberInfo() {
+export default function MemberInfo({memberInfo} : {memberInfo:UserInformation}) {
     const { data: session, status } = useSession();
-    const [contactTel, setTel] = useState<string>("-");
+    // const [contactTel, setTel] = useState<string>("-");
 
 
-    useEffect(() => {
-        const getUserInfo = async () => {
-            if(session){
-                const userInfo:UserInformation = (await getUserProfile(session?.user.token)).data;
-                setTel(userInfo.tel);
-            }
-        };
-        getUserInfo();
-    })
+    // useEffect(() => {
+    //     const getUserInfo = async () => {
+    //         if(session){
+    //             const userInfo:UserInformation = (await getUserProfile(session?.user.token)).data;
+    //             setTel(userInfo.tel);
+    //         }
+    //     };
+    //     getUserInfo();
+    // })
 
     return(
-        <div className="flex m-4 text-base border border-gray-300 w-full h-[200px] rounded-xl bg-white ">
+        <div className="flex text-base border border-gray-300 w-full h-[200px] rounded-xl bg-white shadow-md">
             {/* <div className='h-full'></div> */}
             <div className='content-center p-10'>
             <Stack direction="row" spacing={2}>
-                <Avatar {...stringAvatar(`${session?.user.name}`)}/>
+                <Avatar {...stringAvatar(`${memberInfo.name}`)}/>
             </Stack>
             </div>
             <div className='content-center font-bold w-full mr-8'>
-                <div className={`px-2   text-4xl text-zinc-800`}>{session?.user.name}</div>
+                <div className={`px-2   text-4xl text-zinc-800`}>{memberInfo.name}</div>
                 <hr className='mt-3 mb-1'/>
             <table className='border-separate border-spacing-2 text-zinc-600'>
                 <tr>
                     <td>Email</td>
-                    <td>{session?.user.email}</td>
+                    <td>{memberInfo.email}</td>
                 </tr>
                 <tr>
                     <td>Tel.</td>
-                    <td>{contactTel}</td>
+                    <td>{memberInfo.tel}</td>
                 </tr>
             </table>
             </div>
