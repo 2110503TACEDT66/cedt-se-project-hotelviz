@@ -1,5 +1,6 @@
 const Coupon = require("../models/Coupon");
 
+
 exports.getCoupons = async (req, res, next) => {
   let query;
   //General users can see only their coupons!
@@ -53,15 +54,22 @@ exports.getCoupon = async (req, res, next) => {
   //@access Private
   exports.addCoupon = async (req, res, next) => {
     try {
-        const coupon = await Coupon.create(req.body);
-        res.status(201).json({ success: true, data: coupon });
-      } catch (error) {
-        console.log(error.stack);
-        return res.status(400).json({
-          success: false,
-          message: "The requested body not match the Coupon model",
-        });
+      const { numberOfCoupons, ...couponData } = req.body;
+      const coupons = [];
+  
+      for (let i = 0; i < numberOfCoupons; i++) {
+        const coupon = await Coupon.create({ ...couponData});
+        coupons.push(coupon);
       }
+  
+      res.status(201).json({ success: true, data: coupons });
+    } catch (error) {
+      console.log(error.stack);
+      return res.status(400).json({
+        success: false,
+        message: "The requested body not match the Coupon model",
+      });
+    }
   };
   
   //@desc Update coupon
