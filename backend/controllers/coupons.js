@@ -399,6 +399,7 @@ exports.getSingleCouponSummary = async (req, res, next) => {
           usedCount: { $sum: { $cond: [{ $eq: ["$used", true] }, 1, 0] } },
           unusedCount: { $sum: { $cond: [{ $eq: ["$used", false] }, 1, 0] } },
           ownedCount: { $sum: { $cond: [{ $ne: ["$owner", null] }, 1, 0] } },
+          unownedCount: { $sum: { $cond: [{ $eq: ["$owner", null] }, 1, 0] } },
           createdAt: { $first: "$createdAt" },
           expiredDate: { $first: "$expiredDate" },
           discount: { $first: "$discount" },
