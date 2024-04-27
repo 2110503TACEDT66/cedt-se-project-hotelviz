@@ -96,7 +96,8 @@ exports.updateCoupon = async (req, res, next) => {
 
     if (req.user.role !== "admin") {
       // Check if the user owns the coupon and the coupon is not already used
-      if (req.user.id.toString() !== coupon.owner.toString() || coupon.used) {
+      if (coupon.owner==null || req.user.id.toString() !== coupon.owner.toString() || coupon.used) {
+        console.log(`${coupon.owner}, ${req.user.id.toString()}, ${coupon.owner.toString()}, ${coupon.used}`);
         return res.status(401).json({
           success: false,
           message: `User ${req.user.id} is not authorized to update this coupon`,
@@ -108,6 +109,10 @@ exports.updateCoupon = async (req, res, next) => {
       coupon = await Coupon.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true,
+      });
+      res.status(200).json({
+        success: true,
+        data: coupon,
       });
     } 
     else{
