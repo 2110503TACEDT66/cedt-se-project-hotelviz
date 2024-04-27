@@ -5,7 +5,7 @@ exports.getCoupons = async (req, res, next) => {
   let query;
   //General users can see only their coupons!
   if (req.user.role !== "admin") {
-    query = Coupon.find({ user: req.user.id });
+    query = Coupon.find({ owner: req.user.id });
   } else {
     //If you are an admin, you can see all!
     query = Coupon.find();
@@ -173,11 +173,12 @@ exports.redeemCoupon = async (req, res, next) => {
   try {
     const { couponType } = req.params;
     let user;
-
-    if (req.user.role === "admin" && req.body.user !== null)
+    
+    if (req.user.role === "admin" && req.body.user != null)
       user = await User.findById(req.body.user);
     else user = await User.findById(req.user.id);
-
+  
+    console.log(couponType, user);
     // Find an unowned coupon of the specified type
     const coupon = await Coupon.findOne({
       type: couponType,
@@ -189,13 +190,6 @@ exports.redeemCoupon = async (req, res, next) => {
       return res.status(404).json({
         success: false,
         message: `No unowned coupons found for type ${couponType}`,
-      });
-    }
-
-    if (user.coupons.includes(coupon._id)) {
-      return res.status(400).json({
-        success: false,
-        message: `The user with ID ${user.id} has already owned this coupon`,
       });
     }
 
@@ -364,6 +358,7 @@ exports.getCouponSummary = async (req, res, next) => {
           usedCount: { $sum: { $cond: [{ $eq: ["$used", true] }, 1, 0] } },
           unusedCount: { $sum: { $cond: [{ $eq: ["$used", false] }, 1, 0] } },
           ownedCount: { $sum: { $cond: [{ $ne: ["$owner", null] }, 1, 0] } },
+          unownedCount: { $sum: { $cond: [{ $eq: ["$owner", null] }, 1, 0] } },
           createdAt: { $first: "$createdAt" },
           expiredDate: { $first: "$expiredDate" },
           discount: { $first: "$discount" },

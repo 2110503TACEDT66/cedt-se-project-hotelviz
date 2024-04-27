@@ -29,7 +29,7 @@ router
   .put(protect, updateCoupon)
   .delete(protect, authorize("admin"), deleteCoupon);
 
-router.route("/redeem/:couponId").post(protect, redeemCoupon);
+router.route("/redeem/:couponType").post(protect, redeemCoupon);
 
 router
   .route("/type/:couponType")
