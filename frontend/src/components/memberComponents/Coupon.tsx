@@ -7,7 +7,7 @@ export default function Coupon(
         <div className=" w-[500px] min-w-[500px] h-[auto] mr-8 my-4 bg-gradient-to-br from-yellow-600 to-indigo-600  text-white text-center py-4 px-8  rounded-lg shadow-md relative  hover:translate-y-[-4px] transition-all duration-250 ease-in-out hover:shadow-md rounded-xl shadow-lg overflow-hidden border-neutral-100 border-[5px]">
             <h1 className="text-3xl font-bold -4">NewYear Sale</h1>
             <hr className='mx-5 my-1'/>
-            <h3 className="text-xl font-semibold mb-5">{300} Bath Discount</h3>
+            <h3 className="text-xl font-semibold mb-5">{300} Baht Discount</h3>
             
             <div className='grid grid-cols-2 mt-[40px] '>
                 <div className='flex justify-start '>                            
