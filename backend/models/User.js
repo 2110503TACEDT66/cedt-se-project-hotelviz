@@ -33,7 +33,7 @@ const UserSchema = new mongoose.Schema({
   },
   tier: {
     type: String,
-    enum: ["none", "platinum", "gold"], //ฝากใส่เพิ่ม
+    enum: ["none", "bronze", "silver", "gold", "platinum"],
     default: "none",
   },
   experience: {
@@ -65,9 +65,16 @@ const UserSchema = new mongoose.Schema({
 
 //Encrypt password using bcrypt
 UserSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+  if (this.experience >= 500) this.tier = "platinum";
+  else if (this.experience >= 200) this.tier = "gold";
+  else if (this.experience >= 50) this.tier = "silver";
+  else if (this.experience >= 1) this.tier = "bronze";
+
+  if (this.isModified("password")) {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+  }
+  next();
 });
 
 //Sign JWT and return
