@@ -79,15 +79,26 @@ export default async function TopMenu() {
 
       <div className="flex flex-1 items-center justify-items-end place-self-end h-full">
         {session ? (
+          <div className="flew-row flex">
+            <Link
+              className="rounded-xl py-2 pr-4 pl-3 text-gray-700 duration-300 ease-in-out hover:bg-blue-100 hover:text-blue-900 flex items-center space-x-2"
+              href="/member">
+              <PersonIcon />
+              <div className="underline text-lg font-sans font-semibold whitespace-nowrap">
+                Profile
+              </div>
+            </Link>
           <Link
             className="rounded-xl py-2 pr-4 pl-3 text-gray-700 duration-300 ease-in-out hover:bg-blue-100 hover:text-blue-900 flex items-center space-x-2"
-            href="/api/auth/signout?callbackUrl=%2F"
-          >
+            href="/api/auth/signout?callbackUrl=%2F">
             <div className="underline text-lg font-sans font-semibold whitespace-nowrap">
               <LogoutIcon />
-              Sign-Out of {session.user.name}
+              Sign-Out 
+              {/* of {session.user.name} */}
             </div>
           </Link>
+          
+          </div>
         ) : (
           <div className="flew-row flex">
             <Link

@@ -17,21 +17,21 @@ export default function MemberExp({memberInfo} : {memberInfo:UserInformation}) {
     
 
     const setColorDisplay = () => {
-        if(tier == "Platinum") {
+        if(tier == "Platinum" || tier == "platinum") {
             setColorA("#14b8a6");
             setColorB("text-teal-500");
             setFullExp(500);
-        } else if (tier == "Gold") {
+        } else if (tier == "Gold" || tier == "gold") {
             setColorA("#eab308");
             setColorB("text-yellow-500");
             setFullExp(500);
             setNextTier("Platinum");
-        } else if (tier == "Sliver") {
+        } else if (tier == "Sliver" || tier == "sliver") {
             setColorA("#64748b");
             setColorB("text-slate-500");
             setFullExp(200);
             setNextTier("Gold");
-        } else if (tier == "Bronze") {
+        } else if (tier == "Bronze" || tier == "bronze") {
             setColorA("#854d0e");
             setColorB("text-yellow-800");
             setFullExp(50);
@@ -53,8 +53,8 @@ export default function MemberExp({memberInfo} : {memberInfo:UserInformation}) {
 
 
     return (
-        <div className="flex border border-gray-300 w-full min-w-[450px] h-[200px] rounded-xl bg-white">
-        <div className='ml-1' >
+        <div className="flex border border-gray-300 w-full min-w-[450px] h-[200px] rounded-xl bg-white shadow-md">
+        <div className='ml-[20px]' >
             <Gauge value={Math.min(exp,fullExp)} valueMax={fullExp} 
             startAngle={-120} endAngle={120} width={180}
             sx={(theme) => ({
@@ -65,7 +65,7 @@ export default function MemberExp({memberInfo} : {memberInfo:UserInformation}) {
             text={''}
             />
         </div>   
-        <div className='absolute mt-16 ml-16 w-[60px]'>
+        <div className='absolute mt-16 ml-[80px] w-[60px]'>
             <div className='text-center mb-1'><BedtimeIcon/></div>
             <div className='font-bold text-2xl text-center'>{exp}</div>
             <div className='border border-stone-800'></div>
@@ -81,7 +81,7 @@ export default function MemberExp({memberInfo} : {memberInfo:UserInformation}) {
             Point balance : {pointBalance}
         </div>
         {
-            (tier == "Platinum")? 
+            (tier == "Platinum" || tier == "platinum")? 
             <div className='mt-2 w-auto text-sm font-bold text-neutral-400 font-sans'>You are the highest tier!</div>
             :
             <div className='mt-2 w-auto text-sm font-bold text-neutral-400 font-sans'>
