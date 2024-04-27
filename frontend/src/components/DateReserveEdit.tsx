@@ -18,8 +18,8 @@ export default function DateReserve({
   onTelChange,
   onEmailChange,
   onLocationChange,
-  roomtype,
-  onRoomTypeChange,
+  
+ 
 }: {
   contactName: string;
   contactEmail: string;
@@ -31,12 +31,12 @@ export default function DateReserve({
   onTelChange: Function;
   onEmailChange: Function;
   onLocationChange: Function;
-  roomtype: RoomType[];
-  onRoomTypeChange: Function;
+  
+ 
 }) {
   const [date, setDate] = useState<Dayjs | null>(bookingDate);
   const [location, setLocation] = useState<String>(bookingLocation);
-  const [roomType, setRoomType] = useState<RoomType>(roomtype[0]);
+  
   
 
   if (date != bookingDate) setDate(bookingDate);
@@ -74,25 +74,7 @@ export default function DateReserve({
         ></DatePicker>
       </LocalizationProvider>
 
-    
-      <div>Roomtype</div>
-      <Select
-        labelId="roomtype"
-        value={roomType}
-        label=""
-        onChange={(e) => {
-          setRoomType(e.target.value)
-          onRoomTypeChange(e.target.value);
-        }}
-      >
-        
-        {roomtype.map((room) => (
-          <MenuItem key={room.key} value={room}>
-            {room.key}
-          </MenuItem>
-        ))}
-
-      </Select>
+      
 
       <div>Contact Name</div>
       <TextField
