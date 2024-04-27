@@ -9,13 +9,14 @@ export default function Coupon(
             <hr className='mx-5 my-1'/>
             <h3 className="text-xl font-semibold mb-5">{300} Bath Discount</h3>
             
-            <div className='grid grid-cols-2 mt-[40px]'>
+            <div className='grid grid-cols-2 mt-[40px] '>
                 <div className='flex justify-start '>                            
-                <span className="border-dashed border text-white text-md px-2 py-2 rounded-l w-[110px]">300 Points</span>
-                <span className=" flex border border-white bg-white text-purple-600 px-2 py-2  w-[100px] rounded-r cursor-pointer justify-content-start">
+                <span className=" flex border border-white bg-white text-purple-600 px-1.5 py-2  w-auto rounded-l  justify-content-start">
                     <h1 className='mr-1'><LoyaltyIcon fontSize={"inherit"}/></h1>
                     <h1 className="mr-[2px] text-sm font-semibold mt-[2px]">Platinum</h1>
                 </span>
+                <span className="border-dashed border text-white text-md px-1.5 py-2 rounded-r w-[120px]">30000 Points</span>
+
                 </div>
             <div className="text-sm flex justify-end mt-[20px]">Valid Till: 20Dec, 2021</div>
             </div>
