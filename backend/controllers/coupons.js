@@ -307,3 +307,38 @@ exports.updateCouponsByType = async (req, res, next) => {
       .json({ success: false, message: "Cannot update coupons" });
   }
 };
+
+//@desc Get coupon summary
+//@route GET /api/v1/coupons/summary
+//@access Private
+exports.getCouponSummary = async (req, res, next) => {
+  try {
+    console.log("ONEONE");
+    const couponSummary = await Coupon.aggregate([
+      {
+        $group: {
+          _id: "$type",
+          count: { $sum: 1 },
+          usedCount: { $sum: { $cond: [{ $eq: ["$used", true] }, 1, 0] } },
+          unusedCount: { $sum: { $cond: [{ $eq: ["$used", false] }, 1, 0] } },
+          ownedCount: { $sum: { $cond: [{ $ne: ["$owner", null] }, 1, 0] } },
+          createdAt: { $first: "$createdAt" },
+          expiredDate: { $first: "$expiredDate" },
+          discount: { $first: "$discount" },
+          tiers: { $first: "$tiers" },
+          point: { $first: "$point" },
+        },
+      },
+    ]);
+    console.log("TWOTWO");
+    res.status(200).json({
+      success: true,
+      data: couponSummary,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Cannot get coupon summary" });
+  }
+};

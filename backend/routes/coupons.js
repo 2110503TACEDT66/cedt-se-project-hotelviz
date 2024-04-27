@@ -7,7 +7,8 @@ const {
   deleteCoupon,
   redeemCoupon,
   deleteCouponsByType,
-  updateCouponsByType
+  updateCouponsByType,
+  getCouponSummary
 } = require("../controllers/coupons");
 
 const router = express.Router({ mergeParams: true });
@@ -18,6 +19,9 @@ router
   .route("/")
   .get(protect, getCoupons)
   .post(protect, authorize("admin"), addCoupon);
+
+router.route("/summary").get(protect, getCouponSummary);
+
 router
   .route("/:id")
   .get(semiprotect, getCoupon)
