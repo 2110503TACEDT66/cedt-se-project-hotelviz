@@ -44,6 +44,18 @@ export interface BookingItem {
   id: string;
 }
 
+export class CouponItem {
+  _id: string="";
+  expiredDate: Date= new Date(0);
+  owner: string="";
+  type: string="";
+  tiers: string[]=[];
+  discount: Number=0;
+  createdAt: Date= new Date(0);
+  point: Number=0;
+  used : boolean=false;
+}
+
 export interface HistoryItem {
   _id: string;
   date: Date;
@@ -65,10 +77,20 @@ export interface BookingJson {
   data: BookingItem[];
 }
 
-export interface BookingDetail {
-  date: Date;
-  roomType: RoomType;
-  contactEmail: string;
-  contactName: string;
-  contactTel: string;
+export interface CouponJson {
+  success: boolean;
+  count: number;
+  data: CouponItem[];
+  pagination: Object;
+  total: number;
 }
+
+export interface UserInformation {
+  _id: string;
+  name: string;
+  tel: string;
+  email: string;
+  role: string;
+  createdAt: string;
+}
+
