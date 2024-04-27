@@ -393,8 +393,7 @@ exports.getSingleCouponSummary = async (req, res, next) => {
       },
       {
         $group: {
-          _id: null,
-          type: { $first: "$type" },
+          _id: "$type" ,
           count: { $sum: 1 },
           usedCount: { $sum: { $cond: [{ $eq: ["$used", true] }, 1, 0] } },
           unusedCount: { $sum: { $cond: [{ $eq: ["$used", false] }, 1, 0] } },
