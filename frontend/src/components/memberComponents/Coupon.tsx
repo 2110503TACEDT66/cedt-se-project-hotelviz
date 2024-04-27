@@ -4,7 +4,7 @@ export default function Coupon(
     // {couponType, discount, tier, point, createdDate, expiredDate}: {couponType: string, discount: Number, tier: string[], point: Number, createdDate: Date, expiredDate: Date}
 ) {
     return (
-        <div className=" w-[500px] min-w-[500px] h-[auto] mr-8 my-4 bg-gradient-to-br from-yellow-600 to-indigo-600  text-white text-center py-4 px-8  rounded-lg shadow-md relative  hover:translate-y-[-4px] transition-all duration-250 ease-in-out hover:shadow-md rounded-xl shadow-lg overflow-hidden border-white border-[5px]">
+        <div className=" w-[500px] min-w-[500px] h-[auto] mr-8 my-4 bg-gradient-to-br from-yellow-600 to-indigo-600  text-white text-center py-4 px-8  rounded-lg shadow-md relative  hover:translate-y-[-4px] transition-all duration-250 ease-in-out hover:shadow-md rounded-xl shadow-lg overflow-hidden border-neutral-100 border-[5px]">
             <h1 className="text-3xl font-bold -4">NewYear Sale</h1>
             <hr className='mx-5 my-1'/>
             <h3 className="text-xl font-semibold mb-5">{300} Bath Discount</h3>
@@ -20,8 +20,8 @@ export default function Coupon(
                 </div>
             <div className="text-sm flex justify-end mt-[20px]">Valid Till: 20Dec, 2021</div>
             </div>
-            <div className="w-12 h-12 bg-white rounded-full absolute top-1/2 transform -translate-y-1/2 left-0 -ml-6"></div>
-            <div className="w-12 h-12 bg-white rounded-full absolute top-1/2 transform -translate-y-1/2 right-0 -mr-6"></div>
+            <div className="w-12 h-12 bg-neutral-100 rounded-full absolute top-1/2 transform -translate-y-1/2 left-0 -ml-6"></div>
+            <div className="w-12 h-12 bg-neutral-100 rounded-full absolute top-1/2 transform -translate-y-1/2 right-0 -mr-6"></div>
         </div>
         
         
