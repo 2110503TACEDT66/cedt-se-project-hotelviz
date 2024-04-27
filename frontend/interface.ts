@@ -36,6 +36,7 @@ export interface BookingItem {
   date: Date;
   user: string;
   hotel: HotelItem;
+  roomType: RoomType;
   contactEmail: string;
   contactName: string;
   contactTel: string;
@@ -60,6 +61,7 @@ export interface HistoryItem {
   date: Date;
   user: string;
   hotel: HotelItem;
+  roomType: RoomType;
   contactEmail: string;
   contactName: string;
   contactTel: string;

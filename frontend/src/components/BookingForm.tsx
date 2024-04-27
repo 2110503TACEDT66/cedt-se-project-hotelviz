@@ -6,12 +6,14 @@ import dayjs, { Dayjs } from "dayjs";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { BookingItem } from "../../interface";
+import { BookingItem, RoomType } from "../../interface";
 import getOneBooking from "@/libs/getOneBooking";
 import getBookings from "@/libs/getBookings";
 import DateReserve from "./DateReserve";
+import DateReserveEdit from "./DateReserveEdit";
 
-export default function BookingForm({ hotelID = "" }: { hotelID?: string }) {
+
+export default function BookingForm({ hotelID = "",roomType}: { hotelID?: string,roomType?:RoomType[] }) {
   const { data: session } = useSession();
 
   const urlParams = useSearchParams();
@@ -23,6 +25,7 @@ export default function BookingForm({ hotelID = "" }: { hotelID?: string }) {
     if (session) {
       const item = {
         date: dayjs(bookingDate).toDate(),
+        roomType:roomtype,
         contactEmail: contactEmail,
         contactName: contactName,
         contactTel: contactTel,
@@ -45,6 +48,7 @@ export default function BookingForm({ hotelID = "" }: { hotelID?: string }) {
   const [contactTel, setTel] = useState<string>("");
   const [bookingDate, setBookingDate] = useState<Dayjs | null>(null);
   const [bookingLocation, setBookingLocation] = useState<string>(hotelID);
+  const [roomtype, setRoomType] = useState<RoomType | null>(null);
 
   useEffect(() => {
     const getBooking = async () => {
@@ -58,24 +62,27 @@ export default function BookingForm({ hotelID = "" }: { hotelID?: string }) {
         setTel(booking.contactTel);
         setBookingDate(dayjs(booking.date));
         setBookingLocation(booking.hotel._id);
+        setRoomType(booking.roomType);
       } else {
         const bookings = await getBookings(session.user.token);
         if (bookings.count < 3) setCanCreateBooking(true);
       }
     };
     getBooking();
-  }, [contactName, contactEmail, contactTel, bookingDate, bookingLocation]);
+  }, [contactName, contactEmail, contactTel, bookingDate, bookingLocation, roomtype]);
   
   return (
     <div className="">
       <div className="w-full space-y-2">
-        
+        {!id&&roomType?
+
         <DateReserve
           contactName={contactName}
           contactEmail={contactEmail}
           contactTel={contactTel}
           bookingDate={bookingDate}
           bookingLocation={bookingLocation}
+          roomtype={roomType}
           onNameChange={(value: string) => {
             setName(value);
           }}
@@ -91,7 +98,35 @@ export default function BookingForm({ hotelID = "" }: { hotelID?: string }) {
           onLocationChange={(value: string) => {
             setBookingLocation(value);
           }}
+          onRoomTypeChange={(value: RoomType) => {
+            setRoomType(value);
+          }}
         ></DateReserve>
+        :
+        <DateReserveEdit
+        contactName={contactName}
+          contactEmail={contactEmail}
+          contactTel={contactTel}
+          bookingDate={bookingDate}
+          bookingLocation={bookingLocation}
+          
+          onNameChange={(value: string) => {
+            setName(value);
+          }}
+          onEmailChange={(value: string) => {
+            setEmail(value);
+          }}
+          onTelChange={(value: string) => {
+            setTel(value);
+          }}
+          onDateChange={(value: Dayjs) => {
+            setBookingDate(value);
+          }}
+          onLocationChange={(value: string) => {
+            setBookingLocation(value);
+          }}
+          >
+            </DateReserveEdit>}
       </div>
       <div className="flex flex-row-reverse">
         <button

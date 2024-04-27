@@ -1,7 +1,9 @@
-export default function RoomType({
+import { RoomType } from "../../interface";
+
+export default function RoomTypeInfo({
   roomType,
 }: {
-  roomType: Array<{ _id: number; price: string; key: string }>;
+  roomType: RoomType[];
 }) {
   return (
     <div className="">
