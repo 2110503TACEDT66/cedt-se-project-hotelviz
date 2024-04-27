@@ -5,6 +5,7 @@ const {
   addCoupon,
   updateCoupon,
   deleteCoupon,
+  redeemCoupon,
 } = require("../controllers/coupons");
 
 const router = express.Router({ mergeParams: true });
@@ -20,5 +21,6 @@ router
   .get(semiprotect, getCoupon)
   .put(protect, authorize("admin"), updateCoupon)
   .delete(protect, authorize("admin"), deleteCoupon);
+router.route("/redeem/:couponId").post(protect, redeemCoupon);
 
 module.exports = router;
