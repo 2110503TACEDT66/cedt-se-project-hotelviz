@@ -93,3 +93,4 @@ export interface UserInformation {
   role: string;
   createdAt: string;
 }
+

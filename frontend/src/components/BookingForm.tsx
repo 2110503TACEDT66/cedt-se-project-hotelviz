@@ -11,6 +11,7 @@ import getOneBooking from "@/libs/getOneBooking";
 import getBookings from "@/libs/getBookings";
 import DateReserve from "./DateReserve";
 import DateReserveEdit from "./DateReserveEdit";
+import Link from "next/link";
 
 
 export default function BookingForm({ hotelID = "",roomType}: { hotelID?: string,roomType?:RoomType[] }) {
@@ -21,26 +22,26 @@ export default function BookingForm({ hotelID = "",roomType}: { hotelID?: string
 
   if (id) hotelID = id;
 
-  const makeBooking = async () => {
-    if (session) {
-      const item = {
-        date: dayjs(bookingDate).toDate(),
-        roomType:roomtype,
-        contactEmail: contactEmail,
-        contactName: contactName,
-        contactTel: contactTel,
-      };
-      if (id) {
-        await updateBooking(session.user.token, id, item);
-        window.location.href = "/account/mybookings";
-      } else {
-        if (canCreateBooking) {
-          await createBooking(session.user.token, bookingLocation, item);
-          window.location.href = "/account/mybookings";
-        } else alert("Can't book more than three");
-      }
-    }
-  };
+  // const makeBooking = async () => {
+  //   if (session) {
+  //     const item = {
+  //       date: dayjs(bookingDate).toDate(),
+  //       roomType:roomtype,
+  //       contactEmail: contactEmail,
+  //       contactName: contactName,
+  //       contactTel: contactTel,
+  //     };
+  //     if (id) {
+  //       await updateBooking(session.user.token, id, item);
+  //       window.location.href = "/account/mybookings";
+  //     } else {
+  //       if (canCreateBooking) {
+  //         await createBooking(session.user.token, bookingLocation, item);
+  //         window.location.href = "/account/mybookings";
+  //       } else alert("Can't book more than three");
+  //     }
+  //   }
+  // };
 
   const [canCreateBooking, setCanCreateBooking] = useState<boolean>(false);
   const [contactName, setName] = useState<string>("");
@@ -49,6 +50,8 @@ export default function BookingForm({ hotelID = "",roomType}: { hotelID?: string
   const [bookingDate, setBookingDate] = useState<Dayjs | null>(null);
   const [bookingLocation, setBookingLocation] = useState<string>(hotelID);
   const [roomtype, setRoomType] = useState<RoomType | null>(null);
+  const [key, setKey] = useState<string | null>(null);
+  const [price, setPrice] = useState<number | null>(null);
 
   useEffect(() => {
     const getBooking = async () => {
@@ -65,6 +68,8 @@ export default function BookingForm({ hotelID = "",roomType}: { hotelID?: string
         setRoomType(booking.roomType);
       } else {
         const bookings = await getBookings(session.user.token);
+        setKey(roomtype? roomtype.key : null);
+        setPrice(roomtype? roomtype.price : null);
         if (bookings.count < 3) setCanCreateBooking(true);
       }
     };
@@ -129,13 +134,29 @@ export default function BookingForm({ hotelID = "",roomType}: { hotelID?: string
             </DateReserveEdit>}
       </div>
       <div className="flex flex-row-reverse">
-        <button
+        {/* <button
           name="Book Now!"
           className="block rounded-full bg-orange-500 px-5 py-2 text-white shadow-sm mt-5"
           onClick={makeBooking}
         >
           Book Now!
-        </button>
+        </button> */}
+        <Link
+        href={{
+          pathname: `${window.location.pathname}/payment`,
+          query: {
+            contactName,
+            contactEmail,
+            contactTel,
+            bookingDate: bookingDate ? bookingDate.format() : null,
+            key,
+            price,
+          },
+        }}
+        className="block rounded-full bg-orange-500 px-5 py-2 text-white shadow-sm mt-5"
+        >
+        Book
+        </Link>
       </div>
     </div>
   );
