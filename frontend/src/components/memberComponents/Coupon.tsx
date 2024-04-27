@@ -1,6 +1,8 @@
 import LoyaltyIcon from '@mui/icons-material/Loyalty';
 
-export default function Coupon({couponType, discount, tier, point, createdDate, expiredDate}: {couponType: string, discount: Number, tier: string[], point: Number, createdDate: Date, expiredDate: Date}) {
+export default function Coupon(
+    // {couponType, discount, tier, point, createdDate, expiredDate}: {couponType: string, discount: Number, tier: string[], point: Number, createdDate: Date, expiredDate: Date}
+) {
     return (
         <div className="container mx-auto">
                     <div className="bg-gradient-to-br from-yellow-600 to-indigo-600 w-[600px] h-[250px] text-white text-center py-10 px-20 rounded-lg shadow-md relative cursor-pointer min-w-[188px] hover:translate-y-[-4px] transition-all duration-250 ease-in-out hover:shadow-md rounded-xl shadow-lg overflow-hidden">
