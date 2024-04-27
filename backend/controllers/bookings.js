@@ -114,11 +114,13 @@ exports.addBooking = async (req, res, next) => {
       const roomType = await RoomType.findById(bookedRoom.roomType);
 
       // Add the price of the room type to the user's points
-      const pointsToAdd = parseInt(roomType.price/50);
+      const pointsToAdd = parseInt(roomType.price/10);
+      const exptoAdd = parseInt(roomType.price/100)
 
       // Find the user and update their points
       const user = await User.findById(req.user.id);
       user.point += pointsToAdd;
+      user.experience += exptoAdd;
       await user.save();
     }
   
