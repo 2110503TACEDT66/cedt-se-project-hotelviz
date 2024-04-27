@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { UserInformation } from "../../../interface";
 import getUserProfile from "@/libs/getUserProfile";
+import { Skeleton } from "@mui/material";
+import MemberLoading from "@/components/memberComponents/MemberLoading";
 
 export default function Member() {
 
@@ -25,6 +27,17 @@ export default function Member() {
 
     return(
         <main className=" flex flex-col px-28 py-4">
+          {
+            (userInfo._id == "")? 
+            <div className="flex flex-wrap">
+            <div className="w-full xl:w-1/2 p-4 min-w-[500px]">
+            <MemberLoading/>
+            </div>
+            <div className="w-full xl:w-1/2 p-4 min-w-[500px]">
+            <MemberLoading/>
+            </div>
+          </div>
+        :
           <div className="flex flex-wrap">
             <div className="w-full xl:w-1/2 p-4 min-w-[500px]">
             <MemberExp memberInfo={userInfo}/>
@@ -33,6 +46,8 @@ export default function Member() {
             <MemberInfo memberInfo={userInfo}/>
             </div>
           </div>
+          }
+          
           <div>
               <Coupon/>      
           </div>

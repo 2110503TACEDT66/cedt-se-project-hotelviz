@@ -16,7 +16,7 @@ export default async function userSignUp(
         tel: userTel,
         email: userEmail,
         password: userPassword,
-        role: "user",
+        role: "Bronze",
       }),
     }
   );
