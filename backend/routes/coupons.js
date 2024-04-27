@@ -6,6 +6,8 @@ const {
   updateCoupon,
   deleteCoupon,
   redeemCoupon,
+  deleteCouponsByType,
+  updateCouponsByType
 } = require("../controllers/coupons");
 
 const router = express.Router({ mergeParams: true });
@@ -19,8 +21,15 @@ router
 router
   .route("/:id")
   .get(semiprotect, getCoupon)
-  .put(protect, authorize("admin"), updateCoupon)
+  .put(protect, updateCoupon)
   .delete(protect, authorize("admin"), deleteCoupon);
+
 router.route("/redeem/:couponId").post(protect, redeemCoupon);
+
+router
+  .route("/type/:couponType")
+  .delete(protect, authorize("admin"), deleteCouponsByType)
+  .put(protect, authorize("admin"), updateCouponsByType);
+
 
 module.exports = router;
