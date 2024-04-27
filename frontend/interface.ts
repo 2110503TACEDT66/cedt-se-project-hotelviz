@@ -84,3 +84,12 @@ export interface CouponJson {
   pagination: Object;
   total: number;
 }
+
+export interface UserInformation {
+  _id: string;
+  name: string;
+  tel: string;
+  email: string;
+  role: string;
+  createdAt: string;
+}
