@@ -20,7 +20,7 @@ export default function Member() {
 
   const [userCoupons, setUserCoupons] = useState<CouponItem[]>([]);
 
-  const [CouponsRedeem, setCouponsRedeem] = useState<CouponSummary[]>([]);
+  const [CouponsRedeem, setCouponsRedeem] = useState<CouponSummaryItem[]>([]);
 
 
 
@@ -40,12 +40,14 @@ export default function Member() {
       if (session && userInfo._id === "") {
         const userInfoA:UserInformation = (await getUserProfile(session?.user.token)).data;
         const userCouponsData: CouponItem[] = (await getCouponsForUser(session?.user.token)).data;
-        const CouponsRe: CouponSummary[] = (await getCouponsRedeem(session?.user.token)).data;
+        const CouponsRe: CouponSummaryItem[] = (await getCouponsRedeem(session?.user.token)).data;
         // const userCoupons: CouponItem[] = userInfoA.coupons;
         console.log ;
         setUserInfo(userInfoA);
         setUserCoupons(userCouponsData);
-        setCouponsRedeem(CouponsRe);
+
+        const filteredCouponsRedeem = CouponsRe.filter(coupon => coupon.tiers.includes(userInfoA.tier));
+        setCouponsRedeem(filteredCouponsRedeem);
 
       }
     };
