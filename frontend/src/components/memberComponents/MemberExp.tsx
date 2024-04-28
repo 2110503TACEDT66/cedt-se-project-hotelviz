@@ -26,7 +26,7 @@ export default function MemberExp({memberInfo} : {memberInfo:UserInformation}) {
             setColorB("text-yellow-500");
             setFullExp(500);
             setNextTier("Platinum");
-        } else if (tier == "Sliver" || tier == "sliver") {
+        } else if (tier == "Silver" || tier == "silver") {
             setColorA("#64748b");
             setColorB("text-slate-500");
             setFullExp(200);

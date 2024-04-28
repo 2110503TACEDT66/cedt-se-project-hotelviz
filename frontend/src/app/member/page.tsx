@@ -76,17 +76,22 @@ export default function Member() {
             </div>
           </div>
           }
-          <h1 className="text-2xl font-bold mx-4 mt-8">Your Coupon</h1>
+          {
+            (userCoupons.length != 0)?
+            <h1 className="text-2xl font-bold mx-4 mt-8">Your Coupon</h1>
+            : 
+            <div></div>
+          }
           <div className="flex overflow-x-auto mx-4 ">
               {userCoupons.map((coupon) => (
                 <Coupon  coupon={coupon} />
               ))}
           </div>
           
-          <h1 className="text-2xl font-bold mx-4 mt-8">Collect coupons here !</h1>
+          <h1 className="text-2xl font-bold mx-4 mt-8">Redeem coupon here !</h1>
           <div className="flex overflow-x-auto mx-4 ">
               {CouponsRedeem.map((coupon) => (
-                <CouponSummary   coupon={coupon}/>
+                <CouponSummary coupon={coupon} userInfo={userInfo}/>
               ))}
               {/* <Coupon/>      
               <Coupon/>      
