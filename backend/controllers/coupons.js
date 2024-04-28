@@ -5,7 +5,7 @@ exports.getCoupons = async (req, res, next) => {
   let query;
   //General users can see only their coupons!
   if (req.user.role !== "admin") {
-    query = Coupon.find({ user: req.user.id });
+    query = Coupon.find({ owner: req.user.id });
   } else {
     //If you are an admin, you can see all!
     query = Coupon.find();
@@ -54,8 +54,24 @@ exports.getCoupon = async (req, res, next) => {
 //@access Private
 exports.addCoupon = async (req, res, next) => {
   try {
-    const coupon = await Coupon.create(req.body);
-    res.status(201).json({ success: true, data: coupon });
+    const { numberOfCoupons, type, ...couponData } = req.body;
+    const coupons = [];
+
+    // Check if the coupon type already exists
+    const existingCoupon = await Coupon.findOne({ type });
+    if (existingCoupon) {
+      return res.status(400).json({
+        success: false,
+        message: `Coupon type '${type}' already exists`,
+      });
+    }
+
+    for (let i = 0; i < numberOfCoupons; i++) {
+      const coupon = await Coupon.create({ ...couponData, type });
+      coupons.push(coupon);
+    }
+
+    res.status(201).json({ success: true, data: coupons });
   } catch (error) {
     console.log(error.stack);
     return res.status(400).json({
@@ -79,20 +95,36 @@ exports.updateCoupon = async (req, res, next) => {
     }
 
     if (req.user.role !== "admin") {
-      return res.status(401).json({
-        success: false,
-        message: `User ${req.user.id} is not authorized to update this coupon`,
+      // Check if the user owns the coupon and the coupon is not already used
+      if (coupon.owner==null || req.user.id.toString() !== coupon.owner.toString() || coupon.used) {
+        console.log(`${coupon.owner}, ${req.user.id.toString()}, ${coupon.owner.toString()}, ${coupon.used}`);
+        return res.status(401).json({
+          success: false,
+          message: `User ${req.user.id} is not authorized to update this coupon`,
+        });
+      }
+
+      // Allow users to update only the 'used' field to true
+      req.body = { used: true };
+      coupon = await Coupon.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+        runValidators: true,
+      });
+      res.status(200).json({
+        success: true,
+        data: coupon,
+      });
+    } 
+    else{
+      coupon = await Coupon.findByIdAndUpdate(req.params.id, req.body, {
+        new: true,
+        runValidators: true,
+      });
+      res.status(200).json({
+        success: true,
+        data: coupon,
       });
     }
-
-    coupon = await Coupon.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-    res.status(200).json({
-      success: true,
-      data: coupon,
-    });
   } catch (error) {
     console.log(error);
     return res
@@ -134,39 +166,43 @@ exports.deleteCoupon = async (req, res, next) => {
   }
 };
 
-//@desc Redeem one coupon
-//@route POST /api/v1/coupons/reddem/: couponID
+//@desc Redeem one coupon by type
+//@route POST /api/v1/coupons/redeem/type/:couponType
 //@access Private
 exports.redeemCoupon = async (req, res, next) => {
   try {
-    const coupon = await Coupon.findById(req.params.couponId);
+    const { couponType } = req.params;
+    let user;
+    
+    if (req.user.role === "admin" && req.body.user != null)
+      user = await User.findById(req.body.user);
+    else user = await User.findById(req.user.id);
+  
+    console.log(couponType, user);
+    // Find an unowned coupon of the specified type
+    const coupon = await Coupon.findOne({
+      type: couponType,
+      owner: null,
+      used: false,
+    });
+
     if (!coupon) {
       return res.status(404).json({
         success: false,
-        message: `No coupon with the id of ${req.params.couponId}`,
-      });
-    } else if (coupon.owner != undefined) {
-      return res.status(404).json({
-        success: false,
-        message: `Coupon with the id of ${req.params.couponId} is already owned`,
+        message: `No unowned coupons found for type ${couponType}`,
       });
     }
 
-    let user;
-
-    if (req.user.role === "admin" && req.body.user != undefined)
-      user = await User.findById(req.body.user);
-    else user = await User.findById(req.user.id);
-
-    if (user.coupons.includes(req.params.couponId)) {
+    // Check if the user's tier is eligible for the coupon (skip for admins)
+    if (req.user.role !== "admin" && !coupon.tiers.includes(user.tier)) {
       return res.status(400).json({
         success: false,
-        message: `The user with ID ${user.id} has already owned this coupon`,
+        message: `The user with ID ${user.id} is not eligible for this coupon`,
       });
     }
 
     if (req.user.role === "admin") {
-      //free coupon
+      // free coupon
     } else if (user.point >= coupon.point) {
       user.point -= coupon.point;
     } else {
@@ -179,7 +215,7 @@ exports.redeemCoupon = async (req, res, next) => {
     coupon.owner = user.id;
     await coupon.save();
 
-    user.coupons.push(req.params.couponId);
+    user.coupons.push(coupon._id);
     await user.save();
     res.status(201).json({
       success: true,
@@ -192,5 +228,201 @@ exports.redeemCoupon = async (req, res, next) => {
     return res
       .status(500)
       .json({ success: false, message: "Cannot redeem coupon" });
+  }
+};
+
+//@desc Delete coupons by type
+//@route DELETE /api/v1/coupons/type/:couponType
+//@access Private
+exports.deleteCouponsByType = async (req, res, next) => {
+  try {
+    const { couponType } = req.params;
+
+    // Check if the user is an admin
+    if (req.user.role !== "admin") {
+      return res.status(401).json({
+        success: false,
+        message: `User ${req.user.id} is not authorized to delete coupons`,
+      });
+    }
+
+    // Find and delete coupons with the provided couponType
+    const deletedCoupons = await Coupon.deleteMany({ type: couponType });
+
+    if (deletedCoupons.deletedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: `No coupons found with type ${couponType}`,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {},
+      message: `${deletedCoupons.deletedCount} coupons with type ${couponType} deleted successfully`,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Cannot delete coupons" });
+  }
+};
+
+//@desc Update coupons by type
+//@route PUT /api/v1/coupons/type/:couponType
+//@access Private
+exports.updateCouponsByType = async (req, res, next) => {
+  try {
+    const { couponType } = req.params;
+    const updateData = req.body;
+
+    // Check if the user is an admin
+    if (req.user.role !== "admin") {
+      return res.status(401).json({
+        success: false,
+        message: `User ${req.user.id} is not authorized to update coupons`,
+      });
+    }
+
+    // Find and update coupons with the provided couponType
+    const updatedCoupons = await Coupon.updateMany(
+      { type: couponType },
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    if (updatedCoupons.modifiedCount === 0) {
+      return res.status(404).json({
+        success: false,
+        message: `No coupons found with type ${couponType}`,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: updatedCoupons,
+      message: `${updatedCoupons.modifiedCount} coupons with type ${couponType} updated successfully`,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Cannot update coupons" });
+  }
+};
+
+//@desc Get coupon summary
+//@route GET /api/v1/coupons/summary
+//@access Private
+exports.getCouponSummary = async (req, res, next) => {
+  try {
+    const couponSummary = await Coupon.aggregate([
+      {
+        $group: {
+          _id: "$type",
+          count: { $sum: 1 },
+          usedCount: { $sum: { $cond: [{ $eq: ["$used", true] }, 1, 0] } },
+          unusedCount: { $sum: { $cond: [{ $eq: ["$used", false] }, 1, 0] } },
+          ownedCount: { $sum: { $cond: [{ $ne: ["$owner", null] }, 1, 0] } },
+          createdAt: { $first: "$createdAt" },
+          expiredDate: { $first: "$expiredDate" },
+          discount: { $first: "$discount" },
+          tiers: { $first: "$tiers" },
+          point: { $first: "$point" },
+        },
+      },
+    ]);
+    res.status(200).json({
+      success: true,
+      data: couponSummary,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Cannot get coupon summary" });
+  }
+};
+
+//@desc Get coupon summary
+//@route GET /api/v1/coupons/summary
+//@access Private
+exports.getCouponSummary = async (req, res, next) => {
+  try {
+    const couponSummary = await Coupon.aggregate([
+      {
+        $group: {
+          _id: "$type",
+          count: { $sum: 1 },
+          usedCount: { $sum: { $cond: [{ $eq: ["$used", true] }, 1, 0] } },
+          unusedCount: { $sum: { $cond: [{ $eq: ["$used", false] }, 1, 0] } },
+          ownedCount: { $sum: { $cond: [{ $ne: ["$owner", null] }, 1, 0] } },
+          unownedCount: { $sum: { $cond: [{ $eq: ["$owner", null] }, 1, 0] } },
+          createdAt: { $first: "$createdAt" },
+          expiredDate: { $first: "$expiredDate" },
+          discount: { $first: "$discount" },
+          tiers: { $first: "$tiers" },
+          point: { $first: "$point" },
+        },
+      },
+    ]);
+    res.status(200).json({
+      success: true,
+      data: couponSummary,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Cannot get coupon summary" });
+  }
+};
+
+//@desc Get summary for a single coupon type
+//@route GET /api/v1/coupons/type/:couponType
+//@access Private
+exports.getSingleCouponSummary = async (req, res, next) => {
+  try {
+    const couponType = req.params.couponType;
+
+    // Aggregate data for the coupon type
+    const couponSummary = await Coupon.aggregate([
+      {
+        $match: { type: couponType },
+      },
+      {
+        $group: {
+          _id: "$type" ,
+          count: { $sum: 1 },
+          usedCount: { $sum: { $cond: [{ $eq: ["$used", true] }, 1, 0] } },
+          unusedCount: { $sum: { $cond: [{ $eq: ["$used", false] }, 1, 0] } },
+          ownedCount: { $sum: { $cond: [{ $ne: ["$owner", null] }, 1, 0] } },
+          unownedCount: { $sum: { $cond: [{ $eq: ["$owner", null] }, 1, 0] } },
+          createdAt: { $first: "$createdAt" },
+          expiredDate: { $first: "$expiredDate" },
+          discount: { $first: "$discount" },
+          tiers: { $first: "$tiers" },
+          point: { $first: "$point" },
+        },
+      },
+    ]);
+
+    if (couponSummary.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: `No coupons found with type ${couponType}`,
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: couponSummary[0],
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Cannot get coupon summary" });
   }
 };
