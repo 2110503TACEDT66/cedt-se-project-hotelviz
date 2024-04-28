@@ -193,7 +193,7 @@ const { protect, authorize } = require("../middleware/auth");
 * @swagger
 * /bookings/{id}:
 *   get:
-*     summary: Get the booking by id
+*     summary: Get one booking by id
 *     tags: [Bookings]
 *     parameters:
 *       - in: path
@@ -216,7 +216,7 @@ const { protect, authorize } = require("../middleware/auth");
 * @swagger
 * /hotels/{id}/bookings:
 *   get:
-*     summary: Get the booking by hotel id
+*     summary: Get bookings by hotel id
 *     tags: [Bookings]
 *     parameters:
 *       - in: path
@@ -348,7 +348,7 @@ const { protect, authorize } = require("../middleware/auth");
 * @swagger
 * /bookings/{id}:
 *   put:
-*     summary: Update the booking by the id
+*     summary: Update one booking by the id
 *     tags: [Bookings]
 *     parameters:
 *       - in: path
@@ -379,7 +379,7 @@ const { protect, authorize } = require("../middleware/auth");
 * @swagger
 * /bookings//history/{id}:
 *   put:
-*     summary: Update the booking history by the id
+*     summary: Update one booking history by the id
 *     tags: [Bookings]
 *     parameters:
 *       - in: path
@@ -410,7 +410,7 @@ const { protect, authorize } = require("../middleware/auth");
 * @swagger
 * /bookings/{id}:
 *   delete:
-*     summary: Remove the booking by id
+*     summary: Remove one booking by id
 *     tags: [Bookings]
 *     parameters:
 *       - in: path
