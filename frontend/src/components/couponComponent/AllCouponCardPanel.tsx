@@ -4,30 +4,27 @@ import AllCouponCard from "./AllCouponCard";
 import { useReducer, useState } from "react";
 import { useEffect } from "react";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import getCoupons from "@/libs/getCoupons";
+import getSummaryCoupon from "@/libs/getSummaryCoupon";
 import { CircularProgress } from "@mui/material";
 import LoadingHotelCard from "../hotelsComponents/LoadingHotelCard";
 import PaginationBar from "../PaginationBar";
 import Skeleton from "@mui/material/Skeleton";
-import { CouponItem, CouponJson } from "../../../interface";
+import { CouponItem, CouponJson, SummaryCoupon } from "../../../interface";
 
 export default function AllCouponCardPanel({ session }: { session: any }) {
   const [spinner, setSpinner] = useState(true);
-  const [coupons, setCoupons] = useState<CouponJson>();
-  const pageReducer = (page: number, action: { newPage: number }) => {
-    return action.newPage;
-  };
-  const [page, dispatchPage] = useReducer(pageReducer, 1);
+  const [coupons, setCoupons] = useState<SummaryCoupon[]>();
+
 
   useEffect(() => {
     const fetchData = async () => {
       setSpinner(true);
-      const coupons = await getCoupons(session.user.token, 4, page);
-      setCoupons(coupons);
+      const response = await getSummaryCoupon(session.user.token);
+      setCoupons(response);
       setSpinner(false);
     };
     fetchData();
-  }, [page]);
+  }, []);
 
   return (
     <div className="my-0 relative bg-blue">
@@ -46,19 +43,24 @@ export default function AllCouponCardPanel({ session }: { session: any }) {
           {spinner ? <LoadingHotelCard /> : ""}
           {spinner ? <LoadingHotelCard /> : ""}
           {!spinner && coupons
-            ? coupons.data.map((coupon: CouponItem) => (
+            ? coupons.map((coupon:SummaryCoupon) => (
                 <AllCouponCard
-                  couponType={coupon.type}
+                  couponType={coupon._id}
                   discount={coupon.discount}
                   tier={coupon.tiers}
                   point={coupon.point}
                   createdDate={coupon.createdAt}
                   expiredDate={coupon.expiredDate}
+                  count={coupon.count}
+                  usedCount={coupon.usedCount}
+                  unusedCount={coupon.unusedCount}
+                  ownedCount={coupon.ownedCount}
+                  unownedCount={coupon.unownedCount}
                 ></AllCouponCard>
               ))
             : ""}
         </div>
-        <div className="py-5 justify-self-center mx-auto">
+        {/* <div className="py-5 justify-self-center mx-auto">
           {coupons && !spinner ? (
             <PaginationBar
               totalPages={Math.ceil(coupons.total / 4)}
@@ -90,7 +92,7 @@ export default function AllCouponCardPanel({ session }: { session: any }) {
               />
             </div>
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );

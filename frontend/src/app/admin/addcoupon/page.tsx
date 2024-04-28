@@ -2,14 +2,16 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import getOneHotel from "@/libs/getOneHotel";
-import HotelForm from "@/components/HotelForm";
-import createHotel from "@/libs/createHotel";
-import updateHotel from "@/libs/updateHotel";
-import deleteHotel from "@/libs/deleteHotel";
-import { CouponItem } from "../../../../interface";
+import createCoupon from "@/libs/createCoupon";
+import updateCoupon from "@/libs/updateCoupon";
+import deleteCoupon from "@/libs/deleteCoupon";
+import { CouponItem, SummaryCoupon } from "../../../../interface";
 import Link from "next/link";
-import getCoupons from "@/libs/getCoupons";
+import dayjs from "dayjs";
+import getSingleCouponSummary from "@/libs/getSingleCouponSummary";
+
+import CouponForm from "@/components/couponComponent/CouponForm";
+import getCoupon from "@/libs/getCoupon";
 
 export default function AddCoupon() {
   const { data: session } = useSession();
@@ -17,50 +19,76 @@ export default function AddCoupon() {
   const urlParams = useSearchParams();
   const id = urlParams.get("id");
 
-  const [coupon, setCoupon] = useState<CouponItem>(new CouponItem());
+  const makeCoupon = async () => {
+    if (session) {
+      const item = {
+        type:coupon.type,
+        discount:coupon.discount,
+        tiers:coupon.tiers,
+        point:coupon.point,
+        expiredDate:dayjs(coupon.expiredDate),
+        numberOfCoupons:numberOfCoupons,
+
+      };
+      if (id) {
+        await updateCoupon(session.user.token, id, item);
+      } else await createCoupon(session.user.token, item);
+      //window.location.href = "/account/mybookings";
+    }
+  };
+
+  const [coupon, setCoupon] = useState<SummaryCoupon>(new SummaryCoupon());
+  const [numberOfCoupons,setnumberOfCoupons] = useState<Number>(0);
 
   useEffect(() => {
-    const getBooking = async () => {
-      if (id != null && session && coupon._id == "") {
-        setCoupon((await getCoupons(session.user.token, id)).data);
+    const getData = async () => {
+      if (id != null && session&&coupon._id == "") {
+        const response =(await getSingleCouponSummary(session.user.token, id));
+        setCoupon(response);
+        console.log(coupon);
       }
     };
-    getBooking();
+    getData();
   }, [coupon]);
 
   return (
     <main className="w-[100%] flex flex-row space-y-4">
       {session?.user.role == "admin" ? (
         <div className="w-[70%] m-10 flex flex-col">
-            <div className="text-4xl font-medium py-5">{!id?"Add Hotel":"Edit Hotel"}</div>
+            <div className="text-4xl font-medium py-5">{!id?"Add Coupon":"Edit Coupon"}</div>
           <div className="">
             
               
-              <HotelForm
-                hotel={hotel}
-                onHotelChange={(value: HotelItem) => {
-                  setHotel(value);
+              <CouponForm
+                coupon={coupon}
+                onCouponChange={(value: SummaryCoupon) => {
+                  setCoupon(value);
+                  
                 }}
-              ></HotelForm>
-           <Link href="/admin/allHotels">
+                onNumberCouponChange={(value: Number) => {
+                  setnumberOfCoupons(value);
+                }}
+                
+              ></CouponForm>
+           <Link href="/admin/managecoupon">
               <button
-                name="Edit Hotel"
+                name="Edit Coupon"
                 className="block rounded-full bg-sky-500 px-5 py-2 text-white shadow-sm m-5"
-                onClick={makeBooking}
+                onClick={makeCoupon}
               >
-                {id?"Edit Hotel":"Add Hotel"}
+                {id?"Edit Coupon":"Add Coupon"}
               </button>
             </Link>
             {id ?
             
               <button
-                name="Delete Hotel"
+                name="Delete Coupon"
                 className="block rounded-full bg-red-500 px-5 py-2 text-white shadow-sm m-5"
                 onClick={async () => {
-                  if (id&&confirm("Are you sure you want to delete this booking?")) {
-                    await deleteHotel(session.user.token, id);
+                  if (id&&confirm("Are you sure you want to delete this Coupon?")) {
+                    await deleteCoupon(session.user.token, id);
 
-                    window.location.href="/admin/allHotels"
+                    window.location.href="/admin/managecoupon"
                   }
                 }}
               >
