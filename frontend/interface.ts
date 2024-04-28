@@ -111,3 +111,16 @@ export interface Coupons {
   createAt: string;
   expiredDate: string;
 }
+
+export interface CouponSummary {
+  _id: string;
+  count: number;
+  usedCount: number;
+  unusedCount: number;
+  ownedCount: number;
+  createdAt: string;
+  expiredDate: string;
+  discount: number;
+  tiers: string[];
+  point: number;
+}
