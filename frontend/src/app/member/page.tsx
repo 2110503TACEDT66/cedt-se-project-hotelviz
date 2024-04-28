@@ -9,7 +9,6 @@ import getUserProfile from "@/libs/getUserProfile";
 import { Skeleton } from "@mui/material";
 import MemberLoading from "@/components/memberComponents/MemberLoading";
 import getCouponsForUser from "@/libs/getCouponsForUser";
-import userCoupon from "@/components/memberComponents/userCoupon";
 
 export default function Member() {
 
@@ -40,11 +39,9 @@ export default function Member() {
         const userInfoA:UserInformation = (await getUserProfile(session?.user.token)).data;
         const userCouponsData: CouponItem[] = (await getCouponsForUser(session?.user.token)).data;
         // const userCoupons: CouponItem[] = userInfoA.coupons;
-        console.log ;
+        
         setUserInfo(userInfoA);
         setUserCoupons(userCouponsData);
-        // setUserCouponsU(userCoupons);
-
       }
     };
     fetchUserData();
@@ -72,27 +69,26 @@ export default function Member() {
             </div>
           </div>
           }
-
           <h1 className="text-2xl font-bold mx-4 mt-8">Your Coupon</h1>
+          <div className="flex overflow-x-auto mx-4 ">
+              {userCoupons.map((coupon) => (
+                <Coupon  coupon={coupon} />
+              ))}
+          </div>
           <div className="flex overflow-x-auto mx-4 ">
             
               {/* <userCoupon key={} coupon={userInfo.coupons} /> */}
-            {userInfo.coupons.map((coupon,index) => (
+            {/* {userInfo.coupons.map((coupon,index) => (
                   <Coupon key={index} coupon={coupon} />
-              ))}
-              {/* <Coupon/>      
-              <Coupon/>       */}
+              ))} */}
+              
           </div>
           <h1 className="text-2xl font-bold mx-4 mt-8">Collect coupons here !</h1>
-          <div className="flex overflow-x-auto mx-4 ">
-              {userCoupons.map((coupon, index) => (
-                <Coupon key={index} coupon={coupon} />
+          {/* <div className="flex overflow-x-auto mx-4 ">
+              {userCoupons.map((coupon) => (
+                <Coupon  coupon={coupon} />
               ))}
-              {/* <Coupon/>      
-              <Coupon/>      
-              <Coupon/>                 
-              <Coupon/>       */}
-          </div>
+          </div> */}
         </main>
     )
 }
