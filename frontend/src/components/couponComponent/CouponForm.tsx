@@ -48,6 +48,7 @@ export default function CouponForm({
     return (
       <div className="bg-slate-100 rounded-lg space-y-5 w-full px-10 py-5 flex flex-col">
         <div>Coupon Type</div>
+
         <TextField
           variant="outlined"
           name="name"

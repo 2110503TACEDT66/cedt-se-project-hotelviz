@@ -9,6 +9,7 @@ import { CouponItem, SummaryCoupon } from "../../../../interface";
 import Link from "next/link";
 import dayjs from "dayjs";
 import getSingleCouponSummary from "@/libs/getSingleCouponSummary";
+import { LinearProgress } from "@mui/material";
 
 import CouponForm from "@/components/couponComponent/CouponForm";
 import getCoupon from "@/libs/getCoupon";
@@ -43,22 +44,22 @@ export default function AddCoupon() {
   useEffect(() => {
     const getData = async () => {
       if (id != null && session&&coupon._id == "") {
-        const response =(await getSingleCouponSummary(session.user.token, id));
+        const response =(await getSingleCouponSummary(session.user.token, id)) as SummaryCoupon;
         setCoupon(response);
-        console.log(coupon);
       }
     };
     getData();
-  }, [coupon]);
+  }, []);
 
   return (
     <main className="w-[100%] flex flex-row space-y-4">
       {session?.user.role == "admin" ? (
         <div className="w-[70%] m-10 flex flex-col">
             <div className="text-4xl font-medium py-5">{!id?"Add Coupon":"Edit Coupon"}</div>
+
           <div className="">
             
-              
+              {coupon._id == ""? <LinearProgress />:
               <CouponForm
                 coupon={coupon}
                 onCouponChange={(value: SummaryCoupon) => {
@@ -69,7 +70,7 @@ export default function AddCoupon() {
                   setnumberOfCoupons(value);
                 }}
                 
-              ></CouponForm>
+              ></CouponForm>}
            <Link href="/admin/managecoupon">
               <button
                 name="Edit Coupon"
