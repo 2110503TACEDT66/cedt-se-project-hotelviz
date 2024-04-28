@@ -1,10 +1,10 @@
 import LoyaltyIcon from '@mui/icons-material/Loyalty';
 import {useReducer, useState } from "react";
-import { CouponSummary } from '../../../interface';
+import { CouponSummaryItem } from '../../../interface';
 
-export default function couponSummary(
+export default function CouponSummary(
     // {couponId,couponType, discount, tier, point, createdDate, expiredDate}: {couponId:string, couponType: string, discount: Number, tier: string[], point: Number, createdDate: Date, expiredDate: Date}
-    { coupon }: { coupon: CouponSummary }
+    { coupon }: { coupon: CouponSummaryItem }
 ) {
 
     // const [spinner, setSpinner] = useState(true);

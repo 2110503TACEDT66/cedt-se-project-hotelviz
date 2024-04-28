@@ -4,12 +4,13 @@ import MemberInfo from "@/components/memberComponents/MemberInfo";
 import Coupon from "@/components/memberComponents/Coupon";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { UserInformation, CouponItem, CouponSummary } from "../../../interface";
+import { UserInformation, CouponItem, CouponSummaryItem } from "../../../interface";
 import getUserProfile from "@/libs/getUserProfile";
 import { Skeleton } from "@mui/material";
 import MemberLoading from "@/components/memberComponents/MemberLoading";
 import getCouponsForUser from "@/libs/getCouponsForUser";
-import userCoupon from "@/components/memberComponents/userCoupon";
+import getCouponsRedeem from "@/libs/getCouponsRedeem";
+import CouponSummary from "@/components/memberComponents/CouponSummary";
 
 export default function Member() {
 
@@ -44,7 +45,7 @@ export default function Member() {
         console.log ;
         setUserInfo(userInfoA);
         setUserCoupons(userCouponsData);
-        // setUserCouponsU(userCoupons);
+        setCouponsRedeem(CouponsRe);
 
       }
     };
@@ -79,21 +80,11 @@ export default function Member() {
                 <Coupon  coupon={coupon} />
               ))}
           </div>
-          <div className="flex overflow-x-auto mx-4 ">
-            {userCoupons.map((coupon, index) => (
-                <Coupon key={index} coupon={coupon} />
-              ))}
-              {/* <userCoupon key={} coupon={userInfo.coupons} /> */}
-            {/* {userInfo.coupons.map((coupon,index) => (
-                  <Coupon key={index} coupon={coupon} />
-              ))}
-              {/* <Coupon/>      
-              <Coupon/>       */}
-          </div>
+          
           <h1 className="text-2xl font-bold mx-4 mt-8">Collect coupons here !</h1>
           <div className="flex overflow-x-auto mx-4 ">
-              {userCoupons.map((coupon, index) => (
-                <Coupon key={index} coupon={coupon} />
+              {CouponsRedeem.map((coupon) => (
+                <CouponSummary   coupon={coupon}/>
               ))}
               {/* <Coupon/>      
               <Coupon/>      

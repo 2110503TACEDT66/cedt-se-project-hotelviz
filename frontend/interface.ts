@@ -112,7 +112,7 @@ export interface Coupons {
   expiredDate: string;
 }
 
-export interface CouponSummary {
+export interface CouponSummaryItem {
   _id: string;
   count: number;
   usedCount: number;
