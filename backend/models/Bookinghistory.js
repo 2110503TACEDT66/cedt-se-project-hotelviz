@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const BookinghistoriesSchema = new mongoose.Schema(
+const BookinghistorySchema = new mongoose.Schema(
   {
     date: {
       type: Date,
@@ -49,4 +49,4 @@ const BookinghistoriesSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Bookinghistories", BookinghistoriesSchema);
+module.exports = mongoose.model("Bookinghistory", BookinghistorySchema);
