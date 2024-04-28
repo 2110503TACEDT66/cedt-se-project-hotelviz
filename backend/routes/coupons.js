@@ -117,7 +117,7 @@ const { semiprotect, protect, authorize } = require("../middleware/auth");
 * @swagger
 * /coupons/{id}:
 *   get:
-*     summary: Get the coupon by id
+*     summary: Get one coupon by id
 *     tags: [Coupons]
 *     parameters:
 *       - in: path
@@ -222,7 +222,7 @@ const { semiprotect, protect, authorize } = require("../middleware/auth");
 * @swagger
 * /coupons/{id}:
 *   put:
-*     summary: Update the coupon by the id
+*     summary: Update one coupon by the id
 *     tags: [Coupons]
 *     parameters:
 *       - in: path
@@ -253,7 +253,7 @@ const { semiprotect, protect, authorize } = require("../middleware/auth");
 * @swagger
 * /coupons/type/{couponType}:
 *   put:
-*     summary: Update the coupon by the type
+*     summary: Update coupons by the type
 *     tags: [Coupons]
 *     parameters:
 *       - in: path
@@ -284,7 +284,7 @@ const { semiprotect, protect, authorize } = require("../middleware/auth");
 * @swagger
 * /coupons/{id}:
 *   delete:
-*     summary: Remove the coupon by id
+*     summary: Remove one coupon by id
 *     tags: [Coupons]
 *     parameters:
 *       - in: path
@@ -322,8 +322,11 @@ const { semiprotect, protect, authorize } = require("../middleware/auth");
 * @swagger
 * /coupons/redeem/{id}:
 *   post:
-*     summary: Redeem a coupon
+*     summary: Buy one coupon
 *     tags: [Coupons]
+*     description: |
+*       <b>Note:</b> Only an admin can buy coupon for other user by putting their id in the request body<br>
+*       Default user can only buy coupon for themself (No need to fill the request body)
 *     parameters:
 *       - in: path
 *         name: id

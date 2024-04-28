@@ -1,5 +1,5 @@
 const Booking = require("../models/Booking");
-const Bookinghistories = require("../models/Bookinghistories");
+const Bookinghistory = require("../models/Bookinghistory");
 const Hotel = require("../models/Hotel");
 const User = require('../models/User');
 
@@ -215,19 +215,19 @@ exports.getBookingHistory = async (req, res, next) => {
   let query;
   //General users can see only their bookings!
   if (req.user.role !== "admin") {
-    query = Bookinghistories.find({ user: req.user.id }).populate({
+    query = Bookinghistory.find({ user: req.user.id }).populate({
       path: "hotel",
       select: "name address district province postalcode tel region image",
     });
   } else {
     //If you are an admin, you can see all!
     if (req.params.hotelId) {
-      query = Bookinghistories.find({ hotel: req.params.hotelId }).populate({
+      query = Bookinghistory.find({ hotel: req.params.hotelId }).populate({
         path: "hotel",
         select: "name address district province postalcode tel region image",
       });
     } else
-      query = Bookinghistories.find().populate({
+      query = Bookinghistory.find().populate({
         path: "hotel",
         select: "name address district province postalcode tel region image",
       });
@@ -268,7 +268,7 @@ exports.addBookingHistory = async (req, res, next) => {
   }
 
   try {
-    const booking = await Bookinghistories.create(req.body);
+    const booking = await Bookinghistory.create(req.body);
     res.status(201).json({
       success: true,
       data: booking,
@@ -287,7 +287,7 @@ exports.addBookingHistory = async (req, res, next) => {
 //@access Private
 exports.updateBookingHistory = async (req, res, next) => {
   try {
-    let booking = await Bookinghistories.findById(req.params.id);
+    let booking = await Bookinghistory.findById(req.params.id);
     if (!booking) {
       return res.status(404).json({
         success: false,
@@ -303,7 +303,7 @@ exports.updateBookingHistory = async (req, res, next) => {
       });
     }
 
-    booking = await Bookinghistories.findByIdAndUpdate(
+    booking = await Bookinghistory.findByIdAndUpdate(
       req.params.id,
       req.body,
       {

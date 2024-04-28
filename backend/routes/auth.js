@@ -272,7 +272,7 @@ const { protect } = require("../middleware/auth");
 * @swagger
 * /auth/me:
 *   get:
-*     summary: About me
+*     summary: Get logged-in user
 *     tags: [Users]
 *     responses:
 *       200:
