@@ -99,6 +99,22 @@ const { semiprotect, protect, authorize } = require("../middleware/auth");
 */
 /**
 * @swagger
+* /coupons/summary:
+*   get:
+*     summary: Returns the summary list of all coupons
+*     tags: [Coupons]
+*     responses:
+*       200:
+*         description: The list of coupon types
+*         content:
+*           application/json:
+*             schema:
+*               type: array
+*               items:
+*                 $ref: '#/components/schemas/Coupon'
+*/
+/**
+* @swagger
 * /coupons/{id}:
 *   get:
 *     summary: Get the coupon by id
@@ -113,6 +129,29 @@ const { semiprotect, protect, authorize } = require("../middleware/auth");
 *     responses:
 *       200:
 *         description: The coupon description by id
+*         content:
+*           application/json:
+*             schema:
+*               $ref: '#/components/schemas/Coupon'
+*       404:
+*         description: The coupon was not found
+*/
+/**
+* @swagger
+* /coupons/type/{couponType}:
+*   get:
+*     summary: Get the coupon summary by type
+*     tags: [Coupons]
+*     parameters:
+*       - in: path
+*         name: couponType
+*         schema:
+*           type: string
+*         required: true
+*         description: The coupon type
+*     responses:
+*       200:
+*         description: The coupon description by type
 *         content:
 *           application/json:
 *             schema:
@@ -143,7 +182,7 @@ const { semiprotect, protect, authorize } = require("../middleware/auth");
 *               numberOfCoupons:
 *                 type: number
 *                 description: Total amount of new coupons
-*                 example: 2
+*                 example: 4
 *               type:
 *                 type: string
 *                 description: Type of coupon
@@ -212,6 +251,37 @@ const { semiprotect, protect, authorize } = require("../middleware/auth");
 */
 /**
 * @swagger
+* /coupons/type/{couponType}:
+*   put:
+*     summary: Update the coupon by the type
+*     tags: [Coupons]
+*     parameters:
+*       - in: path
+*         name: couponType
+*         schema:
+*           type: string
+*         required: true
+*         description: The coupon type
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             $ref: '#/components/schemas/Coupon'
+*     responses:
+*       200:
+*         description: The coupon was updated
+*         content:
+*           application/json:
+*             schema:
+*               $ref: '#/components/schemas/Coupon'
+*       404:
+*         description: The coupon was not found
+*       500:
+*         description: Some error happened
+*/
+/**
+* @swagger
 * /coupons/{id}:
 *   delete:
 *     summary: Remove the coupon by id
@@ -223,6 +293,25 @@ const { semiprotect, protect, authorize } = require("../middleware/auth");
 *           type: string
 *         required: true
 *         description: The coupon id
+*     responses:
+*       200:
+*         description: The coupon was deleted
+*       404:
+*         description: The coupon was not found
+*/
+/**
+* @swagger
+* /coupons/type/{couponType}:
+*   delete:
+*     summary: Remove coupons by type
+*     tags: [Coupons]
+*     parameters:
+*       - in: path
+*         name: couponType
+*         schema:
+*           couponType: string
+*         required: true
+*         description: The coupon type
 *     responses:
 *       200:
 *         description: The coupon was deleted
