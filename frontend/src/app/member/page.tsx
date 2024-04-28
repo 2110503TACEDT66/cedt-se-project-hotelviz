@@ -9,8 +9,7 @@ import getUserProfile from "@/libs/getUserProfile";
 import { Skeleton } from "@mui/material";
 import MemberLoading from "@/components/memberComponents/MemberLoading";
 import getCouponsForUser from "@/libs/getCouponsForUser";
-import getCouponsRedeem from "@/libs/getCouponsRedeem";
-import couponSummary from "@/components/memberComponents/CouponSummary";
+import userCoupon from "@/components/memberComponents/userCoupon";
 
 export default function Member() {
 
@@ -42,12 +41,10 @@ export default function Member() {
         const userCouponsData: CouponItem[] = (await getCouponsForUser(session?.user.token)).data;
         const CouponsRe: CouponSummary[] = (await getCouponsRedeem(session?.user.token)).data;
         // const userCoupons: CouponItem[] = userInfoA.coupons;
-
+        console.log ;
         setUserInfo(userInfoA);
         setUserCoupons(userCouponsData);
-        setCouponsRedeem(CouponsRe);
-
-        console.log(CouponsRe);
+        // setUserCouponsU(userCoupons);
 
       }
     };
@@ -76,8 +73,12 @@ export default function Member() {
             </div>
           </div>
           }
-
           <h1 className="text-2xl font-bold mx-4 mt-8">Your Coupon</h1>
+          <div className="flex overflow-x-auto mx-4 ">
+              {userCoupons.map((coupon) => (
+                <Coupon  coupon={coupon} />
+              ))}
+          </div>
           <div className="flex overflow-x-auto mx-4 ">
             {userCoupons.map((coupon, index) => (
                 <Coupon key={index} coupon={coupon} />
@@ -85,15 +86,15 @@ export default function Member() {
               {/* <userCoupon key={} coupon={userInfo.coupons} /> */}
             {/* {userInfo.coupons.map((coupon,index) => (
                   <Coupon key={index} coupon={coupon} />
-              ))} */}
+              ))}
               {/* <Coupon/>      
               <Coupon/>       */}
           </div>
           <h1 className="text-2xl font-bold mx-4 mt-8">Collect coupons here !</h1>
           <div className="flex overflow-x-auto mx-4 ">
-            {/* {CouponsRedeem.map((coupon, index) => (
-                <couponSummary coupon={coupon} />
-              ))}   */}
+              {userCoupons.map((coupon, index) => (
+                <Coupon key={index} coupon={coupon} />
+              ))}
               {/* <Coupon/>      
               <Coupon/>      
               <Coupon/>                 

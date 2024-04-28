@@ -21,14 +21,14 @@ export default function Coupon(
             
             <div className='grid grid-cols-2 mt-[40px] '>
                 <div className='flex justify-start '>                            
-                <span className=" flex border border-white bg-white text-purple-600 px-1.5 py-2  w-auto rounded-l  justify-content-start">
+                <span className=" flex border border-white bg-white text-purple-600 px-1.5 py-2  w-auto rounded  justify-content-start">
                     <h1 className='mr-1'><LoyaltyIcon fontSize={"inherit"}/></h1>
                     <h1 className="mr-[2px] text-sm font-semibold mt-[2px]">{coupon.tiers}</h1>
                 </span>
-                <span className="border-dashed border text-white text-md px-1.5 py-2 rounded-r w-[120px]">{coupon.point.toString()} Points</span>
+                {/* <span className="border-dashed border text-white text-md px-1.5 py-2 rounded-r w-[120px]">{coupon.point.toString()} Points</span> */}
 
                 </div>
-            <div className="text-sm flex justify-end mt-[20px]">Valid Till: {coupon.expiredDate.toString()}</div>
+            <div className="text-xs flex justify-end mt-[25px]">Valid Till: {coupon.expiredDate.toString()}</div>
             </div>
             <div className="w-12 h-12 bg-neutral-100 rounded-full absolute top-1/2 transform -translate-y-1/2 left-0 -ml-6"></div>
             <div className="w-12 h-12 bg-neutral-100 rounded-full absolute top-1/2 transform -translate-y-1/2 right-0 -mr-6"></div>
