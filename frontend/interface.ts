@@ -97,7 +97,7 @@ export class UserInformation {
   tier: string = "";
   experience: number = 0;
   point: number = 0;
-  coupons: Coupons[] = [];
+  coupons: CouponItem[] = [];
 }
 
 export interface Coupons {
