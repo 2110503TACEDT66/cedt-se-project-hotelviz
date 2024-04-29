@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User"); // Import your User model
-const { register, login, reset } = require("../controllers/auth");
+const { register, login, reset, updateUser } = require("../controllers/auth");
 
 let loginId = null;
 
@@ -84,46 +84,12 @@ describe("User", () => {
       } catch (err) {
         error = err;
       }
-      expect(error).toEqual(undefined);
+      expect(error).toBe(undefined);
+      expect(await User.findOne({ name: "test1" })).not.toBe(null);
     });
-
-    // it("should require name field", async () => {
-    //   let error;
-    //   try {
-    //     const user = await User.create({
-    //       //name: "test1",
-    //       tel: "123-456-7890",
-    //       email: "test1@gmail.com",
-    //       password: "password123",
-    //       role: "user",
-    //     });
-    //     await user.save();
-    //   } catch (err) {
-    //     error = err;
-    //   }
-    //   expect(error.message).toEqual(
-    //     "User validation failed: name: Please add a name"
-    //   );
-    // });
-
-    //   describe("Password Encryption", () => {
-    //     it("should encrypt password before saving", async () => {
-    //       const user = new User({
-    //         name: "Test User",
-    //         tel: "1234567890",
-    //         email: "test@example.com",
-    //         password: "password",
-    //       });
-    //       await user.save();
-    //       // Check if password is encrypted
-    //       expect(user.password).toBeDefined();
-    //       expect(user.password).not.toEqual("password");
-    //     });
-
-    //     // Write other tests related to password encryption
-    //   });
   });
 
+  //------------------------------------------------------------------------------------------------------------------------
   describe("Register user", () => {
     it("should register a user and return status 201", async () => {
       const res = await createRequest(register, {
@@ -134,23 +100,53 @@ describe("User", () => {
         role: "user",
       });
 
-      expect(res.status).toEqual(201);
+      expect(res.status).toBe(201);
+      expect(await User.findOne({ name: "test2" })).not.toBe(null);
+    });
+
+    it("should not register a user with same email and return status 400", async () => {
+      const res = await createRequest(register, {
+        name: "testduplicate",
+        tel: "123-456-7890",
+        email: "test2@gmail.com",
+        password: "password123",
+        role: "user",
+      });
+
+      expect(res.status).toBe(400);
+      expect(await User.findOne({ name: "testduplicate" })).toBe(null);
+    });
+
+    it("should not register a user and return status 400", async () => {
+      const res = await createRequest(register, {
+        name: "testcannotcreateuser",
+        tel: "123-456-7890",
+        email: "test",
+        password: "password123",
+        role: "user",
+      });
+
+      expect(res.status).toBe(400);
+      expect(await User.findOne({ name: "testcannotcreateuser" })).toBe(null);
     });
   });
 
+  //------------------------------------------------------------------------------------------------------------------------
   describe("Login user", () => {
     it("should login user and return status 200", async () => {
       const res = await createRequest(login, {
         email: "test1@gmail.com",
         password: "password123",
       });
-      
-      loginId = res.json._id
 
-      expect(res.status).toEqual(200);
+      loginId = res.json._id;
+
+      expect(res.status).toBe(200);
+      expect(res.json.email).toBe("test1@gmail.com");
     });
   });
 
+  //------------------------------------------------------------------------------------------------------------------------
   describe("Reset password", () => {
     it("should reset user password and return status 201", async () => {
       const res = await createRequest(reset, {
@@ -158,7 +154,7 @@ describe("User", () => {
         new_password: "newpassword",
       });
 
-      expect(res.status).toEqual(200);
+      expect(res.status).toBe(200);
     });
 
     it("should not reset user password and return status 401", async () => {
@@ -167,9 +163,55 @@ describe("User", () => {
         new_password: "newpassword",
       });
 
-      expect(res.status).toEqual(401);
+      expect(res.status).toBe(401);
     });
   });
 
-  // Write similar tests for other methods like getSignedJwtToken, matchPassword, changePassword
+  //------------------------------------------------------------------------------------------------------------------------
+  describe("Tier Upgrade", () => {
+    it("Upgrade to None", async () => {
+      const res = await createRequest(updateUser, {
+        experience: 0,
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.json.data.tier).toBe("None");
+    });
+
+    it("Upgrade to Bronze", async () => {
+      const res = await createRequest(updateUser, {
+        experience: 10,
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.json.data.tier).toBe("Bronze");
+    });
+
+    it("Upgrade to Silver", async () => {
+      const res = await createRequest(updateUser, {
+        experience: 70,
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.json.data.tier).toBe("Silver");
+    });
+
+    it("Upgrade to Gold", async () => {
+      const res = await createRequest(updateUser, {
+        experience: 300,
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.json.data.tier).toBe("Gold");
+    });
+
+    it("Upgrade to Platinum", async () => {
+      const res = await createRequest(updateUser, {
+        experience: 600,
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.json.data.tier).toBe("Platinum");
+    });
+  });
 });

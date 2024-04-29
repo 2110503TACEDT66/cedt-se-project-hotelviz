@@ -121,6 +121,24 @@ exports.logout = async (req, res, next) => {
   });
 };
 
+// Cannot update password
+exports.updateUser = async (req, res, next) => {
+  delete req.body.password;
+  try {
+    const user = await User.findByIdAndUpdate(req.user.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!user) {
+      return res.status(400).json({ success: false });
+    }
+    res.status(200).json({ success: true, data: user });
+  } catch (err) {
+    res.status(400).json({ success: false });
+  }
+};
+
 exports.deleteUser = async (req, res, next) => {
   try {
     const { password } = req.body;
