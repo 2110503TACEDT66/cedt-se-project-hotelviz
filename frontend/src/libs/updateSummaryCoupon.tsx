@@ -1,4 +1,4 @@
-export default async function updateCoupon(
+export default async function updateSummaryCoupon(
     token: string,
     coupon_Type: string,
     body: any

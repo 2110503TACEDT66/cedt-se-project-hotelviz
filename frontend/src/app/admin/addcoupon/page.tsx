@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import createCoupon from "@/libs/createCoupon";
-import updateCoupon from "@/libs/updateCoupon";
+import updateSummaryCoupon from "@/libs/updateSummaryCoupon";
 import deleteCoupon from "@/libs/deleteCoupon";
 import { CouponItem, SummaryCoupon } from "../../../../interface";
 import Link from "next/link";
@@ -32,7 +32,7 @@ export default function AddCoupon() {
 
       };
       if (id) {
-        const response = await updateCoupon(session.user.token, id, item);
+        const response = await updateSummaryCoupon(session.user.token, id, item);
         
         if(response.success==false){
           alert(response.message)
