@@ -8,7 +8,7 @@ import { UserInformation } from "../../interface";
 import { useState } from "react";
 import getUserProfile from "@/libs/getUserProfile";
 import { CouponItem } from "../../interface";
-import getCouponsForUser from "@/libs/getCouponsForUser";
+// import getCouponsForUser from "@/libs/getCouponsForUser";
 import CouponForBooking from "./CouponForBooking";
 
 export default function CouponSelected ({onSelectCoupon , onSelectCouponId }:{onSelectCoupon: (discount: Number | undefined) => void , onSelectCouponId : (id: string | undefined) => void}){
@@ -26,7 +26,7 @@ export default function CouponSelected ({onSelectCoupon , onSelectCouponId }:{on
         const fetchUserData = async () => {
           if (session && userInfo._id === "") {
             const userInfoA:UserInformation = (await getUserProfile(session?.user.token)).data;
-            const userCouponsData: CouponItem[] = (await getCouponsForUser(session?.user.token)).data;
+            const userCouponsData: CouponItem[] = (await getCoupons(session?.user.token,100,100)).data;
             // const userCoupons: CouponItem[] = userInfoA.coupons;
             setUserInfo(userInfoA);
             setUserCoupons(userCouponsData);
@@ -48,7 +48,7 @@ export default function CouponSelected ({onSelectCoupon , onSelectCouponId }:{on
                 // ))}
                 // </div>
                 <div className="flex overflow-x-auto mx-4 ">
-                    {userCoupons.filter(coupon => coupon.used === null).map((coupon) => (
+                    {userCoupons.filter(coupon => coupon.used === false).map((coupon) => (
                     <CouponForBooking
                         coupon={coupon}
                         onSelect={() => {{setSelectedCoupon(coupon)}; onSelectCoupon(coupon.discount); onSelectCouponId(coupon._id)}}
