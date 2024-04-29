@@ -6,15 +6,25 @@ import dayjs, { Dayjs } from "dayjs";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { BookingItem, RoomType } from "../../interface";
+import { BookingItem, RoomType, CouponItem, UserInformation} from "../../interface";
 import getOneBooking from "@/libs/getOneBooking";
 import getBookings from "@/libs/getBookings";
 import DateReserve from "./DateReserve";
 import DateReserveEdit from "./DateReserveEdit";
-import Link from "next/link";
+import CouponSelected from "./CouponSelected";
+import Coupon from "./memberComponents/Coupon";
+import getUserProfile from "@/libs/getUserProfile";
+import { 
+FormControl, 
+FormLabel,
+Radio,
+RadioGroup,
+FormControlLabel,
+} from "@mui/material";
+import updateCouponByID from "@/libs/updateCouponByID";
 
 
-export default function BookingForm({ hotelID = "",roomType}: { hotelID?: string,roomType?:RoomType[] }) {
+export default function BookingForm({ hotelID = "",roomType}: { hotelID?: string,roomType?:RoomType[]}) {
   const { data: session } = useSession();
 
   const urlParams = useSearchParams();
@@ -22,26 +32,34 @@ export default function BookingForm({ hotelID = "",roomType}: { hotelID?: string
 
   if (id) hotelID = id;
 
-  // const makeBooking = async () => {
-  //   if (session) {
-  //     const item = {
-  //       date: dayjs(bookingDate).toDate(),
-  //       roomType:roomtype,
-  //       contactEmail: contactEmail,
-  //       contactName: contactName,
-  //       contactTel: contactTel,
-  //     };
-  //     if (id) {
-  //       await updateBooking(session.user.token, id, item);
-  //       window.location.href = "/account/mybookings";
-  //     } else {
-  //       if (canCreateBooking) {
-  //         await createBooking(session.user.token, bookingLocation, item);
-  //         window.location.href = "/account/mybookings";
-  //       } else alert("Can't book more than three");
-  //     }
-  //   }
-  // };
+  const makeBooking = async () => {
+    if (session) {
+      const item = {
+        date: dayjs(bookingDate).toDate(),
+        roomType:roomtype?.key,
+        contactEmail: contactEmail,
+        contactName: contactName,
+        contactTel: contactTel,
+        price: roomtype?.price,
+        discount: discount,
+      };
+      if (id) {
+        await updateBooking(session.user.token, id, item);
+        window.location.href = "/account/mybookings";
+      } else {
+        if (canCreateBooking) {
+          if(couponId !== ''){
+            await createBooking(session.user.token, bookingLocation, item);
+            await updateCouponByID(session.user.token, couponId ,item);
+            window.location.href = "/account/mybookings";
+          }else{
+            await createBooking(session.user.token, bookingLocation, item);
+            window.location.href = "/account/mybookings";
+          }
+        } else alert("Can't book more than three");
+      }
+    }
+  };
 
   const [canCreateBooking, setCanCreateBooking] = useState<boolean>(false);
   const [contactName, setName] = useState<string>("");
@@ -52,6 +70,21 @@ export default function BookingForm({ hotelID = "",roomType}: { hotelID?: string
   const [roomtype, setRoomType] = useState<RoomType | null>(null);
   const [key, setKey] = useState<string | null>(null);
   const [price, setPrice] = useState<number | null>(null);
+  const [selectedValue, setSelectedValue] = useState<string>('');
+  const [discount, setDiscount] = useState<number>(0);
+  const [couponId , setCouponId] = useState<string>('');
+  const [discountPrice , setDiscountPrice] = useState<number>(0);
+  const [userInfo, setUserInfo] = useState<UserInformation>(new UserInformation());
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (session && userInfo._id === "") {
+        const userInfoA:UserInformation = (await getUserProfile(session?.user.token)).data;
+        setUserInfo(userInfoA);
+      }
+    };
+    fetchUserData();
+  }, [session, userInfo]);
 
   useEffect(() => {
     const getBooking = async () => {
@@ -75,7 +108,29 @@ export default function BookingForm({ hotelID = "",roomType}: { hotelID?: string
     };
     getBooking();
   }, [contactName, contactEmail, contactTel, bookingDate, bookingLocation, roomtype]);
+
   
+  useEffect(() => {
+    setDiscount(0);
+    if(roomtype && selectedValue == 'Tier Discount'){
+      if(userInfo.tier == "Bronze"){
+        setDiscountPrice(roomtype?.price);
+
+      }else if(userInfo.tier == "Silver"){
+        setDiscountPrice((roomtype?.price * 0.98));
+        setDiscount((roomtype?.price) - discountPrice);
+
+      }else if(userInfo.tier == "Gold"){
+        setDiscountPrice((roomtype?.price * 0.95));
+        setDiscount((roomtype?.price) - discountPrice);
+
+      }else if(userInfo.tier == "Platinum"){
+        setDiscountPrice((roomtype?.price * 0.90));
+        setDiscount((roomtype?.price) - discountPrice);
+
+      }
+    } 
+  }, [selectedValue, roomtype]);
   return (
     <div className="">
       <div className="w-full space-y-2">
@@ -133,30 +188,60 @@ export default function BookingForm({ hotelID = "",roomType}: { hotelID?: string
           >
             </DateReserveEdit>}
       </div>
+      <div className="border-t-2 border-gray-300 my-4"></div>
+
+      <div className="text-3xl font-medium mt-10">Payment</div>
+      <div className="text-base text-gray-600 mt-2">
+          Choose your coupon for a discount on your reservation!
+      </div>
+
+      <FormControl component="fieldset" sx={{ mt: 1, display: 'flex flex-row' }}>
+        <RadioGroup
+          aria-label="direction"
+          name="direction"
+          value={selectedValue}
+          onChange={(e) => setSelectedValue(e.target.value)}
+        >
+          <FormControlLabel value="Tier Discount" control={<Radio />} label="Tier Discount" />
+          <FormControlLabel value="My Coupons" control={<Radio />} label="My Coupons" />
+        </RadioGroup>
+      </FormControl>
+      <div className="flex overflow-x-auto mx-4">
+        {selectedValue === 'My Coupons' && <CouponSelected onSelectCoupon={(value)=> {setDiscount(value as number)}} onSelectCouponId={(value)=> {setCouponId(value as string)}}/>}
+      </div>
+
+      <div className="border-t-2 border-gray-300 my-4"></div>
+      
+      <div className="flex justify-between mt-5">
+        <div className="text-3xl font-medium">Price</div>
+        <div className="flex flex-end items-end">
+          {selectedValue == '' ?  (
+              <div className="text-3xl">{roomtype?roomtype.price : 0} THB</div>
+          ): (
+            <div>
+              {selectedValue == 'Tier Discount' ? (
+                <div className="flex flex-end items-end">
+                  <div className="text-xl line-through">{roomtype?.price}</div>
+                  <div className="text-3xl text-orange-500">{discountPrice} THB</div>
+                </div>
+              ) : (
+                <div className="flex flex-end items-end">
+                  <div className="text-xl line-through">{roomtype?.price}</div>
+                  <div className="text-3xl text-orange-500">{(roomtype?roomtype.price : 0) - Number(discount)} THB</div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
       <div className="flex flex-row-reverse">
-        {/* <button
+        <button
           name="Book Now!"
-          className="block rounded-full bg-orange-500 px-5 py-2 text-white shadow-sm mt-5"
+          className="block rounded-full bg-orange-500 px-10 py-2 text-white shadow-sm mt-5 text-xl"
           onClick={makeBooking}
         >
           Book Now!
-        </button> */}
-        <Link
-        href={{
-          pathname: `${window.location.pathname}/payment`,
-          query: {
-            contactName,
-            contactEmail,
-            contactTel,
-            bookingDate: bookingDate ? bookingDate.format() : null,
-            key,
-            price,
-          },
-        }}
-        className="block rounded-full bg-orange-500 px-5 py-2 text-white shadow-sm mt-5"
-        >
-        Book
-        </Link>
+        </button>
       </div>
     </div>
   );
