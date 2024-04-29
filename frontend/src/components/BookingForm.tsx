@@ -76,18 +76,14 @@ export default function BookingForm({ hotelID = "",roomType}: { hotelID?: string
   const [discountPrice , setDiscountPrice] = useState<number>(0);
   const [userInfo, setUserInfo] = useState<UserInformation>(new UserInformation());
 
-  useEffect(() => {
-    const fetchUserData = async () => {
+  const fetchUserData = async () => {
       if (session && userInfo._id === "") {
         const userInfoA:UserInformation = (await getUserProfile(session?.user.token)).data;
         setUserInfo(userInfoA);
       }
     };
-    fetchUserData();
-  }, [session, userInfo]);
 
-  useEffect(() => {
-    const getBooking = async () => {
+  const getBooking = async () => {
       if (!session) return;
       if (id != null && !contactEmail) {
         const booking: BookingItem = (
@@ -101,36 +97,99 @@ export default function BookingForm({ hotelID = "",roomType}: { hotelID?: string
         setRoomType(booking.roomType);
       } else {
         const bookings = await getBookings(session.user.token);
-        setKey(roomtype? roomtype.key : null);
-        setPrice(roomtype? roomtype.price : null);
+        // setKey(roomtype? roomtype.key : null);
+        // setPrice(roomtype? roomtype.price : null);
         if (bookings.count < 3) setCanCreateBooking(true);
       }
     };
-    getBooking();
-  }, [contactName, contactEmail, contactTel, bookingDate, bookingLocation, roomtype]);
 
-  
+    const updateDiscount = () => {
+        setDiscount(0);
+        if(roomtype){
+          console.log(selectedValue ? selectedValue : null)
+          if(selectedValue == 'Tier Discount'){
+            let updatedDiscountPrice = roomtype?.price;
+            let discount = 0;
+            if(userInfo.tier == "Silver"){
+              updatedDiscountPrice *= 0.98;
+              discount = roomtype?.price - updatedDiscountPrice;
+            }else if(userInfo.tier == "Gold"){
+              updatedDiscountPrice *= 0.95;
+              discount = roomtype?.price - updatedDiscountPrice;
+            }else if(userInfo.tier == "Platinum"){
+              updatedDiscountPrice *= 0.90;
+              discount = roomtype?.price - updatedDiscountPrice;
+            }
+            setDiscountPrice(updatedDiscountPrice);
+            setDiscount(discount)
+          }
+        }
+      };
+
   useEffect(() => {
-    setDiscount(0);
-    if(roomtype && selectedValue == 'Tier Discount'){
-      if(userInfo.tier == "Bronze"){
-        setDiscountPrice(roomtype?.price);
+    const fetchData = async () => {
+      await fetchUserData();
+      await getBooking();
+      updateDiscount();
+    };
+  
+    fetchData();
+    // const fetchUserData = async () => {
+    //   if (session && userInfo._id === "") {
+    //     const userInfoA:UserInformation = (await getUserProfile(session?.user.token)).data;
+    //     setUserInfo(userInfoA);
+    //   }
+    // };
+    // const getBooking = async () => {
+    //   if (!session) return;
+    //   if (id != null && !contactEmail) {
+    //     const booking: BookingItem = (
+    //       await getOneBooking(session.user.token, id)
+    //     ).data;
+    //     setName(booking.contactName);
+    //     setEmail(booking.contactEmail);
+    //     setTel(booking.contactTel);
+    //     setBookingDate(dayjs(booking.date));
+    //     setBookingLocation(booking.hotel._id);
+    //     setRoomType(booking.roomType);
+    //   } else {
+    //     const bookings = await getBookings(session.user.token);
+    //     // setKey(roomtype? roomtype.key : null);
+    //     // setPrice(roomtype? roomtype.price : null);
+    //     if (bookings.count < 3) setCanCreateBooking(true);
+    //   }
+    // };
+    // const updateDiscount = () => {
+    //   setDiscount(0);
+    //   if(roomtype){
+    //     console.log(selectedValue ? selectedValue : null)
+    //     if(selectedValue == 'Tier Discount'){
+    //       let updatedDiscountPrice = roomtype?.price;
+    //       if(userInfo.tier == "Silver"){
+    //         updatedDiscountPrice *= 0.98;
+    //       }else if(userInfo.tier == "Gold"){
+    //         updatedDiscountPrice *= 0.95;
+    //       }else if(userInfo.tier == "Platinum"){
+    //         updatedDiscountPrice *= 0.90;
+    //       }
+    //       setDiscountPrice(updatedDiscountPrice);
+    //     }
+    //   }
+    // };
+    // fetchUserData();
+    // getBooking();
+    // updateDiscount();
+    // console.log("roomtype?.price " + roomtype?.price)
+    // console.log("discountPrice " + discountPrice)
+    // console.log("discount " + discount)
+  }, [session, userInfo,contactName, contactEmail, contactTel, bookingDate, bookingLocation, roomtype, selectedValue]);
 
-      }else if(userInfo.tier == "Silver"){
-        setDiscountPrice((roomtype?.price * 0.98));
-        setDiscount((roomtype?.price) - discountPrice);
+  useEffect(() => {
+    console.log("roomtype?.price " + roomtype?.price);
+    console.log("discountPrice " + discountPrice);
+    console.log("discount " + discount);
+  }, [roomtype?.price, discountPrice, discount]);
 
-      }else if(userInfo.tier == "Gold"){
-        setDiscountPrice((roomtype?.price * 0.95));
-        setDiscount((roomtype?.price) - discountPrice);
-
-      }else if(userInfo.tier == "Platinum"){
-        setDiscountPrice((roomtype?.price * 0.90));
-        setDiscount((roomtype?.price) - discountPrice);
-
-      }
-    } 
-  }, [selectedValue, roomtype]);
   return (
     <div className="">
       <div className="w-full space-y-2">
@@ -188,51 +247,67 @@ export default function BookingForm({ hotelID = "",roomType}: { hotelID?: string
           >
             </DateReserveEdit>}
       </div>
-      <div className="border-t-2 border-gray-300 my-4"></div>
 
-      <div className="text-3xl font-medium mt-10">Payment</div>
-      <div className="text-base text-gray-600 mt-2">
-          Choose your coupon for a discount on your reservation!
-      </div>
-
-      <FormControl component="fieldset" sx={{ mt: 1, display: 'flex flex-row' }}>
-        <RadioGroup
-          aria-label="direction"
-          name="direction"
-          value={selectedValue}
-          onChange={(e) => setSelectedValue(e.target.value)}
-        >
-          <FormControlLabel value="Tier Discount" control={<Radio />} label="Tier Discount" />
-          <FormControlLabel value="My Coupons" control={<Radio />} label="My Coupons" />
-        </RadioGroup>
-      </FormControl>
-      <div className="flex overflow-x-auto mx-4">
-        {selectedValue === 'My Coupons' && <CouponSelected onSelectCoupon={(value)=> {setDiscount(value as number)}} onSelectCouponId={(value)=> {setCouponId(value as string)}}/>}
-      </div>
-
-      <div className="border-t-2 border-gray-300 my-4"></div>
+      <div>
+      {!id&&roomType? 
+          <div>
+              <div className="border-t-2 border-gray-300 my-4"></div>
+          { session?.user.role== "user" ? (
+           <div>
+               <div className="text-3xl font-medium mt-10">Payment</div>
+             <div className="text-base text-gray-600 mt-2">
+                 Choose your coupon for a discount on your reservation!
+             </div>
+   
+             <FormControl component="fieldset" sx={{ mt: 1, display: 'flex flex-row' }}>
+               <RadioGroup
+                 aria-label="direction"
+                 name="direction"
+                 value={selectedValue}
+                 onChange={(e) => setSelectedValue(e.target.value)}
+               >
+                 <FormControlLabel value="Tier Discount" control={<Radio />} label="Tier Discount" />
+                 <FormControlLabel value="My Coupons" control={<Radio />} label="My Coupons" />
+               </RadioGroup>
+             </FormControl>
+             <div className="flex overflow-x-auto mx-4">
+               {selectedValue === 'My Coupons' && <CouponSelected onSelectCoupon={(value)=> {setDiscount(value as number);console.log('coupon')}} onSelectCouponId={(value)=> {setCouponId(value as string)}}/>}
+             </div>
+       
+             <div className="border-t-2 border-gray-300 my-4"></div>
+           </div>
       
-      <div className="flex justify-between mt-5">
-        <div className="text-3xl font-medium">Price</div>
-        <div className="flex flex-end items-end">
-          {selectedValue == '' ?  (
-              <div className="text-3xl">{roomtype?roomtype.price : 0} THB</div>
-          ): (
-            <div>
-              {selectedValue == 'Tier Discount' ? (
-                <div className="flex flex-end items-end">
-                  <div className="text-xl line-through">{roomtype?.price}</div>
-                  <div className="text-3xl text-orange-500">{discountPrice} THB</div>
-                </div>
-              ) : (
-                <div className="flex flex-end items-end">
-                  <div className="text-xl line-through">{roomtype?.price}</div>
-                  <div className="text-3xl text-orange-500">{(roomtype?roomtype.price : 0) - Number(discount)} THB</div>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+         ) : (
+             <div></div>
+         )
+         }
+         
+         <div className="flex justify-between mt-5">
+           <div className="text-3xl font-medium">Price</div>
+           <div className="flex flex-end items-end">
+             {selectedValue == '' ?  (
+                 <div className="text-3xl">{roomtype?roomtype.price : 0} THB</div>
+             ): (
+               <div>
+                 {selectedValue == 'Tier Discount' ? (
+                   <div className="flex flex-end items-end">
+                     <div className="text-xl line-through">{roomtype?.price}</div>
+                     <div className="text-3xl text-orange-500">{discountPrice} THB</div>
+                   </div>
+                 ) : (
+                   <div className="flex flex-end items-end">
+                     <div className="text-xl line-through">{roomtype?.price}</div>
+                     <div className="text-3xl text-orange-500">{(roomtype?roomtype.price : 0) - Number(discount)} THB</div>
+                   </div>
+                 )}
+               </div>
+             )}
+           </div>
+         </div>
+          </div>
+      :
+         <div></div>
+      }
       </div>
       <div className="flex flex-row-reverse">
         <button
