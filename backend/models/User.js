@@ -33,8 +33,8 @@ const UserSchema = new mongoose.Schema({
   },
   tier: {
     type: String,
-    enum: ["None", "Bronze", "Silver", "Gold", "Platinum"],
-    default: "None",
+    enum: ["Bronze", "Silver", "Gold", "Platinum"],
+    default: "Bronze",
   },
   experience: {
     type: Number,
@@ -63,7 +63,7 @@ function upgradeTier(experience) {
   if (experience >= 500) tier = "Platinum";
   else if (experience >= 200) tier = "Gold";
   else if (experience >= 50) tier = "Silver";
-  else if (experience >= 1) tier = "Bronze";
+  else if (experience >= 0) tier = "Bronze";
   return tier;
 }
 

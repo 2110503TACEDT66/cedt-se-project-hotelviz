@@ -58,6 +58,21 @@ export class CouponItem {
   used : boolean=false;
 }
 
+export class SummaryCoupon {
+  _id: string="";
+  type: string="";
+  count: number=0;
+  usedCount:number=0;
+  unusedCount:number=0;
+  ownedCount:number=0;
+  unownedCount:number=0;
+  createdAt: Date= new Date(0);
+  expiredDate: Date= new Date(0);
+  discount:number=0;
+  tiers:string[]=[];
+  point:number=0;
+}
+
 export interface HistoryItem {
   _id: string;
   date: Date;
@@ -97,7 +112,7 @@ export class UserInformation {
   tier: string = "";
   experience: number = 0;
   point: number = 0;
-  coupons: Coupons[] = [];
+  coupons: CouponItem[] = [];
 }
 
 export interface Coupons {
@@ -110,4 +125,18 @@ export interface Coupons {
   used: boolean;
   createAt: string;
   expiredDate: string;
+}
+
+export interface CouponSummaryItem {
+  _id: string;
+  count: number;
+  usedCount: number;
+  unownedCount: number;
+  unusedCount: number;
+  ownedCount: number;
+  createdAt: string;
+  expiredDate: string;
+  discount: number;
+  tiers: string[];
+  point: number;
 }
