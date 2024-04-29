@@ -33,7 +33,7 @@ const UserSchema = new mongoose.Schema({
   },
   tier: {
     type: String,
-    enum: [ "Bronze", "Silver", "Gold", "Platinum"],
+    enum: ["Bronze", "Silver", "Gold", "Platinum"],
     default: "Bronze",
   },
   experience: {

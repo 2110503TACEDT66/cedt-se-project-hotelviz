@@ -58,6 +58,21 @@ export class CouponItem {
   used : boolean=false;
 }
 
+export class SummaryCoupon {
+  _id: string="";
+  type: string="";
+  count: number=0;
+  usedCount:number=0;
+  unusedCount:number=0;
+  ownedCount:number=0;
+  unownedCount:number=0;
+  createdAt: Date= new Date(0);
+  expiredDate: Date= new Date(0);
+  discount:number=0;
+  tiers:string[]=[];
+  point:number=0;
+}
+
 export interface HistoryItem {
   _id: string;
   date: Date;
