@@ -33,7 +33,7 @@ const UserSchema = new mongoose.Schema({
   },
   tier: {
     type: String,
-    enum: [ "Bronze", "Silver", "Gold", "Platinum"],
+    enum: ["Bronze", "Silver", "Gold", "Platinum"],
     default: "Bronze",
   },
   experience: {
@@ -65,10 +65,10 @@ const UserSchema = new mongoose.Schema({
 
 //Encrypt password using bcrypt
 UserSchema.pre("save", async function (next) {
-  if (this.experience >= 500) this.tier = "platinum";
-  else if (this.experience >= 200) this.tier = "gold";
-  else if (this.experience >= 50) this.tier = "silver";
-  else if (this.experience >= 1) this.tier = "bronze";
+  if (this.experience >= 500) this.tier = "Platinum";
+  else if (this.experience >= 200) this.tier = "Gold";
+  else if (this.experience >= 50) this.tier = "Silver";
+  else if (this.experience >= 0) this.tier = "Bronze";
 
   if (this.isModified("password")) {
     const salt = await bcrypt.genSalt(10);
