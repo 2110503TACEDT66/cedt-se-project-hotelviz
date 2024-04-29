@@ -9,6 +9,7 @@ import ListAltIcon from "@mui/icons-material/ListAlt";
 import LoginIcon from "@mui/icons-material/Login";
 import PersonIcon from "@mui/icons-material/Person";
 import LogoutIcon from "@mui/icons-material/Logout";
+import ConfirmationNumberIcon from '@mui/icons-material/ConfirmationNumber';
 
 export default async function TopMenu() {
   const session = await getServerSession(authOptions);
@@ -71,6 +72,17 @@ export default async function TopMenu() {
           >
             <ListAltIcon />
             <span className="text-lg font-medium">Manage Hotels</span>
+          </Link>
+        ) : (
+          ""
+        )}
+        {session?.user.role === "admin" ? (
+          <Link
+            href="/admin/managecoupon"
+            className="rounded-lg py-2 pr-4 pl-3 text-gray-700 duration-300 ease-in-out hover:bg-blue-100 hover:text-blue-900 flex items-center space-x-2"
+          >
+            <ConfirmationNumberIcon/>
+            <span className="text-lg font-medium">Manage Coupon</span>
           </Link>
         ) : (
           ""

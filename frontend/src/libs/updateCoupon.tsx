@@ -16,11 +16,7 @@ export default async function updateCoupon(
         }
       );
   
-      if (!response.ok) {
-       
-        throw new Error("Failed to update coupons");
-      }
-  
+      
       return await response.json();
     } catch (error: any) {
       throw new Error(`Failed to update coupons: ${error.message}`);
