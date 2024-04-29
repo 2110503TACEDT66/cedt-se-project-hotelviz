@@ -50,11 +50,6 @@ const UserSchema = new mongoose.Schema({
       ref: "Coupon",
     },
   ],
-  favorite: [
-    {
-      type: mongoose.Schema.ObjectId,
-    },
-  ],
   resetPasswordToken: String,
   resetPasswordExpire: Date,
   createdAt: {
@@ -78,7 +73,6 @@ UserSchema.pre("save", async function (next) {
 });
 
 //Sign JWT and return
-
 UserSchema.methods.getSignedJwtToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE,
