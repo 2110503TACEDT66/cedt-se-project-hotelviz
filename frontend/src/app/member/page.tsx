@@ -44,7 +44,9 @@ export default function Member() {
         // const userCoupons: CouponItem[] = userInfoA.coupons;
         console.log ;
         setUserInfo(userInfoA);
-        setUserCoupons(userCouponsData);
+
+        const filterCouponUser = userCouponsData.filter(coupon => coupon.used == false);
+        setUserCoupons(filterCouponUser);
 
         const filteredCouponsRedeem = CouponsRe.filter(coupon => coupon.tiers.includes(userInfoA.tier) && coupon.unownedCount != 0);
         setCouponsRedeem(filteredCouponsRedeem);
