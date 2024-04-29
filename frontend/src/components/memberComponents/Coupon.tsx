@@ -1,6 +1,7 @@
 import LoyaltyIcon from '@mui/icons-material/Loyalty';
 import {useReducer, useState } from "react";
 import { CouponItem } from "../../../interface";
+import dayjs from 'dayjs';
 
 
 export default function Coupon(
@@ -44,7 +45,7 @@ export default function Coupon(
             <div className="flex flex-col justify-end items-end ">
                 <h1 className='text-[15px] font-semibold'>Valid Till</h1>
 
-                <h1 className='text-[13px]'>{coupon.expiredDate.toString()}</h1>
+                <h1 className='text-[14px]'>{dayjs(coupon.expiredDate.toString()).format('DD MMMM YYYY')}</h1>
             </div>
             </div>
             <div className="w-12 h-12 bg-neutral-100 rounded-full absolute top-1/2 transform -translate-y-1/2 left-0 -ml-6"></div>
