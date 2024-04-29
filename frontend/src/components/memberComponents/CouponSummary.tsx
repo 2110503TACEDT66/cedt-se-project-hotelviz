@@ -1,6 +1,9 @@
 import LoyaltyIcon from '@mui/icons-material/Loyalty';
 import {useReducer, useState } from "react";
 import { CouponSummaryItem, UserInformation } from '../../../interface';
+import redeemCoupon from '@/libs/redeemCoupon';
+import { useSession } from "next-auth/react";
+import dayjs from 'dayjs';
 
 export default function CouponSummary(
     // {couponId,couponType, discount, tier, point, createdDate, expiredDate}: {couponId:string, couponType: string, discount: Number, tier: string[], point: Number, createdDate: Date, expiredDate: Date}
@@ -8,6 +11,8 @@ export default function CouponSummary(
 ) {
 
     // const [spinner, setSpinner] = useState(true);
+    const { data: session } = useSession();
+
 
     function getColorDisplay(tier: string): string{
         if(tier == "Platinum" || tier == "platinum") {
@@ -22,6 +27,7 @@ export default function CouponSummary(
             return "text-blue-800";
         }
     }
+
 
     return (
         <div className=" min-w-[500px] w-[500px] h-[auto] mr-8 my-4 self-start bg-gradient-to-br from-yellow-600 to-indigo-600  text-white text-center py-4 px-8  rounded-lg shadow-md relative  hover:translate-y-[-4px] transition-all duration-250 ease-in-out hover:shadow-md rounded-xl shadow-lg overflow-hidden border-neutral-100 border-[5px]">
@@ -42,8 +48,8 @@ export default function CouponSummary(
                     ))}
                 </div>
             <div className="flex flex-col justify-end items-end ">
-                <div className='text-base font-semibold text-md'>Left : {coupon.unusedCount}</div>
-                <h1 className='text-[10px]'>Valid Till : {coupon.expiredDate.toString()}</h1>
+                <div className='text-base font-semibold text-md'>Left : {coupon.unownedCount}</div>
+                <h1 className='text-[11px]'>Valid Till : {dayjs(coupon.expiredDate.toString()).format('DD MMMM YYYY')}</h1>
                 <div className='flex mt-2.5'>
                     <span className="border-dashed border text-white text-md px-2 py-1.5 rounded-l  content-center">{coupon.point.toString()} Points</span>
                     <button className="border bg-gradient-to-r from-stone-100 to-gray-100 text-slate-600 text-md font-semibold px-2 py-1.5 rounded-r w-[120px] content-center hover:text-white hover:from-neutral-800 hover:to-slate-800 hover:cursor-pointer"
@@ -51,8 +57,9 @@ export default function CouponSummary(
                         if (userInfo.point < coupon.point){
                             alert("You don't have enough point :(")
                         }
-                        else if (confirm(`Are you sure you want to redeem this coupon with ${coupon.point.toString()} Points?`)) {
+                        else if (session && confirm(`Are you sure you want to redeem this coupon with ${coupon.point.toString()} Points?`)) {
                         //   await .....
+                            await redeemCoupon(session?.user.token,coupon._id);
                           window.location.reload();
                         }}}
                     >
