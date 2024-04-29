@@ -49,8 +49,8 @@ export default function Member() {
         const filteredCouponsRedeem = CouponsRe.filter(coupon => coupon.tiers.includes(userInfoA.tier) && coupon.unownedCount != 0);
         setCouponsRedeem(filteredCouponsRedeem);
 
-        console.log(CouponsRe);
-        console.log(filteredCouponsRedeem);
+        // console.log(CouponsRe);
+        // console.log(filteredCouponsRedeem);
       }
     };
     fetchUserData();
@@ -80,7 +80,11 @@ export default function Member() {
           }
           {
             (userCoupons.length != 0)?
-            <h1 className="text-2xl font-bold mx-4 mt-8">Your Coupon</h1>
+            <h1 className="text-2xl font-bold mx-4 mt-8">
+              {
+              (session?.user.role == "admin")? "All Coupon" : "Your Coupon"
+              }
+            </h1>
             : 
             <div></div>
           }
@@ -89,17 +93,18 @@ export default function Member() {
                 <Coupon  coupon={coupon} />
               ))}
           </div>
+          {
+              (session?.user.role == "admin")? <div/> : 
+              <div>
+              <h1 className="text-2xl font-bold mx-4 mt-8">Redeem coupon here !</h1>
+              <div className="flex overflow-x-auto mx-4 ">
+                  {CouponsRedeem.map((coupon) => (
+                    <CouponSummary coupon={coupon} userInfo={userInfo}/>
+                  ))}
+              </div></div>
+
+          }
           
-          <h1 className="text-2xl font-bold mx-4 mt-8">Redeem coupon here !</h1>
-          <div className="flex overflow-x-auto mx-4 ">
-              {CouponsRedeem.map((coupon) => (
-                <CouponSummary coupon={coupon} userInfo={userInfo}/>
-              ))}
-              {/* <Coupon/>      
-              <Coupon/>      
-              <Coupon/>                 
-              <Coupon/>       */}
-          </div>
         </main>
     )
 }
