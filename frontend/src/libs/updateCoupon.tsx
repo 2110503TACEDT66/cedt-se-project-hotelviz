@@ -17,6 +17,7 @@ export default async function updateCoupon(
       );
   
       if (!response.ok) {
+       
         throw new Error("Failed to update coupons");
       }
   

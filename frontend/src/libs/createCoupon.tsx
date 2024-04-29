@@ -16,7 +16,7 @@ export default async function createCoupon(
       );
   
       if (!response.ok) {
-        throw new Error("Failed to create coupons");
+        throw new Error(`${response}`);
       }
   
       return await response.json();

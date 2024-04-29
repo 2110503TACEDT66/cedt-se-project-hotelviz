@@ -59,7 +59,7 @@ export default function AddCoupon() {
 
           <div className="">
             
-              {coupon._id == ""? <LinearProgress />:
+              {coupon._id == ""&&id? <LinearProgress />:
               <CouponForm
                 coupon={coupon}
                 onCouponChange={(value: SummaryCoupon) => {
