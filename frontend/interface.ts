@@ -112,7 +112,7 @@ export class UserInformation {
   tier: string = "";
   experience: number = 0;
   point: number = 0;
-  coupons: Coupons[] = [];
+  coupons: CouponItem[] = [];
 }
 
 export interface Coupons {
@@ -125,4 +125,17 @@ export interface Coupons {
   used: boolean;
   createAt: string;
   expiredDate: string;
+}
+
+export interface CouponSummaryItem {
+  _id: string;
+  count: number;
+  usedCount: number;
+  unusedCount: number;
+  ownedCount: number;
+  createdAt: string;
+  expiredDate: string;
+  discount: number;
+  tiers: string[];
+  point: number;
 }
