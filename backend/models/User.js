@@ -63,7 +63,7 @@ function upgradeTier(experience) {
   if (experience >= 500) tier = "Platinum";
   else if (experience >= 200) tier = "Gold";
   else if (experience >= 50) tier = "Silver";
-  else if (experience >= 0) tier = "Bronze";
+  else tier = "Bronze";
   return tier;
 }
 
@@ -81,7 +81,7 @@ UserSchema.pre("save", async function (next) {
 UserSchema.pre("findOneAndUpdate", async function (next) {
   const update = this.getUpdate();
   update.tier = upgradeTier(update.experience);
-
+  
   next();
 });
 

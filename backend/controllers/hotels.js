@@ -129,7 +129,7 @@ exports.createHotel = async (req, res, next) => {
     const hotel = await Hotel.create(req.body);
     res.status(201).json({ success: true, data: hotel });
   } catch (error) {
-    console.log(error.stack);
+    //console.log(error.stack);
     return res.status(400).json({
       success: false,
       message: "The requested body not match the Hotel model",

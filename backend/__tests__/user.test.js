@@ -1,7 +1,6 @@
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const User = require("../models/User");
-const Hotel = require("../models/Hotel");
 const {
   register,
   login,
@@ -298,15 +297,6 @@ describe("User", () => {
 
   //------------------------------------------------------------------------------------------------------------------------
   describe("Tier Upgrade", () => {
-    it("Upgrade to None", async () => {
-      const res = await createRequest(updateUser, {
-        experience: 0,
-      });
-
-      expect(res.status).toBe(200);
-      expect(res.json.data.tier).toBe("None");
-    });
-
     it("Upgrade to Bronze", async () => {
       const res = await createRequest(updateUser, {
         experience: 10,

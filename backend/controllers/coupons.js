@@ -18,7 +18,7 @@ exports.getCoupons = async (req, res, next) => {
       data: coupons,
     });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Cannot find Coupon" });
@@ -42,7 +42,7 @@ exports.getCoupon = async (req, res, next) => {
       data: coupon,
     });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Cannot find Coupon" });
@@ -73,7 +73,7 @@ exports.addCoupon = async (req, res, next) => {
 
     res.status(201).json({ success: true, data: coupons });
   } catch (error) {
-    console.log(error.stack);
+    //console.log(error.stack);
     return res.status(400).json({
       success: false,
       message: "The requested body not match the Coupon model",
@@ -97,7 +97,7 @@ exports.updateCoupon = async (req, res, next) => {
     if (req.user.role !== "admin") {
       // Check if the user owns the coupon and the coupon is not already used
       if (coupon.owner==null || req.user.id.toString() !== coupon.owner.toString() || coupon.used) {
-        console.log(`${coupon.owner}, ${req.user.id.toString()}, ${coupon.owner.toString()}, ${coupon.used}`);
+        //console.log(`${coupon.owner}, ${req.user.id.toString()}, ${coupon.owner.toString()}, ${coupon.used}`);
         return res.status(401).json({
           success: false,
           message: `User ${req.user.id} is not authorized to update this coupon`,
@@ -126,7 +126,7 @@ exports.updateCoupon = async (req, res, next) => {
       });
     }
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Cannot update Coupon" });
@@ -159,7 +159,7 @@ exports.deleteCoupon = async (req, res, next) => {
       data: {},
     });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Cannot delete Coupon" });
@@ -178,7 +178,7 @@ exports.redeemCoupon = async (req, res, next) => {
       user = await User.findById(req.body.user);
     else user = await User.findById(req.user.id);
   
-    console.log(couponType, user);
+    //console.log(couponType, user);
     // Find an unowned coupon of the specified type
     const coupon = await Coupon.findOne({
       type: couponType,
@@ -224,7 +224,7 @@ exports.redeemCoupon = async (req, res, next) => {
       coupons: user.coupons,
     });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Cannot redeem coupon" });
@@ -262,7 +262,7 @@ exports.deleteCouponsByType = async (req, res, next) => {
       message: `${deletedCoupons.deletedCount} coupons with type ${couponType} deleted successfully`,
     });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Cannot delete coupons" });
@@ -318,7 +318,7 @@ exports.updateCouponsByType = async (req, res, next) => {
       message: `${updatedCoupons.modifiedCount} coupons with type ${couponType} updated successfully`,
     });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Cannot update coupons" });
@@ -351,7 +351,7 @@ exports.getCouponSummary = async (req, res, next) => {
       data: couponSummary,
     });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Cannot get coupon summary" });
@@ -385,7 +385,7 @@ exports.getCouponSummary = async (req, res, next) => {
       data: couponSummary,
     });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Cannot get coupon summary" });
@@ -433,7 +433,7 @@ exports.getSingleCouponSummary = async (req, res, next) => {
       data: couponSummary[0],
     });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Cannot get coupon summary" });

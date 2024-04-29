@@ -57,7 +57,7 @@ exports.reset = async (req, res, next) => {
     // res.status(200).json({ success: true, token });
     sendTokenResponse(user, 200, res);
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Cannot change password" });
@@ -153,7 +153,7 @@ exports.deleteUser = async (req, res, next) => {
       data: {},
     });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Cannot delete user" });
