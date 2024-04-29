@@ -78,7 +78,7 @@ export interface HistoryItem {
   date: Date;
   user: string;
   hotel: HotelItem;
-  roomType: RoomType;
+  roomType: string;
   contactEmail: string;
   contactName: string;
   contactTel: string;

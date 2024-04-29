@@ -16,12 +16,10 @@ const BookinghistorySchema = new mongoose.Schema(
 
       required: [true, "Please add a hotel"],
     },
-    roomType: [
-      {
-        key: String,
-        price: Number,
-      },
-    ],
+    roomType: {
+      type: String,
+      required: [true, "Please add a roomtype"],
+    },
     contactEmail: {
       type: String,
       required: [true, "Please add a contact email"],

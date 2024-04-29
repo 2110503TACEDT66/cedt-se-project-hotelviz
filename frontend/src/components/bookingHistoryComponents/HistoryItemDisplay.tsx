@@ -40,7 +40,7 @@ const HistoryItemDisplay: React.FC<HistoryItemProps> = ({
           Booking Date: {historyItem.date.toString()}
         </div>
         <div className="text-md">
-          Hotel: {(historyItem.hotel as unknown as HotelItem).name}
+          Room type: {historyItem.roomType.toString()}
         </div>
         <div className="text-md">Contact Name: {historyItem.contactName}</div>
         <div className="text-md">Contact Email: {historyItem.contactEmail}</div>

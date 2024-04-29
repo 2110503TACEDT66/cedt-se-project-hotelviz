@@ -61,7 +61,7 @@ const BookingItemDisplay: React.FC<BookingItemProps> = ({
           Booking Date: {bookingItem.date.toString()}
         </div>
         <div className="text-md">
-          Hotel: {(bookingItem.hotel as unknown as HotelItem).name}
+          Room type: {bookingItem.roomType}
         </div>
         <div className="text-md">Contact Name: {bookingItem.contactName}</div>
         <div className="text-md">Contact Email: {bookingItem.contactEmail}</div>
