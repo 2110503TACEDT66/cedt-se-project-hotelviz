@@ -46,9 +46,11 @@ export default function Member() {
         setUserInfo(userInfoA);
         setUserCoupons(userCouponsData);
 
-        const filteredCouponsRedeem = CouponsRe.filter(coupon => coupon.tiers.includes(userInfoA.tier));
+        const filteredCouponsRedeem = CouponsRe.filter(coupon => coupon.tiers.includes(userInfoA.tier) && coupon.unownedCount != 0);
         setCouponsRedeem(filteredCouponsRedeem);
 
+        console.log(CouponsRe);
+        console.log(filteredCouponsRedeem);
       }
     };
     fetchUserData();

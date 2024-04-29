@@ -116,6 +116,7 @@ export interface CouponSummaryItem {
   _id: string;
   count: number;
   usedCount: number;
+  unownedCount: number;
   unusedCount: number;
   ownedCount: number;
   createdAt: string;

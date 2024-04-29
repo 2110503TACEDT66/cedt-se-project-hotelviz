@@ -1,6 +1,8 @@
 import LoyaltyIcon from '@mui/icons-material/Loyalty';
 import {useReducer, useState } from "react";
 import { CouponSummaryItem, UserInformation } from '../../../interface';
+import redeemCoupon from '@/libs/redeemCoupon';
+import { useSession } from "next-auth/react";
 
 export default function CouponSummary(
     // {couponId,couponType, discount, tier, point, createdDate, expiredDate}: {couponId:string, couponType: string, discount: Number, tier: string[], point: Number, createdDate: Date, expiredDate: Date}
@@ -8,6 +10,8 @@ export default function CouponSummary(
 ) {
 
     // const [spinner, setSpinner] = useState(true);
+    const { data: session } = useSession();
+
 
     function getColorDisplay(tier: string): string{
         if(tier == "Platinum" || tier == "platinum") {
@@ -42,7 +46,7 @@ export default function CouponSummary(
                     ))}
                 </div>
             <div className="flex flex-col justify-end items-end ">
-                <div className='text-base font-semibold text-md'>Left : {coupon.unusedCount}</div>
+                <div className='text-base font-semibold text-md'>Left : {coupon.unownedCount}</div>
                 <h1 className='text-[10px]'>Valid Till : {coupon.expiredDate.toString()}</h1>
                 <div className='flex mt-2.5'>
                     <span className="border-dashed border text-white text-md px-2 py-1.5 rounded-l  content-center">{coupon.point.toString()} Points</span>
@@ -51,8 +55,9 @@ export default function CouponSummary(
                         if (userInfo.point < coupon.point){
                             alert("You don't have enough point :(")
                         }
-                        else if (confirm(`Are you sure you want to redeem this coupon with ${coupon.point.toString()} Points?`)) {
+                        else if (session && confirm(`Are you sure you want to redeem this coupon with ${coupon.point.toString()} Points?`)) {
                         //   await .....
+                            await redeemCoupon(session?.user.token,coupon._id);
                           window.location.reload();
                         }}}
                     >
