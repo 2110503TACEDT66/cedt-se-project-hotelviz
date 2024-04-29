@@ -285,6 +285,19 @@ exports.updateCouponsByType = async (req, res, next) => {
       });
     }
 
+    // Check if the update would result in a duplicate coupon type
+    if (updateData.type) {
+      const existingCoupon = await Coupon.findOne({
+        type: updateData.type,
+      });
+      if (existingCoupon) {
+        return res.status(400).json({
+          success: false,
+          message: `Coupon type '${updateData.type}' already exists`,
+        });
+      }
+    }
+
     // Find and update coupons with the provided couponType
     const updatedCoupons = await Coupon.updateMany(
       { type: couponType },
@@ -380,7 +393,7 @@ exports.getCouponSummary = async (req, res, next) => {
 };
 
 //@desc Get summary for a single coupon type
-//@route GET /api/v1/coupons/type/:couponType
+//@route GET /api/v1/coupons/:couponType
 //@access Private
 exports.getSingleCouponSummary = async (req, res, next) => {
   try {
