@@ -32,7 +32,7 @@ export default function AllCouponCardPanel({ session }: { session: any }) {
         <div className="flex flex-row">
           <div className="text-5xl mt-4">Manage All Coupon</div>
           <Link href={"/admin/addcoupon"}>
-            <button className="block rounded-full bg-sky-500 px-5 py-2 text-white shadow-sm m-5">
+            <button data-testid="Add coupon" className="block rounded-full bg-sky-500 px-5 py-2 text-white shadow-sm m-5">
               Add Coupon
             </button>
           </Link>

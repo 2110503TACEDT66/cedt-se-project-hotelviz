@@ -5,7 +5,7 @@ import './styles.css';
 export default function AllCouponCard({ couponType, discount, tier, point, createdDate, expiredDate, count, usedCount, unusedCount, ownedCount, unownedCount }: { couponType: string, discount: number, tier: string[], point: number, createdDate: Date, expiredDate: Date, count: number, usedCount: number, unusedCount: number, ownedCount: number, unownedCount: number }) {
     return (
         <a href={"/admin/addcoupon/?id=" + couponType}>
-            <div className="relative flex flex-col m-0 gap-2 border border-disable cursor-pointer min-w-[188px] hover:translate-y-[-4px] transition-all duration-250 ease-in-out hover:shadow-md w-full h-[270px] shadow-lg overflow-hidden" style={{width: 'calc(5/8 * 100vw)' }}>
+            <div data-testid="Coupon" className="relative flex flex-col m-0 gap-2 border border-disable cursor-pointer min-w-[188px] hover:translate-y-[-4px] transition-all duration-250 ease-in-out hover:shadow-md w-full h-[270px] shadow-lg overflow-hidden" style={{width: 'calc(5/8 * 100vw)' }}>
                 <div className="coupon-left"></div>
                 <div className="remaining"></div>
                 <div className="width-1/2 absolute left-0 right-0 px-4 py-4 text-center text-lg right-box">

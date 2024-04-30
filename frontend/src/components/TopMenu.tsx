@@ -77,12 +77,12 @@ export default async function TopMenu() {
           ""
         )}
         {session?.user.role === "admin" ? (
-          <Link
+          <Link 
             href="/admin/managecoupon"
             className="rounded-lg py-2 pr-4 pl-3 text-gray-700 duration-300 ease-in-out hover:bg-blue-100 hover:text-blue-900 flex items-center space-x-2"
           >
             <ConfirmationNumberIcon/>
-            <span className="text-lg font-medium">Manage Coupon</span>
+            <span data-testid="Manage-Coupon" className="text-lg font-medium">Manage Coupon</span>
           </Link>
         ) : (
           ""
