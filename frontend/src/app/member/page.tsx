@@ -11,6 +11,7 @@ import MemberLoading from "@/components/memberComponents/MemberLoading";
 import getCouponsForUser from "@/libs/getCouponsForUser";
 import getCouponsRedeem from "@/libs/getCouponsRedeem";
 import CouponSummary from "@/components/memberComponents/CouponSummary";
+import dayjs from "dayjs";
 
 export default function Member() {
 
@@ -45,10 +46,10 @@ export default function Member() {
         console.log ;
         setUserInfo(userInfoA);
 
-        const filterCouponUser = userCouponsData.filter(coupon => coupon.used == false);
+        const filterCouponUser = userCouponsData.filter(coupon => coupon.used == false && dayjs().isBefore(dayjs(coupon.expiredDate)));
         setUserCoupons(filterCouponUser);
 
-        const filteredCouponsRedeem = CouponsRe.filter(coupon => coupon.tiers.includes(userInfoA.tier) && coupon.unownedCount != 0);
+        const filteredCouponsRedeem = CouponsRe.filter(coupon => coupon.tiers.includes(userInfoA.tier) && coupon.unownedCount != 0 && dayjs().isBefore(dayjs(coupon.expiredDate)));
         setCouponsRedeem(filteredCouponsRedeem);
 
         // console.log(CouponsRe);
