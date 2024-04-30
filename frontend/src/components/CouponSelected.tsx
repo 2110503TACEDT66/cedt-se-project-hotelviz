@@ -10,6 +10,7 @@ import getUserProfile from "@/libs/getUserProfile";
 import { CouponItem } from "../../interface";
 // import getCouponsForUser from "@/libs/getCouponsForUser";
 import CouponForBooking from "./CouponForBooking";
+import dayjs from "dayjs";
 
 export default function CouponSelected ({onSelectCoupon , onSelectCouponId }:{onSelectCoupon: (discount: Number | undefined) => void , onSelectCouponId : (id: string | undefined) => void}){
     const { data: session } = useSession();
@@ -48,7 +49,7 @@ export default function CouponSelected ({onSelectCoupon , onSelectCouponId }:{on
                 // ))}
                 // </div>
                 <div className="flex overflow-x-auto mx-4 ">
-                    {userCoupons.filter(coupon => coupon.used === false).map((coupon) => (
+                    {userCoupons.filter(coupon =>coupon.used == false && dayjs().isBefore(dayjs(coupon.expiredDate))).map((coupon) => (
                     <CouponForBooking
                         coupon={coupon}
                         onSelect={() => {{setSelectedCoupon(coupon)}; onSelectCoupon(coupon.discount); onSelectCouponId(coupon._id)}}
