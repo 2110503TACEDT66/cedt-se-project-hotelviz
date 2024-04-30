@@ -265,7 +265,6 @@ export default function BookingForm({ hotelID = "",roomType}: { hotelID?: string
                  name="direction"
                  value={selectedValue}
                  onChange={(e) => setSelectedValue(e.target.value)}
-                 onClick={() => setDiscountPrice(0)}
                >
                  <FormControlLabel value="Tier Discount" control={<Radio />} label={"Tier Discount (" + userInfo.tier + ")"} />
                  <FormControlLabel value="My Coupons" control={<Radio />} label="My Coupons" />
@@ -293,12 +292,12 @@ export default function BookingForm({ hotelID = "",roomType}: { hotelID?: string
                  {selectedValue == 'Tier Discount' ? (
                    <div className="flex flex-end items-end">
                      <div className="text-xl line-through">{roomtype?.price}</div>
-                     <div className="text-3xl text-orange-500">{discountPrice} THB</div>
+                     <div className="text-3xl text-orange-500">{discountPrice.toFixed(2)} THB</div>
                    </div>
                  ) : (
                    <div className="flex flex-end items-end">
                      <div className="text-xl line-through">{roomtype?.price}</div>
-                     <div className="text-3xl text-orange-500">{Math.max((roomtype ? roomtype.price : 0) - Number(discount), 0)} THB</div>
+                     <div className="text-3xl text-orange-500">{Math.max((roomtype ? roomtype.price : 0) - Number(discount), 0).toFixed(2)} THB</div>
                    </div>
                  )}
                </div>
