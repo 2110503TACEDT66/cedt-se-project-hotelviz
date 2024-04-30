@@ -1,5 +1,3 @@
-const { exists } = require("../../backend/models/User")
-
 describe('Redeem coupon test', () => {
   it('Redeem coupon', () => {
     cy.visit('http://localhost:3000/')
@@ -33,7 +31,7 @@ describe('Redeem coupon test', () => {
 
       cy.visit('http://localhost:3000/member')
 
-      let price;
+      let price:any;
 
       
       cy.get('.absolute > .text-2xl') // Replace with the actual selector
