@@ -63,10 +63,6 @@ const { protect } = require("../middleware/auth");
 *             type: string
 *             format: uuid
 *             example: 660255d64df8323ed9dafe43
-*           items:
-*             type: string
-*             format: uuid
-*             example: 660255d64df3243ed9dafe24
 *         resetPasswordToken:
 *           type: string
 *           description: Token for resetting password

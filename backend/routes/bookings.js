@@ -377,7 +377,7 @@ const { protect, authorize } = require("../middleware/auth");
 */
 /**
 * @swagger
-* /bookings//history/{id}:
+* /bookings/history/{id}:
 *   put:
 *     summary: Update one booking history by the id
 *     tags: [Bookings]
