@@ -1,6 +1,7 @@
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const User = require("../models/User");
+const Coupon = require("../models/Coupon");
 const {
   register,
   login,
@@ -11,7 +12,7 @@ const {
   getMe,
 } = require("../controllers/auth");
 
-let loginId = null;
+let session = {};
 
 class Response {
   constructor() {
@@ -44,7 +45,7 @@ class Response {
 async function createRequest(func, body = null) {
   const req = {
     user: {
-      id: loginId,
+      id: session._id,
     },
     body: body,
   };
@@ -61,8 +62,8 @@ describe("User", () => {
     dotenv.config({ path: "./config/config.env" });
     mongoose.set("strictQuery", true);
     await mongoose.connect(process.env.MONGO_URI_TEST);
-
     await User.deleteMany();
+    await Coupon.deleteMany();
   });
 
   afterAll(async () => {
@@ -74,18 +75,18 @@ describe("User", () => {
       let error;
       try {
         const user = await User.create({
-          name: "user1",
+          name: "admin",
           tel: "123-456-7890",
-          email: "user1@gmail.com",
+          email: "admin@gmail.com",
           password: "password123",
-          role: "user",
+          role: "admin",
         });
         await user.save();
       } catch (err) {
         error = err;
       }
       expect(error).toBe(undefined);
-      expect(await User.findOne({ name: "user1" })).not.toBe(null);
+      expect(await User.findOne({ name: "admin" })).not.toBe(null);
     });
   });
 
@@ -93,22 +94,22 @@ describe("User", () => {
   describe("Register user", () => {
     it("should register a user and return status 201", async () => {
       const res = await createRequest(register, {
-        name: "user2",
+        name: "user1",
         tel: "123-456-7890",
-        email: "user2@gmail.com",
+        email: "user1@gmail.com",
         password: "password123",
         role: "user",
       });
 
       expect(res.status).toBe(201);
-      expect(await User.findOne({ name: "user2" })).not.toBe(null);
+      expect(await User.findOne({ name: "user1" })).not.toBe(null);
     });
 
     it("should prevent user from register with same email and return status 400", async () => {
       const res = await createRequest(register, {
         name: "testduplicate",
         tel: "123-456-7890",
-        email: "user2@gmail.com",
+        email: "user1@gmail.com",
         password: "password123",
         role: "user",
       });
@@ -139,7 +140,7 @@ describe("User", () => {
         password: "password123",
       });
 
-      loginId = res.json._id;
+      session = res.json;
 
       expect(res.status).toBe(200);
       expect(res.json.email).toBe("user1@gmail.com");
@@ -210,14 +211,14 @@ describe("User", () => {
     });
 
     it("should prevent from set new password without logged-in and return status 500", async () => {
-      let tempId = loginId;
-      loginId = null;
+      let tempId = session._id;
+      session._id = null;
       const res = await createRequest(reset, {
         current_password: "password123",
         new_password: "newpassword",
       });
 
-      loginId = tempId;
+      session._id = tempId;
 
       expect(res.status).toBe(500);
     });
@@ -235,13 +236,13 @@ describe("User", () => {
     });
 
     it("should prevent user from update without logged-in and return status 400", async () => {
-      let tempId = loginId;
-      loginId = null;
+      let tempId = session._id;
+      session._id = null;
       const res = await createRequest(updateUser, {
         tel: "111-111-1111",
       });
 
-      loginId = tempId;
+      session._id = tempId;
 
       expect(res.status).toBe(400);
     });
@@ -261,7 +262,7 @@ describe("User", () => {
       });
 
       expect(res.status).toBe(200);
-      loginId = null;
+      session._id = null;
     });
 
     it("should prevent user from delete without logged-in and return status 400", async () => {
@@ -273,11 +274,11 @@ describe("User", () => {
 
       // login another account
       const res2 = await createRequest(login, {
-        email: "user2@gmail.com",
+        email: "admin@gmail.com",
         password: "password123",
       });
 
-      loginId = res2.json._id;
+      session._id = res2.json._id;
     });
 
     it("should prevent from delete user without password and return status 400", async () => {
@@ -343,7 +344,7 @@ describe("User", () => {
     });
 
     it("should prevent from getting user data without token", async () => {
-      loginId = null;
+      session._id = null;
       const res = await createRequest(getMe);
 
       expect(res.status).toBe(400);

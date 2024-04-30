@@ -10,19 +10,12 @@ exports.getCoupons = async (req, res, next) => {
     //If you are an admin, you can see all!
     query = Coupon.find();
   }
-  try {
-    const coupons = await query;
-    res.status(200).json({
-      success: true,
-      count: coupons.length,
-      data: coupons,
-    });
-  } catch (error) {
-    //console.log(error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Cannot find Coupon" });
-  }
+  const coupons = await query;
+  res.status(200).json({
+    success: true,
+    count: coupons.length,
+    data: coupons,
+  });
 };
 
 //@desc Get single coupon
@@ -96,7 +89,11 @@ exports.updateCoupon = async (req, res, next) => {
 
     if (req.user.role !== "admin") {
       // Check if the user owns the coupon and the coupon is not already used
-      if (coupon.owner==null || req.user.id.toString() !== coupon.owner.toString() || coupon.used) {
+      if (
+        coupon.owner == null ||
+        req.user.id.toString() !== coupon.owner.toString() ||
+        coupon.used
+      ) {
         //console.log(`${coupon.owner}, ${req.user.id.toString()}, ${coupon.owner.toString()}, ${coupon.used}`);
         return res.status(401).json({
           success: false,
@@ -114,8 +111,7 @@ exports.updateCoupon = async (req, res, next) => {
         success: true,
         data: coupon,
       });
-    } 
-    else{
+    } else {
       coupon = await Coupon.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true,
@@ -173,11 +169,11 @@ exports.redeemCoupon = async (req, res, next) => {
   try {
     const { couponType } = req.params;
     let user;
-    
+
     if (req.user.role === "admin" && req.body.user != null)
       user = await User.findById(req.body.user);
     else user = await User.findById(req.user.id);
-  
+
     //console.log(couponType, user);
     // Find an unowned coupon of the specified type
     const coupon = await Coupon.findOne({
@@ -220,6 +216,7 @@ exports.redeemCoupon = async (req, res, next) => {
     res.status(201).json({
       success: true,
       user: user._id,
+      coupon: coupon._id,
       count: user.coupons.length,
       coupons: user.coupons,
     });
@@ -406,7 +403,7 @@ exports.getSingleCouponSummary = async (req, res, next) => {
       },
       {
         $group: {
-          _id: "$type" ,
+          _id: "$type",
           count: { $sum: 1 },
           usedCount: { $sum: { $cond: [{ $eq: ["$used", true] }, 1, 0] } },
           unusedCount: { $sum: { $cond: [{ $eq: ["$used", false] }, 1, 0] } },
