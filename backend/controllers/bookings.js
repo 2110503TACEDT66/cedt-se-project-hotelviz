@@ -35,7 +35,7 @@ exports.getBookings = async (req, res, next) => {
       data: bookings,
     });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Cannot find Booking" });
@@ -62,7 +62,7 @@ exports.getBooking = async (req, res, next) => {
       data: booking,
     });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Cannot find Booking" });
@@ -97,7 +97,7 @@ exports.addBooking = async (req, res, next) => {
       });
     }
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Cannot create Booking" });
@@ -124,7 +124,7 @@ exports.addBooking = async (req, res, next) => {
       data: booking,
     });
   } catch (error) {
-    console.log(error.stack);
+    //console.log(error.stack);
     return res.status(400).json({
       success: false,
       message: "The requested body does not match the Booking model",
@@ -164,7 +164,7 @@ exports.updateBooking = async (req, res, next) => {
       data: booking,
     });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Cannot update Booking" });
@@ -198,7 +198,7 @@ exports.deleteBooking = async (req, res, next) => {
       data: {},
     });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Cannot delete Booking" });
@@ -240,7 +240,7 @@ exports.getBookingHistory = async (req, res, next) => {
       data: bookings,
     });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Cannot find Booking" });
@@ -261,7 +261,7 @@ exports.addBookingHistory = async (req, res, next) => {
       });
     }
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Cannot create Booking" });
@@ -274,7 +274,7 @@ exports.addBookingHistory = async (req, res, next) => {
       data: booking,
     });
   } catch (error) {
-    console.log(error.stack);
+    //console.log(error.stack);
     return res.status(400).json({
       success: false,
       message: "The requested body not match the Booking model",
@@ -316,7 +316,7 @@ exports.updateBookingHistory = async (req, res, next) => {
       data: booking,
     });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Cannot update Booking" });

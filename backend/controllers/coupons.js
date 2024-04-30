@@ -10,19 +10,12 @@ exports.getCoupons = async (req, res, next) => {
     //If you are an admin, you can see all!
     query = Coupon.find();
   }
-  try {
-    const coupons = await query;
-    res.status(200).json({
-      success: true,
-      count: coupons.length,
-      data: coupons,
-    });
-  } catch (error) {
-    console.log(error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Cannot find Coupon" });
-  }
+  const coupons = await query;
+  res.status(200).json({
+    success: true,
+    count: coupons.length,
+    data: coupons,
+  });
 };
 
 //@desc Get single coupon
@@ -42,7 +35,7 @@ exports.getCoupon = async (req, res, next) => {
       data: coupon,
     });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Cannot find Coupon" });
@@ -73,7 +66,7 @@ exports.addCoupon = async (req, res, next) => {
 
     res.status(201).json({ success: true, data: coupons });
   } catch (error) {
-    console.log(error.stack);
+    //console.log(error.stack);
     return res.status(400).json({
       success: false,
       message: "The requested body not match the Coupon model",
@@ -96,8 +89,12 @@ exports.updateCoupon = async (req, res, next) => {
 
     if (req.user.role !== "admin") {
       // Check if the user owns the coupon and the coupon is not already used
-      if (coupon.owner==null || req.user.id.toString() !== coupon.owner.toString() || coupon.used) {
-        console.log(`${coupon.owner}, ${req.user.id.toString()}, ${coupon.owner.toString()}, ${coupon.used}`);
+      if (
+        coupon.owner == null ||
+        req.user.id.toString() !== coupon.owner.toString() ||
+        coupon.used
+      ) {
+        //console.log(`${coupon.owner}, ${req.user.id.toString()}, ${coupon.owner.toString()}, ${coupon.used}`);
         return res.status(401).json({
           success: false,
           message: `User ${req.user.id} is not authorized to update this coupon`,
@@ -114,8 +111,7 @@ exports.updateCoupon = async (req, res, next) => {
         success: true,
         data: coupon,
       });
-    } 
-    else{
+    } else {
       coupon = await Coupon.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true,
@@ -126,7 +122,7 @@ exports.updateCoupon = async (req, res, next) => {
       });
     }
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Cannot update Coupon" });
@@ -159,7 +155,7 @@ exports.deleteCoupon = async (req, res, next) => {
       data: {},
     });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Cannot delete Coupon" });
@@ -173,12 +169,12 @@ exports.redeemCoupon = async (req, res, next) => {
   try {
     const { couponType } = req.params;
     let user;
-    
+
     if (req.user.role === "admin" && req.body.user != null)
       user = await User.findById(req.body.user);
     else user = await User.findById(req.user.id);
-  
-    console.log(couponType, user);
+
+    //console.log(couponType, user);
     // Find an unowned coupon of the specified type
     const coupon = await Coupon.findOne({
       type: couponType,
@@ -220,11 +216,12 @@ exports.redeemCoupon = async (req, res, next) => {
     res.status(201).json({
       success: true,
       user: user._id,
+      coupon: coupon._id,
       count: user.coupons.length,
       coupons: user.coupons,
     });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Cannot redeem coupon" });
@@ -262,7 +259,7 @@ exports.deleteCouponsByType = async (req, res, next) => {
       message: `${deletedCoupons.deletedCount} coupons with type ${couponType} deleted successfully`,
     });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Cannot delete coupons" });
@@ -285,6 +282,19 @@ exports.updateCouponsByType = async (req, res, next) => {
       });
     }
 
+    // Check if the update would result in a duplicate coupon type
+    if (updateData.type) {
+      const existingCoupon = await Coupon.findOne({
+        type: updateData.type,
+      });
+      if (existingCoupon) {
+        return res.status(400).json({
+          success: false,
+          message: `Coupon type '${updateData.type}' already exists`,
+        });
+      }
+    }
+
     // Find and update coupons with the provided couponType
     const updatedCoupons = await Coupon.updateMany(
       { type: couponType },
@@ -305,7 +315,7 @@ exports.updateCouponsByType = async (req, res, next) => {
       message: `${updatedCoupons.modifiedCount} coupons with type ${couponType} updated successfully`,
     });
   } catch (error) {
-    console.log(error);
+    //console.log(error);
     return res
       .status(500)
       .json({ success: false, message: "Cannot update coupons" });
@@ -316,113 +326,66 @@ exports.updateCouponsByType = async (req, res, next) => {
 //@route GET /api/v1/coupons/summary
 //@access Private
 exports.getCouponSummary = async (req, res, next) => {
-  try {
-    const couponSummary = await Coupon.aggregate([
-      {
-        $group: {
-          _id: "$type",
-          count: { $sum: 1 },
-          usedCount: { $sum: { $cond: [{ $eq: ["$used", true] }, 1, 0] } },
-          unusedCount: { $sum: { $cond: [{ $eq: ["$used", false] }, 1, 0] } },
-          ownedCount: { $sum: { $cond: [{ $ne: ["$owner", null] }, 1, 0] } },
-          createdAt: { $first: "$createdAt" },
-          expiredDate: { $first: "$expiredDate" },
-          discount: { $first: "$discount" },
-          tiers: { $first: "$tiers" },
-          point: { $first: "$point" },
-        },
+  const couponSummary = await Coupon.aggregate([
+    {
+      $group: {
+        _id: "$type",
+        count: { $sum: 1 },
+        usedCount: { $sum: { $cond: [{ $eq: ["$used", true] }, 1, 0] } },
+        unusedCount: { $sum: { $cond: [{ $eq: ["$used", false] }, 1, 0] } },
+        ownedCount: { $sum: { $cond: [{ $ne: ["$owner", null] }, 1, 0] } },
+        unownedCount: { $sum: { $cond: [{ $eq: ["$owner", null] }, 1, 0] } },
+        createdAt: { $first: "$createdAt" },
+        expiredDate: { $first: "$expiredDate" },
+        discount: { $first: "$discount" },
+        tiers: { $first: "$tiers" },
+        point: { $first: "$point" },
       },
-    ]);
-    res.status(200).json({
-      success: true,
-      data: couponSummary,
-    });
-  } catch (error) {
-    console.log(error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Cannot get coupon summary" });
-  }
-};
-
-//@desc Get coupon summary
-//@route GET /api/v1/coupons/summary
-//@access Private
-exports.getCouponSummary = async (req, res, next) => {
-  try {
-    const couponSummary = await Coupon.aggregate([
-      {
-        $group: {
-          _id: "$type",
-          count: { $sum: 1 },
-          usedCount: { $sum: { $cond: [{ $eq: ["$used", true] }, 1, 0] } },
-          unusedCount: { $sum: { $cond: [{ $eq: ["$used", false] }, 1, 0] } },
-          ownedCount: { $sum: { $cond: [{ $ne: ["$owner", null] }, 1, 0] } },
-          unownedCount: { $sum: { $cond: [{ $eq: ["$owner", null] }, 1, 0] } },
-          createdAt: { $first: "$createdAt" },
-          expiredDate: { $first: "$expiredDate" },
-          discount: { $first: "$discount" },
-          tiers: { $first: "$tiers" },
-          point: { $first: "$point" },
-        },
-      },
-    ]);
-    res.status(200).json({
-      success: true,
-      data: couponSummary,
-    });
-  } catch (error) {
-    console.log(error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Cannot get coupon summary" });
-  }
+    },
+  ]);
+  res.status(200).json({
+    success: true,
+    data: couponSummary,
+  });
 };
 
 //@desc Get summary for a single coupon type
-//@route GET /api/v1/coupons/type/:couponType
+//@route GET /api/v1/coupons/:couponType
 //@access Private
 exports.getSingleCouponSummary = async (req, res, next) => {
-  try {
-    const couponType = req.params.couponType;
+  const couponType = req.params.couponType;
 
-    // Aggregate data for the coupon type
-    const couponSummary = await Coupon.aggregate([
-      {
-        $match: { type: couponType },
+  // Aggregate data for the coupon type
+  const couponSummary = await Coupon.aggregate([
+    {
+      $match: { type: couponType },
+    },
+    {
+      $group: {
+        _id: "$type",
+        count: { $sum: 1 },
+        usedCount: { $sum: { $cond: [{ $eq: ["$used", true] }, 1, 0] } },
+        unusedCount: { $sum: { $cond: [{ $eq: ["$used", false] }, 1, 0] } },
+        ownedCount: { $sum: { $cond: [{ $ne: ["$owner", null] }, 1, 0] } },
+        unownedCount: { $sum: { $cond: [{ $eq: ["$owner", null] }, 1, 0] } },
+        createdAt: { $first: "$createdAt" },
+        expiredDate: { $first: "$expiredDate" },
+        discount: { $first: "$discount" },
+        tiers: { $first: "$tiers" },
+        point: { $first: "$point" },
       },
-      {
-        $group: {
-          _id: "$type" ,
-          count: { $sum: 1 },
-          usedCount: { $sum: { $cond: [{ $eq: ["$used", true] }, 1, 0] } },
-          unusedCount: { $sum: { $cond: [{ $eq: ["$used", false] }, 1, 0] } },
-          ownedCount: { $sum: { $cond: [{ $ne: ["$owner", null] }, 1, 0] } },
-          unownedCount: { $sum: { $cond: [{ $eq: ["$owner", null] }, 1, 0] } },
-          createdAt: { $first: "$createdAt" },
-          expiredDate: { $first: "$expiredDate" },
-          discount: { $first: "$discount" },
-          tiers: { $first: "$tiers" },
-          point: { $first: "$point" },
-        },
-      },
-    ]);
+    },
+  ]);
 
-    if (couponSummary.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: `No coupons found with type ${couponType}`,
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: couponSummary[0],
+  if (couponSummary.length === 0) {
+    return res.status(404).json({
+      success: false,
+      message: `No coupons found with type ${couponType}`,
     });
-  } catch (error) {
-    console.log(error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Cannot get coupon summary" });
   }
+
+  res.status(200).json({
+    success: true,
+    data: couponSummary[0],
+  });
 };

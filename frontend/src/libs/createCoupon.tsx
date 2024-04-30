@@ -15,13 +15,11 @@ export default async function createCoupon(
         }
       );
   
-      if (!response.ok) {
-        throw new Error("Failed to create coupons");
-      }
+    
   
       return await response.json();
-    } catch (error: any) {
-      throw new Error(`Failed to create coupons: ${error.message}`);
-    }
+     } catch (error: any) {
+       throw new Error(`${error.message}`);
+     }
   }
   

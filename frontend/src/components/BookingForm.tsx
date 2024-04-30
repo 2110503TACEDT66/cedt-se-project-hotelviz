@@ -265,13 +265,14 @@ export default function BookingForm({ hotelID = "",roomType}: { hotelID?: string
                  name="direction"
                  value={selectedValue}
                  onChange={(e) => setSelectedValue(e.target.value)}
+                 onClick={() => setDiscountPrice(0)}
                >
-                 <FormControlLabel value="Tier Discount" control={<Radio />} label="Tier Discount" />
+                 <FormControlLabel value="Tier Discount" control={<Radio />} label={"Tier Discount (" + userInfo.tier + ")"} />
                  <FormControlLabel value="My Coupons" control={<Radio />} label="My Coupons" />
                </RadioGroup>
              </FormControl>
              <div className="flex overflow-x-auto mx-4">
-               {selectedValue === 'My Coupons' && <CouponSelected onSelectCoupon={(value)=> {setDiscount(value as number);console.log('coupon')}} onSelectCouponId={(value)=> {setCouponId(value as string)}}/>}
+               {selectedValue === 'My Coupons' && <CouponSelected onSelectCoupon={(value)=> {setDiscount(value as number);console.log('coupon')}} onSelectCouponId={(value)=> {setCouponId(value as string)}}/> }
              </div>
        
              <div className="border-t-2 border-gray-300 my-4"></div>

@@ -50,11 +50,6 @@ const UserSchema = new mongoose.Schema({
       ref: "Coupon",
     },
   ],
-  favorite: [
-    {
-      type: mongoose.Schema.ObjectId,
-    },
-  ],
   resetPasswordToken: String,
   resetPasswordExpire: Date,
   createdAt: {
@@ -63,12 +58,18 @@ const UserSchema = new mongoose.Schema({
   },
 });
 
+function upgradeTier(experience) {
+  let tier = "None";
+  if (experience >= 500) tier = "Platinum";
+  else if (experience >= 200) tier = "Gold";
+  else if (experience >= 50) tier = "Silver";
+  else tier = "Bronze";
+  return tier;
+}
+
 //Encrypt password using bcrypt
 UserSchema.pre("save", async function (next) {
-  if (this.experience >= 500) this.tier = "Platinum";
-  else if (this.experience >= 200) this.tier = "Gold";
-  else if (this.experience >= 50) this.tier = "Silver";
-  else if (this.experience >= 0) this.tier = "Bronze";
+  this.tier = upgradeTier(this.experience);
 
   if (this.isModified("password")) {
     const salt = await bcrypt.genSalt(10);
@@ -77,8 +78,14 @@ UserSchema.pre("save", async function (next) {
   next();
 });
 
-//Sign JWT and return
+UserSchema.pre("findOneAndUpdate", async function (next) {
+  const update = this.getUpdate();
+  update.tier = upgradeTier(update.experience);
+  
+  next();
+});
 
+//Sign JWT and return
 UserSchema.methods.getSignedJwtToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE,

@@ -63,9 +63,6 @@ const { protect } = require("../middleware/auth");
 *             type: string
 *             format: uuid
 *             example: 660255d64df8323ed9dafe43
-*         favorite:
-*           type: array
-*           description: User's favorite hotel (scrapped)
 *           items:
 *             type: string
 *             format: uuid
@@ -92,7 +89,6 @@ const { protect } = require("../middleware/auth");
 *         experience: 100
 *         point: 50
 *         coupons: []
-*         favorite: []
 *         resetPasswordToken: abcdefg123456
 *         resetPasswordExpire: 2024-05-25T12:00:00Z
 *         createdAt: 2024-04-25T12:00:00Z

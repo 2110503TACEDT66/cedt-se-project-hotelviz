@@ -15,6 +15,7 @@ export default async function BookingList({ bookings }: { bookings: any }) {
       const item = {
         date: bookingItem.date,
         user: bookingItem.user,
+        roomType: bookingItem.roomType,
         contactEmail: bookingItem.contactEmail,
         contactName: bookingItem.contactName,
         contactTel: bookingItem.contactTel,

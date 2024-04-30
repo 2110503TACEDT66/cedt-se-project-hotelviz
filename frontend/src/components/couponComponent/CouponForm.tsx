@@ -35,7 +35,7 @@ export default function CouponForm({
   onNumberCouponChange: Function;
 }) {
 
-  const [date, setDate] = useState<Dayjs | null>(dayjs(coupon.expiredDate));
+  const [date, setDate] = useState<Dayjs | null>(dayjs(coupon._id!=""?coupon.expiredDate:new Date()));
   
 
   {
@@ -65,7 +65,7 @@ export default function CouponForm({
           variant="outlined"
           name="discount"
           label=""
-          defaultValue={coupon.discount}
+          defaultValue={coupon._id!=""?coupon.discount:null}
           onChange={(e) => {
             coupon.discount = Number(e.target.value);
             onCouponChange(coupon);
@@ -77,7 +77,7 @@ export default function CouponForm({
           variant="outlined"
           name="point"
           label=""
-          defaultValue={coupon.point}
+          defaultValue={coupon._id!=""?coupon.point:null}
           onChange={(e) => {
             coupon.point = Number(e.target.value);
             onCouponChange(coupon);
@@ -87,10 +87,15 @@ export default function CouponForm({
      <div>Coupon expired Date</div>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <DatePicker
-        
+          sx={{
+            svg: { color: '#000' },
+              input: { color: '#000' },
+              backgroundColor: "#F1F5F9",
+            
+          }}
           slotProps={{ textField: { size: "medium" } }}
           className="bg-white"
-          defaultValue={dayjs(coupon.expiredDate)}
+          defaultValue={coupon._id!=""?dayjs(coupon.expiredDate):dayjs(new Date())}
           value={date}
           onChange={(newValue) => {
             if (newValue) {
@@ -102,7 +107,7 @@ export default function CouponForm({
       </LocalizationProvider>
       
         {!coupon._id?
-<div>
+<div >
 
         <div>Numbers of Coupon</div>
         <TextField

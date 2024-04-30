@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import createCoupon from "@/libs/createCoupon";
-import updateCoupon from "@/libs/updateCoupon";
+import updateSummaryCoupon from "@/libs/updateSummaryCoupon";
 import deleteCoupon from "@/libs/deleteCoupon";
 import { CouponItem, SummaryCoupon } from "../../../../interface";
 import Link from "next/link";
@@ -32,19 +32,36 @@ export default function AddCoupon() {
 
       };
       if (id) {
-        await updateCoupon(session.user.token, id, item);
-      } else await createCoupon(session.user.token, item);
-      //window.location.href = "/account/mybookings";
+        const response = await updateSummaryCoupon(session.user.token, id, item);
+        
+        if(response.success==false){
+          alert(response.message)
+        }
+        else {
+          window.location.href = "/admin/managecoupon";
+        }
+        
+        
+      } else{
+        const response = await createCoupon(session.user.token, item);
+        if(response.success==false){
+          alert(response.message)
+        }
+        else window.location.href = "/admin/managecoupon";
+      } 
+      
     }
   };
 
   const [coupon, setCoupon] = useState<SummaryCoupon>(new SummaryCoupon());
   const [numberOfCoupons,setnumberOfCoupons] = useState<Number>(0);
+  
 
   useEffect(() => {
     const getData = async () => {
       if (id != null && session&&coupon._id == "") {
         const response =(await getSingleCouponSummary(session.user.token, id)) as SummaryCoupon;
+
         setCoupon(response);
       }
     };
@@ -59,7 +76,7 @@ export default function AddCoupon() {
 
           <div className="">
             
-              {coupon._id == ""? <LinearProgress />:
+              {coupon._id == ""&&id? <LinearProgress />:
               <CouponForm
                 coupon={coupon}
                 onCouponChange={(value: SummaryCoupon) => {
@@ -71,7 +88,7 @@ export default function AddCoupon() {
                 }}
                 
               ></CouponForm>}
-           <Link href="/admin/managecoupon">
+           
               <button
                 name="Edit Coupon"
                 className="block rounded-full bg-sky-500 px-5 py-2 text-white shadow-sm m-5"
@@ -79,7 +96,7 @@ export default function AddCoupon() {
               >
                 {id?"Edit Coupon":"Add Coupon"}
               </button>
-            </Link>
+            
             {id ?
             
               <button
