@@ -1,4 +1,4 @@
-node_modules
-config/config.env
-coverage
+/node_modules
+/config/config.env
+/coverage
 newman
