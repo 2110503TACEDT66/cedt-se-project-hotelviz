@@ -1,4 +1,9 @@
 describe('select tier to get discounts', () => {
+  beforeEach(() => {
+   
+    cy.viewport('macbook-13')
+  })
+  
   it('select tier to get discounts', () => {
     //sign up as nattapat (user)
     cy.visit('localhost:3000')
