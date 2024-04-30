@@ -298,7 +298,7 @@ export default function BookingForm({ hotelID = "",roomType}: { hotelID?: string
                  ) : (
                    <div className="flex flex-end items-end">
                      <div className="text-xl line-through">{roomtype?.price}</div>
-                     <div className="text-3xl text-orange-500">{(roomtype?roomtype.price : 0) - Number(discount)} THB</div>
+                     <div className="text-3xl text-orange-500">{Math.max((roomtype ? roomtype.price : 0) - Number(discount), 0)} THB</div>
                    </div>
                  )}
                </div>
