@@ -67,6 +67,8 @@ describe("User", () => {
   });
 
   afterAll(async () => {
+    await User.deleteMany();
+    await Coupon.deleteMany();
     await mongoose.connection.close();
   });
 

@@ -87,6 +87,8 @@ describe("Coupon", () => {
   });
 
   afterAll(async () => {
+    await User.deleteMany();
+    await Coupon.deleteMany();
     await mongoose.connection.close();
   });
 
@@ -131,7 +133,7 @@ describe("Coupon", () => {
       expect(await Coupon.findOne({ type: "coupon2" })).not.toBe(null);
     });
 
-    it("should prevent from creating a hotel with wrong format and return status 400", async () => {
+    it("should prevent from creating a coupon with wrong format and return status 400", async () => {
       const res = await createRequest(addCoupon, {
         body: {
           numberOfCoupons: 4,
@@ -224,7 +226,7 @@ describe("Coupon", () => {
       expect(res.status).toBe(200);
     });
 
-    it("should prevent from getting coupon with invalid coupon id and return status 404", async () => {
+    it("should give error message from getting coupon with invalid coupon id and return status 404", async () => {
       const res = await createRequest(getCoupon, {
         params: { id: "000000000000000000000000" },
       });
@@ -232,7 +234,7 @@ describe("Coupon", () => {
       expect(res.status).toBe(404);
     });
 
-    it("should prevent from getting coupon with incorrect coupon id format and return status 404", async () => {
+    it("should give error message from getting coupon with incorrect coupon id format and return status 404", async () => {
       const res = await createRequest(getCoupon, {
         params: { id: "incorrect" },
       });
@@ -629,7 +631,7 @@ describe("Coupon", () => {
       expect(res.status).toBe(200);
     });
 
-    it("should prevent from getting single coupon summary with invalid coupon type and return status 404", async () => {
+    it("should give error message from getting single coupon summary with invalid coupon type and return status 404", async () => {
       const res = await createRequest(getSingleCouponSummary, {
         params: { couponType: "coupon0" },
       });
