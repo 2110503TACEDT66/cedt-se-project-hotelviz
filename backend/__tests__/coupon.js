@@ -99,7 +99,7 @@ async function loginAdmin() {
   ).json;
 }
 
-describe("Coupon", () => {
+describe("(US2-3)Coupon", () => {
   beforeAll(async () => {
     dotenv.config({ path: "./config/config.env" });
     mongoose.set("strictQuery", true);
@@ -162,6 +162,7 @@ describe("Coupon", () => {
   //------------------------------------------------------------------------------------------------------------------------
   describe("Create coupon", () => {
     it("should create a coupon and return status 201", async () => {
+      await loginAdmin();
       const res = await createRequest(addCoupon, {
         body: {
           numberOfCoupons: 4,
@@ -557,7 +558,7 @@ describe("Coupon", () => {
       const res = await createRequest(getCouponSummary);
 
       expect(res.status).toBe(200);
-      expect(res.json.data[0]).not.toBe(null)
+      expect(res.json.data[0]).not.toBe(null);
     });
   });
 
@@ -569,7 +570,7 @@ describe("Coupon", () => {
       });
 
       expect(res.status).toBe(200);
-      expect(res.json.data._id).toBe("coupon2")
+      expect(res.json.data._id).toBe("coupon2");
     });
 
     it("should give error message from getting single coupon summary with invalid coupon type and return status 404", async () => {

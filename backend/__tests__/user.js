@@ -2,6 +2,8 @@ const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const User = require("../models/User");
 const Coupon = require("../models/Coupon");
+const Hotel = require("../models/Hotel");
+const Booking = require("../models/Booking");
 const {
   register,
   login,
@@ -12,7 +14,10 @@ const {
   getMe,
 } = require("../controllers/auth");
 
-let session = {};
+let session = {
+  _id: null,
+  role: null,
+};
 
 class Response {
   constructor() {
@@ -42,19 +47,136 @@ class Response {
   }
 }
 
-async function createRequest(func, body = null) {
-  const req = {
+async function createRequest(func, request = {}) {
+  let req = {
     user: {
       id: session._id,
+      role: session.role,
     },
-    body: body,
+    params: {
+      id: null,
+    },
+    body: {},
+    query: {},
+    queryPolluted: {},
   };
+  req = { ...req, ...request };
   let res = new Response();
   const next = jest.fn();
 
   await func(req, res, next);
 
   return { status: res.statusCode, json: res.body, cookies: res.cookies };
+}
+
+async function loginUser() {
+  session = (
+    await createRequest(login, {
+      body: {
+        email: "user1@gmail.com",
+        password: "newpassword",
+      },
+    })
+  ).json;
+}
+
+async function loginAdmin() {
+  session = (
+    await createRequest(login, {
+      body: {
+        email: "admin@gmail.com",
+        password: "password123",
+      },
+    })
+  ).json;
+}
+
+async function createHotel(req, res, next) {
+  try {
+    const hotel = await Hotel.create(req.body);
+    res.status(201).json({ success: true, data: hotel });
+  } catch (error) {
+    //console.log(error.stack);
+    return res.status(400).json({
+      success: false,
+      message: "The requested body not match the Hotel model",
+    });
+  }
+}
+
+async function deleteHotel(req, res, next) {
+  try {
+    const hotel = await Hotel.findById(req.params.id);
+
+    if (!hotel) {
+      return res.status(400).json({ success: false });
+    }
+
+    await hotel.deleteOne();
+    res.status(200).json({ success: true, data: {} });
+  } catch (err) {
+    res.status(400).json({ success: false });
+  }
+}
+
+async function addBooking(req, res, next) {
+  try {
+    req.body.hotel = req.params.hotelId;
+    const hotel = await Hotel.findById(req.params.hotelId);
+    if (!hotel) {
+      return res.status(404).json({
+        success: false,
+        message: `No hotel with the id of ${req.params.hotelId}`,
+      });
+    }
+
+    //add user Id to req.body
+    req.body.user = req.user.id;
+
+    //Check for existed booking
+    const existedBookings = await Booking.find({ user: req.user.id });
+
+    //If the user is not an admin, they can only create 3 booking.
+    if (existedBookings.length >= 3 && req.user.role !== "admin") {
+      return res.status(400).json({
+        success: false,
+        message: `The user with ID ${req.user.id} has already made 3 bookings`,
+      });
+    }
+  } catch (error) {
+    //console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Cannot create Booking" });
+  }
+
+  try {
+    const booking = await Booking.create(req.body);
+
+    // Add points to the user after successful booking creation if role is "user"
+    if (req.user.role === "user") {
+      // Add the price of the room type to the user's points
+      const pointsToAdd = parseInt(booking.price / 10);
+      const exptoAdd = parseInt(booking.price / 100);
+
+      // Find the user and update their points
+      const user = await User.findById(req.user.id);
+      user.point += pointsToAdd;
+      user.experience += exptoAdd;
+      await user.save();
+    }
+
+    res.status(201).json({
+      success: true,
+      data: booking,
+    });
+  } catch (error) {
+    //console.log(error.stack);
+    return res.status(400).json({
+      success: false,
+      message: "The requested body does not match the Booking model",
+    });
+  }
 }
 
 describe("User", () => {
@@ -64,11 +186,15 @@ describe("User", () => {
     await mongoose.connect(process.env.MONGO_URI_TEST);
     await User.deleteMany();
     await Coupon.deleteMany();
+    await Hotel.deleteMany();
+    await Booking.deleteMany();
   });
 
   afterAll(async () => {
     await User.deleteMany();
     await Coupon.deleteMany();
+    await Hotel.deleteMany();
+    await Booking.deleteMany();
     await mongoose.connection.close();
   });
 
@@ -96,11 +222,13 @@ describe("User", () => {
   describe("Register user", () => {
     it("should register a user and return status 201", async () => {
       const res = await createRequest(register, {
-        name: "user1",
-        tel: "123-456-7890",
-        email: "user1@gmail.com",
-        password: "password123",
-        role: "user",
+        body: {
+          name: "user1",
+          tel: "123-456-7890",
+          email: "user1@gmail.com",
+          password: "password123",
+          role: "user",
+        },
       });
 
       expect(res.status).toBe(201);
@@ -109,11 +237,13 @@ describe("User", () => {
 
     it("should prevent user from register with same email and return status 400", async () => {
       const res = await createRequest(register, {
-        name: "testduplicate",
-        tel: "123-456-7890",
-        email: "user1@gmail.com",
-        password: "password123",
-        role: "user",
+        body: {
+          name: "testduplicate",
+          tel: "123-456-7890",
+          email: "user1@gmail.com",
+          password: "password123",
+          role: "user",
+        },
       });
 
       expect(res.status).toBe(400);
@@ -122,11 +252,13 @@ describe("User", () => {
 
     it("should prevent user from register with incorrect format and return status 400", async () => {
       const res = await createRequest(register, {
-        name: "testcannotcreateuser",
-        tel: "123-456-7890",
-        email: "test",
-        password: "password123",
-        role: "user",
+        body: {
+          name: "testcannotcreateuser",
+          tel: "123-456-7890",
+          email: "test",
+          password: "password123",
+          role: "user",
+        },
       });
 
       expect(res.status).toBe(400);
@@ -138,20 +270,24 @@ describe("User", () => {
   describe("Login user", () => {
     it("should login user and return status 200", async () => {
       const res = await createRequest(login, {
-        email: "user1@gmail.com",
-        password: "password123",
+        body: {
+          email: "user1@gmail.com",
+          password: "password123",
+        },
       });
 
       session = res.json;
 
       expect(res.status).toBe(200);
       expect(res.json.email).toBe("user1@gmail.com");
-      expect(session.email).toBe("user1@gmail.com")
+      expect(session.email).toBe("user1@gmail.com");
     });
 
     it("should prevent user from login with incorrect request body and return status 400", async () => {
       const res = await createRequest(login, {
-        password: "password123",
+        body: {
+          password: "password123",
+        },
       });
 
       expect(res.status).toBe(400);
@@ -159,8 +295,10 @@ describe("User", () => {
 
     it("should prevent user from login with invalid email and return status 400", async () => {
       const res = await createRequest(login, {
-        email: "wrongemail@gmail.com",
-        password: "wrongpassword",
+        body: {
+          email: "wrongemail@gmail.com",
+          password: "wrongpassword",
+        },
       });
 
       expect(res.status).toBe(400);
@@ -168,8 +306,10 @@ describe("User", () => {
 
     it("should prevent user from login with incorrect password and return status 401", async () => {
       const res = await createRequest(login, {
-        email: "user1@gmail.com",
-        password: "wrongpassword",
+        body: {
+          email: "user1@gmail.com",
+          password: "wrongpassword",
+        },
       });
 
       expect(res.status).toBe(401);
@@ -188,17 +328,30 @@ describe("User", () => {
   //------------------------------------------------------------------------------------------------------------------------
   describe("Reset password", () => {
     it("should set new password and return status 201", async () => {
+      session = (
+        await createRequest(login, {
+          body: {
+            email: "user1@gmail.com",
+            password: "password123",
+          },
+        })
+      ).json;
+
       const res = await createRequest(reset, {
-        current_password: "password123",
-        new_password: "newpassword",
+        body: {
+          current_password: "password123",
+          new_password: "newpassword",
+        },
       });
 
       expect(res.status).toBe(200);
 
       //login with new password
       const res2 = await createRequest(login, {
-        email: "user1@gmail.com",
-        password: "newpassword",
+        body: {
+          email: "user1@gmail.com",
+          password: "newpassword",
+        },
       });
 
       expect(res2.status).toBe(200);
@@ -206,8 +359,10 @@ describe("User", () => {
 
     it("should prevent from set new password with incorrect current password and return status 401", async () => {
       const res = await createRequest(reset, {
-        current_password: "password123",
-        new_password: "newpassword",
+        body: {
+          current_password: "password123",
+          new_password: "newpassword",
+        },
       });
 
       expect(res.status).toBe(401);
@@ -215,21 +370,24 @@ describe("User", () => {
 
     it("should prevent from set new password without current password and return status 400", async () => {
       const res = await createRequest(reset, {
-        new_password: "newpassword",
+        body: {
+          new_password: "newpassword",
+        },
       });
 
       expect(res.status).toBe(400);
     });
 
     it("should prevent from set new password without logged-in and return status 500", async () => {
-      let tempId = session._id;
       session._id = null;
       const res = await createRequest(reset, {
-        current_password: "password123",
-        new_password: "newpassword",
+        body: {
+          current_password: "password123",
+          new_password: "newpassword",
+        },
       });
 
-      session._id = tempId;
+      await loginUser();
 
       expect(res.status).toBe(500);
     });
@@ -238,29 +396,35 @@ describe("User", () => {
   //------------------------------------------------------------------------------------------------------------------------
   describe("Update user", () => {
     it("should update user and return status 200", async () => {
+      await loginUser();
       const res = await createRequest(updateUser, {
-        tel: "000-000-0000",
+        body: {
+          tel: "000-000-0000",
+        },
       });
 
       expect(res.status).toBe(200);
       expect(res.json.data.tel).toBe("000-000-0000");
-      expect((await User.findById(session._id)).tel).toBe("000-000-0000")
+      expect((await User.findById(session._id)).tel).toBe("000-000-0000");
     });
 
     it("should prevent user from update without logged-in and return status 400", async () => {
-      let tempId = session._id;
       session._id = null;
       const res = await createRequest(updateUser, {
-        tel: "111-111-1111",
+        body: {
+          tel: "111-111-1111",
+        },
       });
 
-      session._id = tempId;
+      await loginUser();
 
       expect(res.status).toBe(400);
     });
 
-    it("should prevent user from update without body and return status 400", async () => {
-      const res = await createRequest(updateUser);
+    it("should prevent user from update with incorrect body format and return status 400", async () => {
+      const res = await createRequest(updateUser, {
+        body: { tel: { test: "sfgdf" } },
+      });
 
       expect(res.status).toBe(400);
     });
@@ -269,8 +433,29 @@ describe("User", () => {
   //------------------------------------------------------------------------------------------------------------------------
   describe("Delete user", () => {
     it("should delete user and return status 200", async () => {
+      await createRequest(register, {
+        body: {
+          name: "user2",
+          tel: "123-456-7890",
+          email: "user2@gmail.com",
+          password: "password123",
+          role: "user",
+        },
+      });
+
+      session = (
+        await createRequest(login, {
+          body: {
+            email: "user2@gmail.com",
+            password: "password123",
+          },
+        })
+      ).json;
+
       const res = await createRequest(deleteUser, {
-        password: "newpassword",
+        body: {
+          password: "password123",
+        },
       });
 
       expect(res.status).toBe(200);
@@ -278,27 +463,28 @@ describe("User", () => {
 
     it("should prevent user from delete without logged-in and return status 400", async () => {
       const res = await createRequest(deleteUser, {
-        password: "newpassword",
+        body: {
+          password: "newpassword",
+        },
       });
 
       expect(res.status).toBe(500);
 
-      // login another account
-      session = (await createRequest(login, {
-        email: "admin@gmail.com",
-        password: "password123",
-      })).json;
+      // login other account
+      await loginAdmin();
     });
 
     it("should prevent from delete user without password and return status 400", async () => {
-      const res = await createRequest(deleteUser, {});
+      const res = await createRequest(deleteUser);
 
       expect(res.status).toBe(400);
     });
 
-    it("should delete user and return status 200", async () => {
+    it("should prevent from delete user with incorrect password and return status 401", async () => {
       const res = await createRequest(deleteUser, {
-        password: "wrongpassword",
+        body: {
+          password: "wrongpassword",
+        },
       });
 
       expect(res.status).toBe(401);
@@ -306,10 +492,77 @@ describe("User", () => {
   });
 
   //------------------------------------------------------------------------------------------------------------------------
-  describe("Tier Upgrade", () => {
+  describe("(US2-2)Test experience earning each booking and (US2-3)points earning each booking", () => {
+    it("should create coupon model successfully", async () => {
+      //create hotel
+      await loginAdmin();
+      let hotelId = (
+        await createRequest(createHotel, {
+          body: {
+            name: "hotel2",
+            address: "address2",
+            district: "district2",
+            province: "province2",
+            postalcode: "22222",
+            tel: "222-222-2222",
+            region: "region2",
+            image: "https://drive.google.com/uc?id=imageLink",
+          },
+        })
+      ).json.data.id;
+
+      await loginUser();
+      expect((await User.findById(session._id)).experience).toBe(0);
+      expect((await User.findById(session._id)).point).toBe(0);
+
+      //add booking
+      await createRequest(addBooking, {
+        params: { hotelId: hotelId },
+        body: {
+          date: "2025-04-29T00:00:00.000Z",
+          contactEmail: "user1@gmail.com",
+          contactName: "user1",
+          contactTel: "222-222-2222",
+          roomType: "room1",
+          price: 2000,
+          discount: 0,
+        },
+      });
+      expect((await User.findById(session._id)).experience).toBe(20);
+      expect((await User.findById(session._id)).point).toBe(200);
+
+      //add booking 2
+      await createRequest(addBooking, {
+        params: { hotelId: hotelId },
+        body: {
+          date: "2025-04-29T00:00:00.000Z",
+          contactEmail: "user1@gmail.com",
+          contactName: "user1",
+          contactTel: "222-222-2222",
+          roomType: "room2",
+          price: 1000,
+          discount: 0,
+        },
+      });
+
+      expect((await User.findById(session._id)).experience).toBe(30);
+      expect((await User.findById(session._id)).point).toBe(300);
+
+      //delete hotel
+      await loginAdmin();
+      await createRequest(deleteHotel, {
+        params: { id: hotelId },
+      });
+    });
+  });
+
+  //------------------------------------------------------------------------------------------------------------------------
+  describe("(US2-2)Test tier upgrade based on user experience", () => {
     it("Upgrade to Bronze", async () => {
       const res = await createRequest(updateUser, {
-        experience: 10,
+        body: {
+          experience: 10,
+        },
       });
 
       expect(res.status).toBe(200);
@@ -319,7 +572,9 @@ describe("User", () => {
 
     it("Upgrade to Silver", async () => {
       const res = await createRequest(updateUser, {
-        experience: 70,
+        body: {
+          experience: 70,
+        },
       });
 
       expect(res.status).toBe(200);
@@ -329,7 +584,9 @@ describe("User", () => {
 
     it("Upgrade to Gold", async () => {
       const res = await createRequest(updateUser, {
-        experience: 300,
+        body: {
+          experience: 300,
+        },
       });
 
       expect(res.status).toBe(200);
@@ -339,7 +596,9 @@ describe("User", () => {
 
     it("Upgrade to Platinum", async () => {
       const res = await createRequest(updateUser, {
-        experience: 600,
+        body: {
+          experience: 600,
+        },
       });
 
       expect(res.status).toBe(200);
