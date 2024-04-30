@@ -627,7 +627,6 @@ describe("Coupon", () => {
         params: { couponType: "coupon2" },
       });
 
-      console.log(res.json);
       expect(res.status).toBe(200);
     });
 
