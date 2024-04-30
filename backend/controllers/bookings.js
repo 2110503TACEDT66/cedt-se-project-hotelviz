@@ -1,7 +1,7 @@
 const Booking = require("../models/Booking");
 const Bookinghistory = require("../models/Bookinghistory");
 const Hotel = require("../models/Hotel");
-const User = require('../models/User');
+const User = require("../models/User");
 
 //@desc Get all bookings
 //@route GET /api/v1/bookings
@@ -105,12 +105,12 @@ exports.addBooking = async (req, res, next) => {
 
   try {
     const booking = await Booking.create(req.body);
-  
+
     // Add points to the user after successful booking creation if role is "user"
-    if (req.user.role === 'user') {
+    if (req.user.role === "user") {
       // Add the price of the room type to the user's points
-      const pointsToAdd = parseInt(booking.price/10);
-      const exptoAdd = parseInt(booking.price/100)
+      const pointsToAdd = parseInt(booking.price / 10);
+      const exptoAdd = parseInt(booking.price / 100);
 
       // Find the user and update their points
       const user = await User.findById(req.user.id);
@@ -118,7 +118,7 @@ exports.addBooking = async (req, res, next) => {
       user.experience += exptoAdd;
       await user.save();
     }
-  
+
     res.status(201).json({
       success: true,
       data: booking,
@@ -130,9 +130,7 @@ exports.addBooking = async (req, res, next) => {
       message: "The requested body does not match the Booking model",
     });
   }
-  
-}
-
+};
 
 //@desc Update booking
 //@route PUT/api/v1/bookings/:id
@@ -243,7 +241,7 @@ exports.getBookingHistory = async (req, res, next) => {
     //console.log(error);
     return res
       .status(500)
-      .json({ success: false, message: "Cannot find Booking" });
+      .json({ success: false, message: "Cannot find Booking history" });
   }
 };
 
@@ -264,7 +262,7 @@ exports.addBookingHistory = async (req, res, next) => {
     //console.log(error);
     return res
       .status(500)
-      .json({ success: false, message: "Cannot create Booking" });
+      .json({ success: false, message: "Cannot create Booking history" });
   }
 
   try {
@@ -277,7 +275,7 @@ exports.addBookingHistory = async (req, res, next) => {
     //console.log(error.stack);
     return res.status(400).json({
       success: false,
-      message: "The requested body not match the Booking model",
+      message: "The requested body not match the Booking history model",
     });
   }
 };
@@ -291,7 +289,7 @@ exports.updateBookingHistory = async (req, res, next) => {
     if (!booking) {
       return res.status(404).json({
         success: false,
-        message: `No booking with the id of ${req.params.id}`,
+        message: `No booking history with the id of ${req.params.id}`,
       });
     }
 
@@ -299,18 +297,14 @@ exports.updateBookingHistory = async (req, res, next) => {
     if (booking.user.toString() !== req.user.id && req.user.role !== "admin") {
       return res.status(401).json({
         success: false,
-        message: `User ${req.user.id} is not authorized to update this booking`,
+        message: `User ${req.user.id} is not authorized to update this booking history`,
       });
     }
 
-    booking = await Bookinghistory.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
+    booking = await Bookinghistory.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
     res.status(200).json({
       success: true,
       data: booking,
@@ -319,6 +313,6 @@ exports.updateBookingHistory = async (req, res, next) => {
     //console.log(error);
     return res
       .status(500)
-      .json({ success: false, message: "Cannot update Booking" });
+      .json({ success: false, message: "Cannot update Booking history" });
   }
 };

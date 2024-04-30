@@ -24,9 +24,12 @@ const { protect, authorize } = require("../middleware/auth");
 *         - date
 *         - user
 *         - hotel
+*         - roomType
 *         - contactEmail
 *         - contactName
 *         - contactTel
+*         - price
+*         - discount
 *       properties:
 *         date:
 *           type: string
@@ -43,6 +46,10 @@ const { protect, authorize } = require("../middleware/auth");
 *           format: uuid
 *           description: ID of the booked hotel
 *           example: 660255d64df8343ec5dafe29
+*         roomType:
+*           type: string
+*           description: Room type booked
+*           example: Suite
 *         contactEmail:
 *           type: string
 *           format: email
@@ -61,14 +68,25 @@ const { protect, authorize } = require("../middleware/auth");
 *           format: date-time
 *           description: Date and time when the booking was created
 *           example: 2024-04-25T12:00:00Z
+*         price:
+*           type: number
+*           description: Booking price
+*           example: 4000
+*         discount:
+*           type: number
+*           description: Discount amount
+*           example: 200
 *       example:
 *         date: 2024-04-25
 *         user: 660255d64df8343ed9dafe35
 *         hotel: 660255d64df8343ed9dafe35
+*         roomType: Suite
 *         contactEmail: john@example.com
 *         contactName: John Doe
 *         contactTel: 123-456-7890
 *         createdAt: 2024-04-25T12:00:00Z
+*         price: 4000
+*         discount: 200
 */
 /**
 * @swagger
@@ -275,6 +293,18 @@ const { protect, authorize } = require("../middleware/auth");
 *                 type: string
 *                 description: Contact telephone number
 *                 example: 123-456-7890
+*               roomType:
+*                 type: string
+*                 description: Room type booked
+*                 example: Suite
+*               price:
+*                 type: number
+*                 description: Booking price
+*                 example: 4000
+*               discount:
+*                 type: number
+*                 description: Discount amount
+*                 example: 200
 *     responses:
 *       201:
 *         description: The booking was successfully created
@@ -329,6 +359,10 @@ const { protect, authorize } = require("../middleware/auth");
 *                 type: string
 *                 description: Contact telephone number
 *                 example: 123-456-7890
+*               roomType:
+*                 type: string
+*                 description: Room type booked
+*                 example: Suite
 *               createdAt:
 *                 type: string
 *                 format: date-time

@@ -227,7 +227,7 @@ describe("(US2-3)Coupon", () => {
       couponId = res.json.coupon;
 
       expect(res.status).toBe(201);
-      expect((await Coupon.findById(res.json.coupons[0])).owner.valueOf()).toBe(
+      expect((await Coupon.findById(res.json.coupon)).owner.valueOf()).toBe(
         session._id.valueOf()
       );
     });
@@ -251,7 +251,7 @@ describe("(US2-3)Coupon", () => {
       });
 
       expect(res.status).toBe(201);
-      expect((await Coupon.findById(res.json.coupons[0])).owner.valueOf()).toBe(
+      expect((await Coupon.findById(res.json.coupon)).owner.valueOf()).toBe(
         (await User.findOne({ name: "user1" })).id.valueOf()
       );
     });

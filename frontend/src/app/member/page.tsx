@@ -42,7 +42,6 @@ export default function Member() {
         const userInfoA:UserInformation = (await getUserProfile(session?.user.token)).data;
         const userCouponsData: CouponItem[] = (await getCouponsForUser(session?.user.token)).data;
         const CouponsRe: CouponSummaryItem[] = (await getCouponsRedeem(session?.user.token)).data;
-        // const userCoupons: CouponItem[] = userInfoA.coupons;
         console.log ;
         setUserInfo(userInfoA);
 

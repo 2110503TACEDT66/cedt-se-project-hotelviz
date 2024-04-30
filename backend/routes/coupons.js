@@ -320,7 +320,7 @@ const { semiprotect, protect, authorize } = require("../middleware/auth");
 */
 /**
 * @swagger
-* /coupons/redeem/{id}:
+* /coupons/redeem/{couponType}:
 *   post:
 *     summary: Buy one coupon
 *     tags: [Coupons]
@@ -329,11 +329,11 @@ const { semiprotect, protect, authorize } = require("../middleware/auth");
 *       Default user can only buy coupon for themself (No need to fill the request body)
 *     parameters:
 *       - in: path
-*         name: id
+*         name: couponType
 *         schema:
 *           type: string
 *         required: true
-*         description: The coupon id
+*         description: The coupon type
 *     requestBody:
 *       content:
 *         application/json:

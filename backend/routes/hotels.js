@@ -163,6 +163,7 @@ const { semiprotect, protect, authorize } = require("../middleware/auth");
 *           type: string
 *         required: true
 *         description: The hotel id
+*         example: 65df5083dc8452a715f007cd
 *     responses:
 *       200:
 *         description: The hotel description by id

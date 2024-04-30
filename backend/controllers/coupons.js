@@ -181,14 +181,14 @@ exports.redeemCoupon = async (req, res, next) => {
       owner: null,
       used: false,
     });
-
+    
     if (!coupon) {
       return res.status(404).json({
         success: false,
         message: `No unowned coupons found for type ${couponType}`,
       });
     }
-
+    
     // Check if the user's tier is eligible for the coupon (skip for admins)
     if (req.user.role !== "admin" && !coupon.tiers.includes(user.tier)) {
       return res.status(400).json({
@@ -207,18 +207,13 @@ exports.redeemCoupon = async (req, res, next) => {
         message: `The user with ID ${user.id} does not have enough point`,
       });
     }
-
+    
     coupon.owner = user.id;
     await coupon.save();
-
-    user.coupons.push(coupon._id);
-    await user.save();
     res.status(201).json({
       success: true,
       user: user._id,
       coupon: coupon._id,
-      count: user.coupons.length,
-      coupons: user.coupons,
     });
   } catch (error) {
     //console.log(error);

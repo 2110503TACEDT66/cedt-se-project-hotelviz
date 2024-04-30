@@ -28,7 +28,6 @@ export default function CouponSelected ({onSelectCoupon , onSelectCouponId }:{on
           if (session && userInfo._id === "") {
             const userInfoA:UserInformation = (await getUserProfile(session?.user.token)).data;
             const userCouponsData: CouponItem[] = (await getCoupons(session?.user.token,100,100)).data;
-            // const userCoupons: CouponItem[] = userInfoA.coupons;
             setUserInfo(userInfoA);
             setUserCoupons(userCouponsData);
           }
