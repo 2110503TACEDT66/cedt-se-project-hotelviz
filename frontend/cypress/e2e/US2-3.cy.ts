@@ -53,5 +53,6 @@ describe('template spec', () => {
     cy.get('[data-testid="Manage-Coupon"]').click()
     cy.get('[data-testid="Coupon"]').contains('DewCypress').click()
     cy.get('button[name="Delete Coupon"').click()
+    cy.wait(1000)
   })
 })
