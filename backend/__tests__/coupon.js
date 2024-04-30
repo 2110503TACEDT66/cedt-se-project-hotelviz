@@ -351,6 +351,7 @@ describe("Coupon", () => {
     });
   });
 
+  //------------------------------------------------------------------------------------------------------------------------
   describe("Update coupon", () => {
     it("should allow admin to update coupon and return status 200", async () => {
       await loginAdmin();
@@ -406,6 +407,7 @@ describe("Coupon", () => {
     });
   });
 
+  //------------------------------------------------------------------------------------------------------------------------
   describe("Update coupon by type", () => {
     it("should allow admin to update coupon type and return status 200", async () => {
       await loginAdmin();
@@ -468,6 +470,7 @@ describe("Coupon", () => {
     });
   });
 
+  //------------------------------------------------------------------------------------------------------------------------
   describe("Delete coupon", () => {
     it("should allow admin to delete coupon and return status 200", async () => {
       await loginAdmin();
@@ -508,6 +511,7 @@ describe("Coupon", () => {
     });
   });
 
+  //------------------------------------------------------------------------------------------------------------------------
   describe("Delete coupon by type", () => {
     it("should allow admin to delete coupon type and return status 200", async () => {
       await loginAdmin();
@@ -547,6 +551,7 @@ describe("Coupon", () => {
     });
   });
 
+  //------------------------------------------------------------------------------------------------------------------------
   describe("Get all coupon summary", () => {
     it("should get all coupon summary and return status 200", async () => {
       const res = await createRequest(getCouponSummary);
@@ -556,6 +561,7 @@ describe("Coupon", () => {
     });
   });
 
+  //------------------------------------------------------------------------------------------------------------------------
   describe("Get coupon summary by type", () => {
     it("should get single coupon summary and return status 200", async () => {
       const res = await createRequest(getSingleCouponSummary, {
