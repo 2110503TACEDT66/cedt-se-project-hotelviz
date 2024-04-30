@@ -7,17 +7,23 @@ const User = require("../models/User");
 //@access   Public
 exports.getHotels = async (req, res, next) => {
   let query;
-
   //Copy req.query
   const reqQuery = { ...req.query };
-  const toStringifyReq = {...reqQuery};
+  const toStringifyReq = { ...reqQuery };
   // console.log(req.queryPolluted.amenities);
   //Fields to exclude
-  const removeFields = ["select", "sort", "page", "limit","minPrice","maxPrice"];
-  if(req.queryPolluted.amenities) removeFields.push("amenities");
+  const removeFields = [
+    "select",
+    "sort",
+    "page",
+    "limit",
+    "minPrice",
+    "maxPrice",
+  ];
+  if (req.queryPolluted.amenities) removeFields.push("amenities");
   //Loop over remove fields and delete them from reqQuery
   removeFields.forEach((param) => delete toStringifyReq[param]);
-  
+
   //Create query string
   let queryStr = JSON.stringify(toStringifyReq);
   queryStr = queryStr.replace(
@@ -25,27 +31,27 @@ exports.getHotels = async (req, res, next) => {
     (match) => `$${match}`
   );
   queryObj = [JSON.parse(queryStr)];
-  if(reqQuery["minPrice"]&&reqQuery["maxPrice"]){
+  if (reqQuery["minPrice"] && reqQuery["maxPrice"]) {
     const maxPrice = reqQuery["maxPrice"];
     const minPrice = reqQuery["minPrice"];
     price_range_filter = {
-      "$or": [
-          {"minPrice": {"$lte": maxPrice, "$gte": minPrice}},
-          {"maxPrice": {"$lte": maxPrice, "$gte": minPrice}},
-      ]
-    }
+      $or: [
+        { minPrice: { $lte: maxPrice, $gte: minPrice } },
+        { maxPrice: { $lte: maxPrice, $gte: minPrice } },
+      ],
+    };
     queryObj.push(price_range_filter);
   }
-  if(req.queryPolluted.amenities){
+  if (req.queryPolluted.amenities) {
     const amenities = req.queryPolluted.amenities;
-    amenities.forEach(amenity => {
-      queryObj.push({"amenities":amenity});
+    amenities.forEach((amenity) => {
+      queryObj.push({ amenities: amenity });
     });
   }
   combined_query = {
-    "$and": queryObj
-  }
-  console.log(combined_query);
+    $and: queryObj,
+  };
+  //console.log(combined_query);
 
   //finding resource
   query = Hotel.find(combined_query);
@@ -71,37 +77,33 @@ exports.getHotels = async (req, res, next) => {
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
 
-  try {
-    const total = await Hotel.countDocuments();
-    query = query.skip(startIndex).limit(limit);
-    //Execute query
-    const hotels = await query;
+  const total = await Hotel.countDocuments();
+  query = query.skip(startIndex).limit(limit);
+  //Execute query
+  const hotels = await query;
 
-    //Pagination result
-    const pagination = {};
-    if (endIndex < total) {
-      pagination.next = {
-        page: page + 1,
-        limit,
-      };
-    }
-
-    if (startIndex > 0) {
-      pagination.prev = {
-        page: page - 1,
-        limit,
-      };
-    }
-    return res.status(200).json({
-      success: true,
-      count: hotels.length,
-      pagination,
-      data: hotels,
-      total: total,
-    });
-  } catch (err) {
-    res.status(400).json({ success: false });
+  //Pagination result
+  const pagination = {};
+  if (endIndex < total) {
+    pagination.next = {
+      page: page + 1,
+      limit,
+    };
   }
+
+  if (startIndex > 0) {
+    pagination.prev = {
+      page: page - 1,
+      limit,
+    };
+  }
+  return res.status(200).json({
+    success: true,
+    count: hotels.length,
+    pagination,
+    data: hotels,
+    total: total,
+  });
 };
 
 //@desc     Get single hotels
@@ -127,7 +129,7 @@ exports.createHotel = async (req, res, next) => {
     const hotel = await Hotel.create(req.body);
     res.status(201).json({ success: true, data: hotel });
   } catch (error) {
-    console.log(error.stack);
+    //console.log(error.stack);
     return res.status(400).json({
       success: false,
       message: "The requested body not match the Hotel model",
@@ -228,7 +230,6 @@ exports.getHotelsByPriceRange = async (req, res, next) => {
 //@route    Get /api/v1/hotels/random
 //@access   Public
 exports.getRandomHotel = async (req, res, next) => {
-
   const count = req.query.count;
 
   try {
@@ -241,4 +242,3 @@ exports.getRandomHotel = async (req, res, next) => {
     res.status(500).json({ success: false, error: err.message });
   }
 };
-

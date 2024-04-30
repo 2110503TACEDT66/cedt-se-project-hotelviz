@@ -36,15 +36,15 @@ const HotelSchema = new mongoose.Schema(
     },
     image: {
       type: String,
-      required: [true, "Please add an image"]
+      required: [true, "Please add an image"],
     },
     rating: {
       type: Number,
-      default: 0.0
+      default: 0.0,
     },
     ratingCount: {
       type: Number,
-      default: 0
+      default: 0,
     },
     amenities: [{ type: String }],
     roomType: [
@@ -55,12 +55,12 @@ const HotelSchema = new mongoose.Schema(
     ],
     minPrice: {
       type: Number,
-      default: 0.0
+      default: 0.0,
     },
     maxPrice: {
       type: Number,
-      default: 0.0
-    }
+      default: 0.0,
+    },
   },
   {
     toJSON: { virtuals: true },
