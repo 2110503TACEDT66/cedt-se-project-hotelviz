@@ -100,7 +100,7 @@ export default function CouponForm({
           className="bg-white"
           name="DatePicker"
           data-testid="expire-date"
-          defaultValue={coupon._id!=""?dayjs(coupon.expiredDate):dayjs(new Date())}
+          defaultValue={coupon._id!=""?dayjs(coupon.expiredDate):dayjs(Date.now())}
           value={date}
           onChange={(newValue) => {
             if (newValue) {
