@@ -35,7 +35,7 @@ export default function CouponForm({
   onNumberCouponChange: Function;
 }) {
 
-  const [date, setDate] = useState<Dayjs | null>(dayjs(coupon._id!=""?coupon.expiredDate:new Date()));
+  const [date, setDate] = useState<Dayjs | null>(dayjs(coupon._id!=""?coupon.expiredDate:Date.now()));
   
 
   {
@@ -46,11 +46,12 @@ export default function CouponForm({
       
     }, [coupon.tiers]);
     return (
-      <div className="bg-slate-100 rounded-lg space-y-5 w-full px-10 py-5 flex flex-col">
+      <div datatest-id="coupon-form" className="bg-slate-100 rounded-lg space-y-5 w-full px-10 py-5 flex flex-col">
         <div>Coupon Type</div>
 
         <TextField
           variant="outlined"
+          data-testid="name"
           name="name"
           label=""
           defaultValue={coupon._id}
@@ -63,6 +64,7 @@ export default function CouponForm({
         <div>Discount (Baht)</div>
         <TextField
           variant="outlined"
+          data-testid="discount"
           name="discount"
           label=""
           defaultValue={coupon._id!=""?coupon.discount:null}
@@ -75,6 +77,7 @@ export default function CouponForm({
         <div>Points</div>
         <TextField
           variant="outlined"
+          data-testid="point"
           name="point"
           label=""
           defaultValue={coupon._id!=""?coupon.point:null}
@@ -95,6 +98,8 @@ export default function CouponForm({
           }}
           slotProps={{ textField: { size: "medium" } }}
           className="bg-white"
+          name="DatePicker"
+          data-testid="expire-date"
           defaultValue={coupon._id!=""?dayjs(coupon.expiredDate):dayjs(new Date())}
           value={date}
           onChange={(newValue) => {
@@ -107,11 +112,12 @@ export default function CouponForm({
       </LocalizationProvider>
       
         {!coupon._id?
-<div >
+<div datatest-id="numcoupon-div">
 
         <div>Numbers of Coupon</div>
         <TextField
           variant="outlined"
+          data-testid="CouponNum"
           name="CouponNum"
           label=""
           defaultValue={null}
@@ -125,11 +131,12 @@ export default function CouponForm({
         }
 
 
-        <div>Tiers</div>
-        <FormControl>
+        <div datatest-id="Tiers-lable">Tiers</div>
+        <FormControl datatest-id="FormControl">
           <InputLabel>Tiers</InputLabel>
           <Select
             multiple
+            name="tier"
             value={selectedTiers}
             onChange={(e) => {
               const selected = e.target.value as string[];
