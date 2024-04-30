@@ -8,7 +8,7 @@ import getOneHotel from "@/libs/getOneHotel";
 import BookingForm from "@/components/BookingForm";
 import ConfirmBookingForm from "@/components/paymentComponents/ConfirmBookingForm";
 import dayjs, { Dayjs } from "dayjs";
-import CouponSelected from "@/components/paymentComponents/CouponSelected";
+import CouponSelected from "@/components/CouponSelected";
 
 export default function Payment({
   params,
