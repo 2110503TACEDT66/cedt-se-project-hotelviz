@@ -44,10 +44,11 @@ const { protect } = require("../middleware/auth");
 *           type: string
 *           description: User's tier
 *           enum:
-*             - none
-*             - platinum
-*             - gold
-*           default: none
+*             - Bronze
+*             - Silver
+*             - Gold
+*             - Platinum
+*           default: Bronze
 *         experience:
 *           type: number
 *           description: User's experience points
@@ -81,7 +82,7 @@ const { protect } = require("../middleware/auth");
 *         email: john@example.com
 *         role: user
 *         password: password123
-*         tier: none
+*         tier: Bronze
 *         experience: 100
 *         point: 50
 *         coupons: []

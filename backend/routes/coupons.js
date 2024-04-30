@@ -41,7 +41,7 @@ const { semiprotect, protect, authorize } = require("../middleware/auth");
 *           description: Tiers eligible for the coupon
 *           items:
 *             type: string
-*           example: ["platinum", "gold"]
+*           example: ["Platinum", "Gold"]
 *         point:
 *           type: number
 *           description: Required points for the coupon
@@ -68,7 +68,7 @@ const { semiprotect, protect, authorize } = require("../middleware/auth");
 *       example:
 *         type: NewYearDiscount
 *         discount: 200
-*         tiers: ["platinum", "gold"]
+*         tiers: ["Platinum", "Gold"]
 *         point: 100
 *         owner: 660255d64df8343ed9dafe35
 *         used: false
@@ -196,7 +196,7 @@ const { semiprotect, protect, authorize } = require("../middleware/auth");
 *                 description: Tiers eligible for the coupon
 *                 items:
 *                   type: string
-*                 example: ["platinum", "gold"]
+*                 example: ["Platinum", "Gold"]
 *               point:
 *                 type: number
 *                 description: Required points for the coupon

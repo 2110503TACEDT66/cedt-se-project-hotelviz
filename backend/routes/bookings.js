@@ -119,19 +119,9 @@ const { protect, authorize } = require("../middleware/auth");
 *           description: ID of the booked hotel
 *           example: 660255d64df8343ed9dafe35
 *         roomType:
-*           type: array
-*           description: List of room types booked
-*           items:
-*             type: object
-*             properties:
-*               key:
-*                 type: string
-*                 description: Room type keyword
-*                 example: standard
-*               price:
-*                 type: number
-*                 description: Price of the room type
-*                 example: 100.0
+*           type: string
+*           description: Room type booked
+*           example: Suite
 *         contactEmail:
 *           type: string
 *           format: email
