@@ -106,7 +106,7 @@ export default async function TopMenu() {
               href="/api/auth/signin?callbackUrl=%2F"
             >
               <LoginIcon />
-              <div className="underline text-lg font-sans font-semibold whitespace-nowrap">
+              <div data-testid="Sign-In" className="underline text-lg font-sans font-semibold whitespace-nowrap">
                 Sign-In
               </div>
             </Link>
