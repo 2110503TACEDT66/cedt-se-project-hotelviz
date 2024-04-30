@@ -326,113 +326,66 @@ exports.updateCouponsByType = async (req, res, next) => {
 //@route GET /api/v1/coupons/summary
 //@access Private
 exports.getCouponSummary = async (req, res, next) => {
-  try {
-    const couponSummary = await Coupon.aggregate([
-      {
-        $group: {
-          _id: "$type",
-          count: { $sum: 1 },
-          usedCount: { $sum: { $cond: [{ $eq: ["$used", true] }, 1, 0] } },
-          unusedCount: { $sum: { $cond: [{ $eq: ["$used", false] }, 1, 0] } },
-          ownedCount: { $sum: { $cond: [{ $ne: ["$owner", null] }, 1, 0] } },
-          createdAt: { $first: "$createdAt" },
-          expiredDate: { $first: "$expiredDate" },
-          discount: { $first: "$discount" },
-          tiers: { $first: "$tiers" },
-          point: { $first: "$point" },
-        },
+  const couponSummary = await Coupon.aggregate([
+    {
+      $group: {
+        _id: "$type",
+        count: { $sum: 1 },
+        usedCount: { $sum: { $cond: [{ $eq: ["$used", true] }, 1, 0] } },
+        unusedCount: { $sum: { $cond: [{ $eq: ["$used", false] }, 1, 0] } },
+        ownedCount: { $sum: { $cond: [{ $ne: ["$owner", null] }, 1, 0] } },
+        unownedCount: { $sum: { $cond: [{ $eq: ["$owner", null] }, 1, 0] } },
+        createdAt: { $first: "$createdAt" },
+        expiredDate: { $first: "$expiredDate" },
+        discount: { $first: "$discount" },
+        tiers: { $first: "$tiers" },
+        point: { $first: "$point" },
       },
-    ]);
-    res.status(200).json({
-      success: true,
-      data: couponSummary,
-    });
-  } catch (error) {
-    //console.log(error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Cannot get coupon summary" });
-  }
-};
-
-//@desc Get coupon summary
-//@route GET /api/v1/coupons/summary
-//@access Private
-exports.getCouponSummary = async (req, res, next) => {
-  try {
-    const couponSummary = await Coupon.aggregate([
-      {
-        $group: {
-          _id: "$type",
-          count: { $sum: 1 },
-          usedCount: { $sum: { $cond: [{ $eq: ["$used", true] }, 1, 0] } },
-          unusedCount: { $sum: { $cond: [{ $eq: ["$used", false] }, 1, 0] } },
-          ownedCount: { $sum: { $cond: [{ $ne: ["$owner", null] }, 1, 0] } },
-          unownedCount: { $sum: { $cond: [{ $eq: ["$owner", null] }, 1, 0] } },
-          createdAt: { $first: "$createdAt" },
-          expiredDate: { $first: "$expiredDate" },
-          discount: { $first: "$discount" },
-          tiers: { $first: "$tiers" },
-          point: { $first: "$point" },
-        },
-      },
-    ]);
-    res.status(200).json({
-      success: true,
-      data: couponSummary,
-    });
-  } catch (error) {
-    //console.log(error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Cannot get coupon summary" });
-  }
+    },
+  ]);
+  res.status(200).json({
+    success: true,
+    data: couponSummary,
+  });
 };
 
 //@desc Get summary for a single coupon type
 //@route GET /api/v1/coupons/:couponType
 //@access Private
 exports.getSingleCouponSummary = async (req, res, next) => {
-  try {
-    const couponType = req.params.couponType;
+  const couponType = req.params.couponType;
 
-    // Aggregate data for the coupon type
-    const couponSummary = await Coupon.aggregate([
-      {
-        $match: { type: couponType },
+  // Aggregate data for the coupon type
+  const couponSummary = await Coupon.aggregate([
+    {
+      $match: { type: couponType },
+    },
+    {
+      $group: {
+        _id: "$type",
+        count: { $sum: 1 },
+        usedCount: { $sum: { $cond: [{ $eq: ["$used", true] }, 1, 0] } },
+        unusedCount: { $sum: { $cond: [{ $eq: ["$used", false] }, 1, 0] } },
+        ownedCount: { $sum: { $cond: [{ $ne: ["$owner", null] }, 1, 0] } },
+        unownedCount: { $sum: { $cond: [{ $eq: ["$owner", null] }, 1, 0] } },
+        createdAt: { $first: "$createdAt" },
+        expiredDate: { $first: "$expiredDate" },
+        discount: { $first: "$discount" },
+        tiers: { $first: "$tiers" },
+        point: { $first: "$point" },
       },
-      {
-        $group: {
-          _id: "$type",
-          count: { $sum: 1 },
-          usedCount: { $sum: { $cond: [{ $eq: ["$used", true] }, 1, 0] } },
-          unusedCount: { $sum: { $cond: [{ $eq: ["$used", false] }, 1, 0] } },
-          ownedCount: { $sum: { $cond: [{ $ne: ["$owner", null] }, 1, 0] } },
-          unownedCount: { $sum: { $cond: [{ $eq: ["$owner", null] }, 1, 0] } },
-          createdAt: { $first: "$createdAt" },
-          expiredDate: { $first: "$expiredDate" },
-          discount: { $first: "$discount" },
-          tiers: { $first: "$tiers" },
-          point: { $first: "$point" },
-        },
-      },
-    ]);
+    },
+  ]);
 
-    if (couponSummary.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: `No coupons found with type ${couponType}`,
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: couponSummary[0],
+  if (couponSummary.length === 0) {
+    return res.status(404).json({
+      success: false,
+      message: `No coupons found with type ${couponType}`,
     });
-  } catch (error) {
-    //console.log(error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Cannot get coupon summary" });
   }
+
+  res.status(200).json({
+    success: true,
+    data: couponSummary[0],
+  });
 };

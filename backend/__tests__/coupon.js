@@ -8,6 +8,10 @@ const {
   updateCoupon,
   redeemCoupon,
   deleteCoupon,
+  deleteCouponsByType,
+  updateCouponsByType,
+  getCouponSummary,
+  getSingleCouponSummary,
 } = require("../controllers/coupons");
 const { login, register, updateUser } = require("../controllers/auth");
 const User = require("../models/User");
@@ -307,7 +311,7 @@ describe("Coupon", () => {
 
       await createRequest(addCoupon, {
         body: {
-          numberOfCoupons: 4,
+          numberOfCoupons: 1,
           type: "coupon3",
           discount: 20,
           tiers: ["Gold", "Platinum"],
@@ -322,6 +326,33 @@ describe("Coupon", () => {
 
       expect(res.status).toBe(400);
     });
+
+    it("should prevent user without enough point from redeeming coupon and return status 400", async () => {
+      await createRequest(addCoupon, {
+        body: {
+          numberOfCoupons: 1,
+          type: "coupon4",
+          discount: 20,
+          tiers: ["Bronze", "Gold", "Platinum"],
+          point: 99999999,
+          expiredDate: "2025-04-29T00:00:00.000Z",
+        },
+      });
+
+      const res = await createRequest(redeemCoupon, {
+        params: { couponType: "coupon4" },
+      });
+
+      expect(res.status).toBe(400);
+    });
+
+    it("should prevent user from redeeming coupon with incorrect coupon type format and return status 500", async () => {
+      const res = await createRequest(redeemCoupon, {
+        params: { couponType: { fake: "rfdsdg" } },
+      });
+
+      expect(res.status).toBe(500);
+    });
   });
 
   describe("Update coupon", () => {
@@ -335,7 +366,7 @@ describe("Coupon", () => {
           },
         })
       ).json;
-      
+
       const res = await createRequest(updateCoupon, {
         params: { id: couponId },
         body: { discount: 40 },
@@ -391,6 +422,85 @@ describe("Coupon", () => {
       expect(res.status).toBe(401);
     });
   });
+
+  describe("Update coupon by type", () => {
+    it("should allow admin to update coupon type and return status 200", async () => {
+      //login admin
+      session = (
+        await createRequest(login, {
+          body: {
+            email: "admin@gmail.com",
+            password: "password123",
+          },
+        })
+      ).json;
+
+      const res = await createRequest(updateCouponsByType, {
+        params: { couponType: "coupon2" },
+        body: { discount: 60 },
+      });
+
+      expect(res.status).toBe(200);
+      expect((await Coupon.findOne({ type: "coupon2" })).discount).toBe(60);
+    });
+
+    it("should allow admin to change coupon type name and return status 200", async () => {
+      const res = await createRequest(updateCouponsByType, {
+        params: { couponType: "coupon4" },
+        body: { type: "coupon5" },
+      });
+
+      expect(res.status).toBe(200);
+      expect(await Coupon.findOne({ type: "coupon5" })).not.toBe(null);
+    });
+
+    it("should prevent admin from changing coupon type name to be duplicate and return status 400", async () => {
+      const res = await createRequest(updateCouponsByType, {
+        params: { couponType: "coupon2" },
+        body: { type: "coupon5" },
+      });
+
+      expect(res.status).toBe(400);
+    });
+
+    it("should prevent admin from updating invalid coupon type and return status 404", async () => {
+      const res = await createRequest(updateCouponsByType, {
+        params: { couponType: "coupon0" },
+        body: { discount: 20 },
+      });
+
+      expect(res.status).toBe(404);
+    });
+
+    it("should prevent admin from updating coupon with incorrect coupon type format and return status 500", async () => {
+      const res = await createRequest(updateCouponsByType, {
+        params: { couponType: "coupon0" },
+        body: { discount: { kesg: "gsfd" } },
+      });
+
+      expect(res.status).toBe(500);
+    });
+
+    it("should prevent user from updating coupon type and return status 401", async () => {
+      //login user
+      session = (
+        await createRequest(login, {
+          body: {
+            email: "user1@gmail.com",
+            password: "password123",
+          },
+        })
+      ).json;
+
+      const res = await createRequest(updateCouponsByType, {
+        params: { couponType: "coupon2" },
+        body: { discount: 0 },
+      });
+
+      expect(res.status).toBe(401);
+    });
+  });
+
   describe("Delete coupon", () => {
     it("should allow admin to delete coupon and return status 200", async () => {
       //login admin
@@ -443,6 +553,88 @@ describe("Coupon", () => {
       });
 
       expect(res.status).toBe(401);
+    });
+  });
+
+  describe("Delete coupon by type", () => {
+    it("should allow admin to delete coupon type and return status 200", async () => {
+      //login admin
+      session = (
+        await createRequest(login, {
+          body: {
+            email: "admin@gmail.com",
+            password: "password123",
+          },
+        })
+      ).json;
+
+      const res = await createRequest(deleteCouponsByType, {
+        params: { couponType: "coupon3" },
+      });
+
+      expect(res.status).toBe(200);
+      expect(await Coupon.findOne({ type: "coupon3" })).toBe(null);
+    });
+
+    it("should prevent admin from deleting invalid coupon type and return status 404", async () => {
+      const res = await createRequest(deleteCouponsByType, {
+        params: { couponType: "coupon3" },
+      });
+
+      expect(res.status).toBe(404);
+    });
+
+    it("should prevent admin from deleting incorrect coupon type format and return status 500", async () => {
+      const res = await createRequest(deleteCouponsByType, {
+        params: { couponType: { fake: "dfgdf" } },
+      });
+
+      expect(res.status).toBe(500);
+    });
+
+    it("should prevent user from deleting coupon type and return status 401", async () => {
+      //login admin
+      session = (
+        await createRequest(login, {
+          body: {
+            email: "user1@gmail.com",
+            password: "password123",
+          },
+        })
+      ).json;
+
+      const res = await createRequest(deleteCouponsByType, {
+        params: { couponType: "coupon5" },
+      });
+
+      expect(res.status).toBe(401);
+    });
+  });
+
+  describe("Get all coupon summary", () => {
+    it("should get all coupon summary and return status 200", async () => {
+      const res = await createRequest(getCouponSummary);
+
+      expect(res.status).toBe(200);
+    });
+  });
+
+  describe("Get coupon summary by type", () => {
+    it("should get single coupon summary and return status 200", async () => {
+      const res = await createRequest(getSingleCouponSummary, {
+        params: { couponType: "coupon2" },
+      });
+
+      console.log(res.json);
+      expect(res.status).toBe(200);
+    });
+
+    it("should prevent from getting single coupon summary with invalid coupon type and return status 404", async () => {
+      const res = await createRequest(getSingleCouponSummary, {
+        params: { couponType: "coupon0" },
+      });
+
+      expect(res.status).toBe(404);
     });
   });
 });
