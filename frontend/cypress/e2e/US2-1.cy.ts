@@ -34,7 +34,7 @@ describe('select tier to get discounts', () => {
     cy.get(':nth-child(1) > .MuiButtonBase-root > .PrivateSwitchBase-input').click()
     cy.wait(5000)
     //BookNow
-    cy.get('.justify-between > :nth-child(2) > :nth-child(1) > .flex > .text-3xl').should('have.text', '1800 THB')
+    cy.get('.justify-between > :nth-child(2) > :nth-child(1) > .flex > .text-3xl').should('have.text', '1800.00 THB')
 
   })
 
@@ -79,7 +79,7 @@ describe('select coupon to get discounts', () => {
     cy.log("click")
     cy.wait(5000)
     //BookNow
-    cy.get('.justify-between > :nth-child(2) > :nth-child(1) > .flex > .text-3xl').should('have.text', '1080 THB')
+    cy.get('.justify-between > :nth-child(2) > :nth-child(1) > .flex > .text-3xl').should('have.text', '1080.00 THB')
 
   })
 
