@@ -118,7 +118,7 @@ exports.updateUser = async (req, res, next) => {
       new: true,
       runValidators: true,
     });
-
+    
     if (!user) {
       return res.status(400).json({ success: false });
     }
