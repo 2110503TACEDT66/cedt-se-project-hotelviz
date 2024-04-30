@@ -146,6 +146,7 @@ describe("User", () => {
 
       expect(res.status).toBe(200);
       expect(res.json.email).toBe("user1@gmail.com");
+      expect(session.email).toBe("user1@gmail.com")
     });
 
     it("should prevent user from login with incorrect request body and return status 400", async () => {
@@ -193,6 +194,14 @@ describe("User", () => {
       });
 
       expect(res.status).toBe(200);
+
+      //login with new password
+      const res2 = await createRequest(login, {
+        email: "user1@gmail.com",
+        password: "newpassword",
+      });
+
+      expect(res2.status).toBe(200);
     });
 
     it("should prevent from set new password with incorrect current password and return status 401", async () => {
@@ -235,6 +244,7 @@ describe("User", () => {
 
       expect(res.status).toBe(200);
       expect(res.json.data.tel).toBe("000-000-0000");
+      expect((await User.findById(session._id)).tel).toBe("000-000-0000")
     });
 
     it("should prevent user from update without logged-in and return status 400", async () => {
@@ -264,7 +274,6 @@ describe("User", () => {
       });
 
       expect(res.status).toBe(200);
-      session._id = null;
     });
 
     it("should prevent user from delete without logged-in and return status 400", async () => {
@@ -275,12 +284,10 @@ describe("User", () => {
       expect(res.status).toBe(500);
 
       // login another account
-      const res2 = await createRequest(login, {
+      session = (await createRequest(login, {
         email: "admin@gmail.com",
         password: "password123",
-      });
-
-      session._id = res2.json._id;
+      })).json;
     });
 
     it("should prevent from delete user without password and return status 400", async () => {
@@ -307,6 +314,7 @@ describe("User", () => {
 
       expect(res.status).toBe(200);
       expect(res.json.data.tier).toBe("Bronze");
+      expect((await User.findById(session._id)).tier).toBe("Bronze");
     });
 
     it("Upgrade to Silver", async () => {
@@ -316,6 +324,7 @@ describe("User", () => {
 
       expect(res.status).toBe(200);
       expect(res.json.data.tier).toBe("Silver");
+      expect((await User.findById(session._id)).tier).toBe("Silver");
     });
 
     it("Upgrade to Gold", async () => {
@@ -325,6 +334,7 @@ describe("User", () => {
 
       expect(res.status).toBe(200);
       expect(res.json.data.tier).toBe("Gold");
+      expect((await User.findById(session._id)).tier).toBe("Gold");
     });
 
     it("Upgrade to Platinum", async () => {
@@ -334,15 +344,17 @@ describe("User", () => {
 
       expect(res.status).toBe(200);
       expect(res.json.data.tier).toBe("Platinum");
+      expect((await User.findById(session._id)).tier).toBe("Platinum");
     });
   });
+
   //------------------------------------------------------------------------------------------------------------------------
   describe("Get Me", () => {
     it("should get user data with token", async () => {
       const res = await createRequest(getMe);
 
       expect(res.status).toBe(200);
-      expect(res.json.data).not.toBe(null);
+      expect(res.json.data.email).toBe(session.email);
     });
 
     it("should prevent from getting user data without token", async () => {
