@@ -16,9 +16,9 @@ describe('Redeem coupon test', () => {
     // })
 
     cy.get(':nth-child(1) > .justify-between > .flex-col > .flex > .bg-gradient-to-r').click()
-    // cy.get('.px-28 > :nth-child(3)')
-    //   .children().find('.text-2xl')
-    //   .should('contain', elementText)
+    cy.get('.px-28 > :nth-child(3)')
+      .children().find('.text-2xl')
+      .should('contain', "DewandKongkongandBook")
   })
 
 
