@@ -19,6 +19,8 @@ let session = {
   role: null,
 };
 
+let hotelId = null;
+
 class Response {
   constructor() {
     this.statusCode = 200;
@@ -492,72 +494,7 @@ describe("User", () => {
   });
 
   //------------------------------------------------------------------------------------------------------------------------
-  describe("(US2-2)Test experience earning each booking and (US2-3)points earning each booking", () => {
-    it("should create coupon model successfully", async () => {
-      //create hotel
-      await loginAdmin();
-      let hotelId = (
-        await createRequest(createHotel, {
-          body: {
-            name: "hotel2",
-            address: "address2",
-            district: "district2",
-            province: "province2",
-            postalcode: "22222",
-            tel: "222-222-2222",
-            region: "region2",
-            image: "https://drive.google.com/uc?id=imageLink",
-          },
-        })
-      ).json.data.id;
-
-      await loginUser();
-      expect((await User.findById(session._id)).experience).toBe(0);
-      expect((await User.findById(session._id)).point).toBe(0);
-
-      //add booking
-      await createRequest(addBooking, {
-        params: { hotelId: hotelId },
-        body: {
-          date: "2025-04-29T00:00:00.000Z",
-          contactEmail: "user1@gmail.com",
-          contactName: "user1",
-          contactTel: "222-222-2222",
-          roomType: "room1",
-          price: 2000,
-          discount: 0,
-        },
-      });
-      expect((await User.findById(session._id)).experience).toBe(20);
-      expect((await User.findById(session._id)).point).toBe(200);
-
-      //add booking 2
-      await createRequest(addBooking, {
-        params: { hotelId: hotelId },
-        body: {
-          date: "2025-04-29T00:00:00.000Z",
-          contactEmail: "user1@gmail.com",
-          contactName: "user1",
-          contactTel: "222-222-2222",
-          roomType: "room2",
-          price: 1000,
-          discount: 0,
-        },
-      });
-
-      expect((await User.findById(session._id)).experience).toBe(30);
-      expect((await User.findById(session._id)).point).toBe(300);
-
-      //delete hotel
-      await loginAdmin();
-      await createRequest(deleteHotel, {
-        params: { id: hotelId },
-      });
-    });
-  });
-
-  //------------------------------------------------------------------------------------------------------------------------
-  describe("(US2-2)Test tier upgrade based on user experience", () => {
+  describe("Test tier upgrade based on user experience", () => {
     it("Upgrade to Bronze", async () => {
       const res = await createRequest(updateUser, {
         body: {
@@ -621,6 +558,173 @@ describe("User", () => {
       const res = await createRequest(getMe);
 
       expect(res.status).toBe(400);
+    });
+  });
+
+  //------------------------------------------------------------------------------------------------------------------------
+  describe("(US2-2)Test experience earning each booking", () => {
+    it("(TC1)member is logged in and have enough point from booking to upgrade tier", async () => {
+      //create hotel
+      await loginAdmin();
+      hotelId = (
+        await createRequest(createHotel, {
+          body: {
+            name: "hotel2",
+            address: "address2",
+            district: "district2",
+            province: "province2",
+            postalcode: "22222",
+            tel: "222-222-2222",
+            region: "region2",
+            image: "https://drive.google.com/uc?id=imageLink",
+          },
+        })
+      ).json.data.id;
+
+      await loginUser();
+      let user = await User.findById(session._id);
+
+      // reset experience
+      await createRequest(updateUser, {
+        body: {
+          experience: 0,
+        },
+      });
+      expect(user.tier).toBe("Bronze");
+
+      //add booking
+      await createRequest(addBooking, {
+        params: { hotelId: hotelId },
+        body: {
+          date: "2025-04-29T00:00:00.000Z",
+          contactEmail: "user1@gmail.com",
+          contactName: "user1",
+          contactTel: "222-222-2222",
+          roomType: "room1",
+          price: 5000,
+          discount: 0,
+        },
+      });
+
+      user = await User.findById(session._id);
+      expect(user.tier).toBe("Silver");
+    });
+
+    it("(TC2)member is logged in but does not make bookin to upgrade tier", async () => {
+      await loginUser();
+      let user = await User.findById(session._id);
+      expect(user.tier).toBe("Silver");
+
+      user = await User.findById(session._id);
+      expect(user.tier).toBe("Silver");
+    });
+
+    it("(TC3)member is logged in but does not have enough point from booking to upgrade tier", async () => {
+      await loginUser();
+      let user = await User.findById(session._id);
+      expect(user.tier).toBe("Silver");
+
+      //add booking
+      await createRequest(addBooking, {
+        params: { hotelId: hotelId },
+        body: {
+          date: "2025-04-29T00:00:00.000Z",
+          contactEmail: "user1@gmail.com",
+          contactName: "user1",
+          contactTel: "222-222-2222",
+          roomType: "room1",
+          price: 5000,
+          discount: 0,
+        },
+      });
+
+      user = await User.findById(session._id);
+      expect(user.tier).toBe("Silver");
+    });
+
+    it("(TC4)member does not logged in but make booking (will not upgrade tier)", async () => {
+      let user = await User.findById(session._id);
+      session._id = null;
+
+      expect(user.tier).toBe("Silver");
+      //add booking
+      let res = await createRequest(addBooking, {
+        params: { hotelId: hotelId },
+        body: {
+          date: "2025-04-29T00:00:00.000Z",
+          contactEmail: "user1@gmail.com",
+          contactName: "user1",
+          contactTel: "222-222-2222",
+          roomType: "room1",
+          price: 5000,
+          discount: 0,
+        },
+      });
+      expect(res.status).toBe(400);
+      expect(user.tier).toBe("Silver");
+    });
+  });
+
+  //------------------------------------------------------------------------------------------------------------------------
+  describe("(US2-3)Test points earning each booking", () => {
+    it("(TC1)member is logged in and earning points from booking", async () => {
+      await loginUser();
+      let user = await User.findById(session._id);
+      expect(user.point).toBe(1000);
+
+      //add booking
+      await createRequest(addBooking, {
+        params: { hotelId: hotelId },
+        body: {
+          date: "2025-04-29T00:00:00.000Z",
+          contactEmail: "user1@gmail.com",
+          contactName: "user1",
+          contactTel: "222-222-2222",
+          roomType: "room1",
+          price: 5000,
+          discount: 0,
+        },
+      });
+
+      user = await User.findById(session._id);
+      expect(user.point).toBe(1500);
+    });
+
+    it("(TC2)member is logged in but does not make booking to earn points", async () => {
+      await loginUser();
+      let user = await User.findById(session._id);
+      expect(user.point).toBe(1500);
+
+      user = await User.findById(session._id);
+      expect(user.point).toBe(1500);
+    });
+
+    it("(TC3)member does not logged in but make booking (will not earn points)", async () => {
+      let user = await User.findById(session._id);
+      session._id = null;
+
+      expect(user.point).toBe(1500);
+      //add booking
+      let res = await createRequest(addBooking, {
+        params: { hotelId: hotelId },
+        body: {
+          date: "2025-04-29T00:00:00.000Z",
+          contactEmail: "user1@gmail.com",
+          contactName: "user1",
+          contactTel: "222-222-2222",
+          roomType: "room1",
+          price: 5000,
+          discount: 0,
+        },
+      });
+      expect(res.status).toBe(400);
+      expect(user.point).toBe(1500);
+
+      //delete hotel
+      await loginAdmin();
+      await createRequest(deleteHotel, {
+        params: { id: hotelId },
+      });
     });
   });
 });

@@ -99,7 +99,7 @@ async function loginAdmin() {
   ).json;
 }
 
-describe("(US2-3)Coupon", () => {
+describe("Coupon", () => {
   beforeAll(async () => {
     dotenv.config({ path: "./config/config.env" });
     mongoose.set("strictQuery", true);
